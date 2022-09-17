@@ -4,6 +4,31 @@
   
   
   <entry>
+    <title>Win11中WSL2搭配ubuntu使用笔记</title>
+    <link href="/2022/09/17/Win11%E4%B8%ADWSL2%E6%90%AD%E9%85%8Dubuntu%E4%BD%BF%E7%94%A8%E7%AC%94%E8%AE%B0/"/>
+    <url>/2022/09/17/Win11%E4%B8%ADWSL2%E6%90%AD%E9%85%8Dubuntu%E4%BD%BF%E7%94%A8%E7%AC%94%E8%AE%B0/</url>
+    
+    <content type="html"><![CDATA[<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>在surface go 3上基于WSL2装了一个ubuntu玩玩，记录下相关信息</p><h1 id="安装步骤"><a href="#安装步骤" class="headerlink" title="安装步骤"></a>安装步骤</h1><p><a href="https://ubuntu.com/tutorials/install-ubuntu-on-wsl2-on-windows-11-with-gui-support#1-overview">Install Ubuntu on WSL2 on Windows 11 with GUI support | Ubuntu</a></p><h2 id="WSL命令"><a href="#WSL命令" class="headerlink" title="WSL命令"></a>WSL命令</h2><ul><li>cmd键入以下命令以查看所有正在运行的WSL，然后按Enter：</li></ul><p><code>wsl --list --verbose</code></p><ul><li>cmd关闭所有的后台的linux虚拟机</li></ul><p><code>wsl --shutdown</code></p><ul><li>重新启动linux虚拟机</li></ul><p>如果需要重新启动Linux发行版，只需从开始菜单或使用<code>wsl --distribution DISTRO-NAME</code>命令在命令提示符下再次将其打开。请记住将DISTRO-NAME替换为发行版的实际名称。</p><h1 id="命令"><a href="#命令" class="headerlink" title="命令"></a>命令</h1><h2 id="基本命令"><a href="#基本命令" class="headerlink" title="基本命令"></a>基本命令</h2><ul><li>系统升级</li></ul><p><code>sudo apt update</code></p><p><code>sudo apt full-upgrade</code></p><ul><li>文件传输（图形化界面）</li></ul><p><code>explorer.exe .</code></p><ul><li>查看Linux内核版本命令</li></ul><p><code>cat /proc/version</code></p><ul><li>查看Linux系统版本</li></ul><p><code>cat /etc/issue</code></p><h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><p><a href="https://ubuntu.com/tutorials/install-ubuntu-on-wsl2-on-windows-11-with-gui-support#1-overview">Install Ubuntu on WSL2 on Windows 11 with GUI support | Ubuntu</a></p><p><a href="https://zhuanlan.zhihu.com/p/351880793">只需一条命令，快速在Windows 10上关闭Linux - 知乎 (zhihu.com)</a></p>]]></content>
+    
+    
+    <categories>
+      
+      <category>linux</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>ubuntu</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>人生的智慧</title>
     <link href="/2022/09/11/%E4%BA%BA%E7%94%9F%E7%9A%84%E6%99%BA%E6%85%A7/"/>
     <url>/2022/09/11/%E4%BA%BA%E7%94%9F%E7%9A%84%E6%99%BA%E6%85%A7/</url>
