@@ -191,3 +191,5 @@ hexo help             # 帮助
 [使用 Hexo+GitHub 搭建个人免费博客教程（小白向） - 知乎 (zhihu.com)](https://zhuanlan.zhihu.com/p/60578464)
 
 [在Hexo中使用本地图片 - 个人学习 (idealx.cn)](https://www.idealx.cn/post/Hexo/hexo-asset-image/)
+
+[fluid-dev/hexo-theme-fluid: 一款 Material Design 风格的 Hexo 主题 / An elegant Material-Design theme for Hexo (github.com)](https://github.com/fluid-dev/hexo-theme-fluid)
