@@ -7,13 +7,13 @@ tags:
 - 博客搭建
 ---
 
-# 1 前言
+# 前言
 
 周末参照网上教程基于GitHub和Hexo搭建个人博客，中间踩了不少的坑花了很多时间，所以将他人教程转载过来并加上一些修订内容记录下来。
 
-# 2 步骤
+# 步骤
 
-## 2.1 安装Node.js和Git
+## 安装Node.js和Git
 
 - Node.js：[https://nodejs.org/zh-cn](https://link.zhihu.com/?target=https%3A//nodejs.org/zh-cn)
 - Git：[https://git-scm.com/downloads](https://link.zhihu.com/?target=https%3A//git-scm.com/downloads)
@@ -22,7 +22,7 @@ tags:
 
 ![](./基于GitHub和Hexo搭建博客/组件版本.png)
 
-## 2.2 连接 Github
+## 连接 Github
 
 使用邮箱注册 [GitHub](https://link.zhihu.com/?target=https%3A//github.com/) 账户，选择免费账户（Free），并完成邮件验证。
 
@@ -49,7 +49,7 @@ Title 随便取个名字，粘贴复制的 id_rsa.pub 内容到 Key 中，点击
 
 打开 Git Bash，输入 `ssh -T git@github.com` 出现 “Are you sure……”，输入 yes 回车确认。显示 “Hi xxx! You've successfully……” 即连接成功。如果没有出现“Hi xxx! You've successfully……”字样，可以再次输入 `ssh -T git@github.com`尝试。
 
-## 2.3 创建 Github Pages 仓库
+## 创建 Github Pages 仓库
 
 GitHub 主页右上角加号 -> New repository：
 
@@ -61,7 +61,7 @@ GitHub 主页右上角加号 -> New repository：
 
 创建后默认自动启用 HTTPS，博客地址为：`https://用户名.github.io`
 
-## 2.4 本地安装 Hexo 博客程序
+## 本地安装 Hexo 博客程序
 
 新建一个文件夹用来存放 Hexo 的程序文件，如 hexoblog。打开该文件夹，右键 -> Git Bash Here。
 
@@ -87,7 +87,7 @@ hexo s   # 启动预览
 
 **访问** `http://localhost:4000`**，出现 Hexo 默认页面，本地博客安装成功！**
 
-## 2.5 部署 Hexo 到 GitHub Pages
+## 部署 Hexo 到 GitHub Pages
 
 本地博客测试成功后就是上传到 GitHub 进行部署，使其能够在网络上访问。
 
@@ -110,7 +110,7 @@ deploy:
 
 完成！这时访问我们的 GitHub 域名 `https://用户名.github.io` 就可以看到 Hexo 网站了。
 
-## 2.6 博客图片问题处理
+## 博客图片问题处理
 
 本人采用开源软件MarkText软件进行本地博客编辑，该软件可以在GitHub下载。需要在本地编辑博客和上传部署后的博客上都正常阅览图片，需要安装一些插件来实现该需求，具体操作如下：
 
@@ -131,7 +131,7 @@ deploy:
 
 **注意：**本文的hexo版本为6.2.0（可以通过hexo v查看），这里安装的图像插件为hexo-asset-image-for-hexo5是适用的（hexo5版本以上建议使用 hexo-asset-image-for-hexo5 ），网上绝大部分博客说的`npm install hexo-asset-image --save`经本人测试并不适配6.2.0版本的hexo。
 
-## 2.7 开始使用
+## 开始使用
 
 **发布文章**
 
@@ -169,11 +169,11 @@ tags: # 标签
 正文
 ```
 
-## 2.8 更换主题
+## 更换主题
 
 在 [Themes | Hexo](https://link.zhihu.com/?target=https%3A//hexo.io/themes/) 选择一个喜欢的主题，并参照主题的文档来安装和配置主题。
 
-## 2.9 常用命令
+## 常用命令
 
 ```git
 hexo new "name"       # 新建文章
@@ -186,7 +186,7 @@ hexo clean            # 清除缓存和已生成的静态文件
 hexo help             # 帮助
 ```
 
-# 3 参考资料
+# 参考资料
 
 [使用 Hexo+GitHub 搭建个人免费博客教程（小白向） - 知乎 (zhihu.com)](https://zhuanlan.zhihu.com/p/60578464)
 
