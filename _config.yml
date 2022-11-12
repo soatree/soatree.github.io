@@ -5,7 +5,7 @@
 # Site
 title: LIKE A TREE
 subtitle: ''
-description: ''
+description: '记录生活'
 keywords:
 author: 守常
 language: zh-CN
@@ -31,7 +31,7 @@ i18n_dir: :lang
 skip_render:
 
 # Writing
-new_post_name: :title.md # File name of new posts
+new_post_name: :year-:month-:day-:title.md # File name of new posts
 default_layout: post
 titlecase: false # Transform title into titlecase
 external_link:
@@ -97,6 +97,7 @@ ignore:
 # Extensions
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
+#theme: hexo-theme-butterfly-dev
 theme: fluid
 
 # Deployment
