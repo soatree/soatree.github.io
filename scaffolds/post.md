@@ -7,6 +7,7 @@ categories:
 - linux 
 - vcs 
 - 数据结构与算法
+- 数据库
 tags:
 - git 
 - ubuntu 
@@ -18,4 +19,5 @@ tags:
 - 理财 
 - 计算机结构 
 - 读书与做人
+- mysql
 ---

@@ -16,22 +16,25 @@
   <meta name="author" content="守常">
   <meta name="keywords" content="">
   
-    <meta name="description" content="背景在surface go 3上基于WSL2装了一个ubuntu玩玩，记录下相关信息 安装步骤Install Ubuntu on WSL2 on Windows 11 with GUI support | Ubuntu WSL命令 cmd键入以下命令以查看所有正在运行的WSL，然后按Enter：  wsl --list --verbose  cmd关闭所有的后台的linux虚拟机  wsl --s">
+    <meta name="description" content="背景前一段时间，博主为了在家里搭建学习环境，想模拟一个生产环境，尝试了Windows安装WSL、Vmware workstation player 安装Ubuntu、把Window删了直接装Ubuntu、把Ubuntu删了装回Windows(Windows一直无法安装到SSD，最后拆了电脑拔了机械硬盘才装成功)的多个阶段，发现还是Windows用的习惯，曾经还想过有朝一日试试高贵的Macbook，">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Win11中WSL2搭配ubuntu使用笔记">
-<meta property="og:url" content="http://soatree.github.io/2022/09/17/Win11%E4%B8%ADWSL2%E6%90%AD%E9%85%8Dubuntu%E4%BD%BF%E7%94%A8%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:title" content="Window中搭建centos虚拟机和MySQL">
+<meta property="og:url" content="http://soatree.github.io/2022/11/27/Window%E4%B8%AD%E6%90%AD%E5%BB%BAcentos%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%92%8CMySQL/index.html">
 <meta property="og:site_name" content="LIKE A TREE">
-<meta property="og:description" content="背景在surface go 3上基于WSL2装了一个ubuntu玩玩，记录下相关信息 安装步骤Install Ubuntu on WSL2 on Windows 11 with GUI support | Ubuntu WSL命令 cmd键入以下命令以查看所有正在运行的WSL，然后按Enter：  wsl --list --verbose  cmd关闭所有的后台的linux虚拟机  wsl --s">
+<meta property="og:description" content="背景前一段时间，博主为了在家里搭建学习环境，想模拟一个生产环境，尝试了Windows安装WSL、Vmware workstation player 安装Ubuntu、把Window删了直接装Ubuntu、把Ubuntu删了装回Windows(Windows一直无法安装到SSD，最后拆了电脑拔了机械硬盘才装成功)的多个阶段，发现还是Windows用的习惯，曾经还想过有朝一日试试高贵的Macbook，">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2022-09-17T15:05:49.000Z">
-<meta property="article:modified_time" content="2022-11-23T13:27:20.396Z">
+<meta property="og:image" content="http://soatree.github.io/2022/11/27/Window%E4%B8%AD%E6%90%AD%E5%BB%BAcentos%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%92%8CMySQL/%E9%80%89%E6%8B%A9centos%E9%95%9C%E5%83%8F.png">
+<meta property="og:image" content="http://soatree.github.io/2022/11/27/Window%E4%B8%AD%E6%90%AD%E5%BB%BAcentos%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%92%8CMySQL/mysql%E5%AF%86%E7%A0%81%E9%87%8D%E7%BD%AE.png">
+<meta property="article:published_time" content="2022-11-27T12:20:26.000Z">
+<meta property="article:modified_time" content="2022-11-27T16:08:42.461Z">
 <meta property="article:author" content="守常">
-<meta property="article:tag" content="ubuntu">
+<meta property="article:tag" content="mysql">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://soatree.github.io/2022/11/27/Window%E4%B8%AD%E6%90%AD%E5%BB%BAcentos%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%92%8CMySQL/%E9%80%89%E6%8B%A9centos%E9%95%9C%E5%83%8F.png">
   
   
   
-  <title>Win11中WSL2搭配ubuntu使用笔记 - LIKE A TREE</title>
+  <title>Window中搭建centos虚拟机和MySQL - LIKE A TREE</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -197,7 +200,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="Win11中WSL2搭配ubuntu使用笔记"></span>
+            <span id="subtitle" data-typed-text="Window中搭建centos虚拟机和MySQL"></span>
           
         </div>
 
@@ -208,8 +211,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2022-09-17 23:05" pubdate>
-          2022年9月17日 晚上
+        <time datetime="2022-11-27 20:20" pubdate>
+          2022年11月27日 晚上
         </time>
       </span>
     
@@ -220,7 +223,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          507 字
+          2.2k 字
         
       </span>
     
@@ -231,7 +234,7 @@
         
         
         
-          5 分钟
+          19 分钟
         
       </span>
     
@@ -269,44 +272,63 @@
         <div id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">Win11中WSL2搭配ubuntu使用笔记</h1>
+            <h1 style="display: none">Window中搭建centos虚拟机和MySQL</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>在surface go 3上基于WSL2装了一个ubuntu玩玩，记录下相关信息</p>
-<h1 id="安装步骤"><a href="#安装步骤" class="headerlink" title="安装步骤"></a>安装步骤</h1><p><a target="_blank" rel="noopener" href="https://ubuntu.com/tutorials/install-ubuntu-on-wsl2-on-windows-11-with-gui-support#1-overview">Install Ubuntu on WSL2 on Windows 11 with GUI support | Ubuntu</a></p>
-<h2 id="WSL命令"><a href="#WSL命令" class="headerlink" title="WSL命令"></a>WSL命令</h2><ul>
-<li>cmd键入以下命令以查看所有正在运行的WSL，然后按Enter：</li>
+                <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>前一段时间，博主为了在家里搭建学习环境，想模拟一个生产环境，尝试了Windows安装WSL、Vmware workstation player 安装Ubuntu、把Window删了直接装Ubuntu、把Ubuntu删了装回Windows(Windows一直无法安装到SSD，最后拆了电脑拔了机械硬盘才装成功)的多个阶段，发现还是Windows用的习惯，曾经还想过有朝一日试试高贵的Macbook，如今兴趣也是减了大半了。话归主题，最后博主决定还是使用Windows基于Vmware workstation player安装centos和其他相关组件。</p>
+<h1 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h1><h2 id="VMware-Workstation-16-Player"><a href="#VMware-Workstation-16-Player" class="headerlink" title="VMware Workstation 16 Player"></a>VMware Workstation 16 Player</h2><p>VMware Workstation 16 Player个人使用免费，直接百度搜索官网下载安装，注意软件的安装位置和虚拟机文件的位置选择，其他默认即可。</p>
+<h2 id="centOS镜像"><a href="#centOS镜像" class="headerlink" title="centOS镜像"></a>centOS镜像</h2><p>博主前往<a href="%E6%B8%85%E5%8D%8E%E5%A4%A7%E5%AD%A6%E5%BC%80%E6%BA%90%E8%BD%AF%E4%BB%B6%E9%95%9C%E5%83%8F%E7%AB%99">https://mirrors.tuna.tsinghua.edu.cn</a>下载的centos7镜像，具体路径是<code>/centos/7/isos/x86_64/</code>，具体镜像名为<strong>CentOS-7-x86_64-DVD-2009.iso</strong></p>
+<h1 id="虚拟机创建"><a href="#虚拟机创建" class="headerlink" title="虚拟机创建"></a>虚拟机创建</h1><p>打开Vmware workstation player，点击<strong>创建新虚拟机</strong>，选择刚才下载下来的镜像，点击下一步</p>
+<p><img src="/2022/11/27/Window%E4%B8%AD%E6%90%AD%E5%BB%BAcentos%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%92%8CMySQL/%E9%80%89%E6%8B%A9centos%E9%95%9C%E5%83%8F.png" srcset="/img/loading.gif" lazyload alt="选择centos镜像"></p>
+<p>填写全名（主机名称）、用户名、密码，本步骤用于Vmware workstation player自动安装centos，点击下一步</p>
+<p>填写Vmware workstation player上显示的虚拟机名称和虚拟机文件的存放位置，点击下一步</p>
+<p>配置磁盘大小，博主设置为了60GB，其他配置默认，点击下一步</p>
+<p>选择<strong>自定义组件</strong>，博主将<strong>虚拟机的内存</strong>设置为了6GB，<strong>处理器内核数量</strong>设置为了8，网络选择了<strong>桥接模式</strong>，其他配置默认，点击关闭，然后点击<strong>完成</strong>，然后后续Vmware workstation player会全自动安装centOS，比使用公司的魔改centos镜像安装还要顺滑~</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_27088383/article/details/108634985">NAT模式和桥接模式的区别详解</a>中介绍了桥接模式的基本原理</p>
+<h1 id="虚拟机配置"><a href="#虚拟机配置" class="headerlink" title="虚拟机配置"></a>虚拟机配置</h1><p>因为网络选择的是桥接模式，所以虚拟机会有一个独立的ip，Vmware workstation player已经自动为我们配置好了系统的网卡，直接执行<code>ifconfig</code>可以看到虚拟机的ip信息，但是外部还无法基于ssh连接虚拟机，需要开放ssh的端口。</p>
+<p>修改ssh配置，<code>vim /etc/ssh/sshd_config</code>，将<code>Port 22</code>注释解开,重启sshd<code>sudo service sshd restart</code>，然后使用MabaXterm尝试连接虚拟机即可。</p>
+<p>为了方便后续mysql图形化客户端连接，把防火墙也一并关掉<code>systemctl stop firewalld.service</code>，然后永久关闭防火墙<code>systemctl disable firewalld.service</code></p>
+<h1 id="mysql安装"><a href="#mysql安装" class="headerlink" title="mysql安装"></a>mysql安装</h1><ul>
+<li>安装mysql源</li>
 </ul>
-<p><code>wsl --list --verbose</code></p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs awk"><span class="hljs-comment"># 下载安装包</span><br>wget https:<span class="hljs-regexp">//</span>dev.mysql.com<span class="hljs-regexp">/get/my</span>sql80-community-release-el7-<span class="hljs-number">3</span>.noarch.rpm<br><span class="hljs-comment"># 安装</span><br>rpm -vih mysql80-community-release-el7-<span class="hljs-number">3</span>.noarch.rpm<br><span class="hljs-comment"># 确认是否安装成功</span><br>yum repolist enabled | grep <span class="hljs-string">&quot;mysql.*-community.*&quot;</span><br></code></pre></td></tr></table></figure>
+
 <ul>
-<li>cmd关闭所有的后台的linux虚拟机</li>
+<li>修改版本</li>
 </ul>
-<p><code>wsl --shutdown</code></p>
+<p>以上安装版本一般会安装最新稳定版，但是我们一般用5.6版本，所以需要调整版本</p>
+<p><code>yum repolist all | grep mysql</code>可以展示哪些源被禁用或者启动</p>
+<p>执行<code>yum-config-manager --disable mysql80-community</code>禁用8.0版本，执行<code>yum-config-manager --enable mysql56-community</code>启用5.6版本</p>
 <ul>
-<li>重新启动linux虚拟机</li>
+<li>安装Mysql</li>
 </ul>
-<p>如果需要重新启动Linux发行版，只需从开始菜单或使用<code>wsl --distribution DISTRO-NAME</code>命令在命令提示符下再次将其打开。请记住将DISTRO-NAME替换为发行版的实际名称。</p>
-<h1 id="命令"><a href="#命令" class="headerlink" title="命令"></a>命令</h1><h2 id="基本命令"><a href="#基本命令" class="headerlink" title="基本命令"></a>基本命令</h2><ul>
-<li>系统升级</li>
-</ul>
-<p><code>sudo apt update</code></p>
-<p><code>sudo apt full-upgrade</code></p>
+<figure class="highlight axapta"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs axapta">yum install mysql-community-<span class="hljs-keyword">server</span><br></code></pre></td></tr></table></figure>
+
 <ul>
-<li>文件传输（图形化界面）</li>
+<li>启动Mysql</li>
 </ul>
-<p><code>explorer.exe .</code></p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs crmsh">service mysqld <span class="hljs-literal">start</span><br></code></pre></td></tr></table></figure>
+
+<p>启动说明里有提示如何修改密码，参照说明进行密码修改可以</p>
+<p><img src="/2022/11/27/Window%E4%B8%AD%E6%90%AD%E5%BB%BAcentos%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%92%8CMySQL/mysql%E5%AF%86%E7%A0%81%E9%87%8D%E7%BD%AE.png" srcset="/img/loading.gif" lazyload alt="MySQL密码重置"></p>
 <ul>
-<li>查看Linux内核版本命令</li>
+<li>MySQL其他命令</li>
 </ul>
-<p><code>cat /proc/version</code></p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs crmsh">service mysqld <span class="hljs-literal">stop</span>　　　　　　　　<span class="hljs-comment">#关闭MySQL服务</span><br>service mysqld restart　　　　　　<span class="hljs-comment">#重启MySQL服务 </span><br>service mysqld status　　　　　　<span class="hljs-comment">#查看服务状态</span><br></code></pre></td></tr></table></figure>
+
 <ul>
-<li>查看Linux系统版本</li>
+<li>登录与简单信息查看</li>
 </ul>
-<p><code>cat /etc/issue</code></p>
-<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><p><a target="_blank" rel="noopener" href="https://ubuntu.com/tutorials/install-ubuntu-on-wsl2-on-windows-11-with-gui-support#1-overview">Install Ubuntu on WSL2 on Windows 11 with GUI support | Ubuntu</a></p>
-<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/351880793">只需一条命令，快速在Windows 10上关闭Linux - 知乎 (zhihu.com)</a></p>
+<figure class="highlight gauss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs gauss">mysql -uroot -pve<span class="hljs-meta">#LoVkeU2u!</span><br><span class="hljs-keyword">show</span> databases;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>图形化MySQL客户端工具连接MySQL报错</li>
+</ul>
+<p>图形化MySQL客户端工具连接MySQL报错<strong>Host ‘xxx’ is not allowed to connect to this MySQL server</strong></p>
+<p>通过<a target="_blank" rel="noopener" href="https://www.cnblogs.com/codecat/p/10729033.html%E5%92%8Chttps://blog.csdn.net/qq_38331606/article/details/79535489%E8%A7%A3%E5%86%B3">https://www.cnblogs.com/codecat/p/10729033.html和https://blog.csdn.net/qq_38331606/article/details/79535489解决</a></p>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_27088383/article/details/108634985">NAT模式和桥接模式的区别详解</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/u013766416/article/details/121351256">在Windows上使用 VMware 16 Player 创建新虚拟机</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/hailexuexi/p/15124213.html">Centos7 怎么永久关闭防火墙</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/xsge/p/13827288.html">Linux系统发行版ContOS7演示安装MySQL</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/codecat/p/10729033.html">解决MySql报错：1130 - Host ‘xxx’ is not allowed to connect to this MySQL server的方法</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_38331606/article/details/79535489">Duplicate entry ‘%-root’ for key ‘PRIMARY’</a></p>
 
                 
               </div>
@@ -325,7 +347,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/linux/" class="category-chain-item">linux</a>
+  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="category-chain-item">数据库</a>
   
   
 
@@ -340,7 +362,7 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/ubuntu/">#ubuntu</a>
+        <a href="/tags/mysql/">#mysql</a>
       
     </div>
   
@@ -352,8 +374,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>Win11中WSL2搭配ubuntu使用笔记</div>
-      <div>http://soatree.github.io/2022/09/17/Win11中WSL2搭配ubuntu使用笔记/</div>
+      <div>Window中搭建centos虚拟机和MySQL</div>
+      <div>http://soatree.github.io/2022/11/27/Window中搭建centos虚拟机和MySQL/</div>
     </div>
     <div class="license-meta">
       
@@ -365,7 +387,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2022年9月17日</div>
+          <div>2022年11月27日</div>
         </div>
       
       
@@ -407,18 +429,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2022/09/25/git%E5%AD%A6%E4%B9%A0%E6%95%B4%E7%90%86/" title="git学习整理">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">git学习整理</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2022/09/11/%E4%BA%BA%E7%94%9F%E7%9A%84%E6%99%BA%E6%85%A7/" title="人生的智慧">
-                        <span class="hidden-mobile">人生的智慧</span>
+                      <a href="/2022/11/24/Markdown%E6%8B%BE%E9%81%97/" title="Markdown拾遗">
+                        <span class="hidden-mobile">Markdown拾遗</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

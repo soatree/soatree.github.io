@@ -20,7 +20,7 @@ tags:
 
 基于上面两个网站下载最新的Node.js和Git安装包，基于默认配置一路点下去安装Node.js和Git。安装完成后，在cmd中依次执行 `node -v`、`npm -v` 和 `git --version`，看到类似以下版本号说明安装成功
 
-![](./基于GitHub和Hexo搭建博客/组件版本.png)
+![](./2022-11-01-基于GitHub和Hexo搭建博客/组件版本.png)
 
 ## 连接 Github
 
@@ -184,6 +184,8 @@ hexo g -d             # 生成页面并部署
 hexo s                # 本地预览
 hexo clean            # 清除缓存和已生成的静态文件
 hexo help             # 帮助
+hexo new draft "title" #创建草稿布局文章的命令
+hexo publish "title"  # 将草稿发布为正式文章的命令
 ```
 
 # 参考资料
