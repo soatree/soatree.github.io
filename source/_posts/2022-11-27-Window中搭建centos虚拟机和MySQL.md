@@ -99,9 +99,7 @@ show databases;
 
 - 图形化MySQL客户端工具连接MySQL报错
 
-图形化MySQL客户端工具连接MySQL报错**Host 'xxx' is not allowed to connect to this MySQL server**
-
-通过https://www.cnblogs.com/codecat/p/10729033.html和https://blog.csdn.net/qq_38331606/article/details/79535489解决
+博主使用MySQL Workbench来连接MySQL，端口默认。连接MySQL报错**Host 'xxx' is not allowed to connect to this MySQL server**，通过https://www.cnblogs.com/codecat/p/10729033.html和https://blog.csdn.net/qq_38331606/article/details/79535489解决
 
 # 参考资料
 
