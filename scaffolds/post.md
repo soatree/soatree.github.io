@@ -11,6 +11,7 @@ categories:
 - java
 tags:
 - git 
+- 哲学
 - ubuntu 
 - 养生 
 - 博客搭建 

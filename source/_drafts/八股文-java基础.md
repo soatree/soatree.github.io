@@ -4,7 +4,7 @@ categories:
   - 面经
 tags:
   - java
-date: 2022-12-23 22:41:02
+date: 2023-01-14 22:02:42
 ---
 
 # 前言
@@ -312,12 +312,5 @@ Java技术使用finalize()方法在垃圾收集器将对象从内存中清除出
 # 参考
 
 [微信公众号:我的IT技术路](https://mp.weixin.qq.com/s/54_bMeUwjxk-8DHa90heNQ)
-
-
-
-
-
-
-
 
 

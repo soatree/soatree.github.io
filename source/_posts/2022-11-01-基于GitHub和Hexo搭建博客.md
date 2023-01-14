@@ -169,6 +169,20 @@ tags: # 标签
 正文
 ```
 
+**处理草稿**
+
+输入如下命令新建一个草稿文件，其中<title>替换成草稿标题，实际运行可以知道新建的草稿文件存放在/source/_drafts路径下
+
+```
+$ hexo new draft <title>
+```
+
+输入如下命令将草稿转成正式文章，该命令会把/source/_drafts下的文章移到/source/_posts下
+
+```
+$ hexo publish <title>
+```
+
 ## 更换主题
 
 在 [Themes | Hexo](https://link.zhihu.com/?target=https%3A//hexo.io/themes/) 选择一个喜欢的主题，并参照主题的文档来安装和配置主题。
@@ -195,3 +209,5 @@ hexo publish "title"  # 将草稿发布为正式文章的命令
 [在Hexo中使用本地图片 - 个人学习 (idealx.cn)](https://www.idealx.cn/post/Hexo/hexo-asset-image/)
 
 [fluid-dev/hexo-theme-fluid: 一款 Material Design 风格的 Hexo 主题 / An elegant Material-Design theme for Hexo (github.com)](https://github.com/fluid-dev/hexo-theme-fluid)
+
+[Hexo博客新建草稿](https://blog.csdn.net/mqdxiaoxiao/article/details/93524924)
