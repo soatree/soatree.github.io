@@ -2,11 +2,14 @@
 title: {{ title }}
 date: {{ date }}
 categories:
-- 读书 
+- 读书与做人 
 - 其他 
 - linux 
 - vcs 
 - 数据结构与算法
+- 计算机组成原理
+- 操作系统原理
+- 计算机网络
 - 数据库
 - java
 tags:

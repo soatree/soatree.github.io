@@ -290,6 +290,10 @@ Java技术使用finalize()方法在垃圾收集器将对象从内存中清除出
 [Java中final、finally、finalize的区别与用法](https://www.cnblogs.com/smart-hwt/p/8257330.html)
 
 ## Java的IO流有了解过，实现一个按行读取数据的方式。
+
+
+
+
 ## Java的反射原理是什么？Getclass和classforName的区别是什么？
 ## 如何实现一个list类型的深拷贝？Java的clone接口的作用是什么？
 ## Java的泛型的作用是什么？
