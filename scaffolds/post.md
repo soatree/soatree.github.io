@@ -12,6 +12,7 @@ categories:
 - 计算机网络
 - 数据库
 - java
+- 生活
 tags:
 - git 
 - 哲学
@@ -26,4 +27,6 @@ tags:
 - 读书与做人
 - mysql
 - web
+- 聊天
+- 历史
 ---
