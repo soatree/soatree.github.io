@@ -1,0 +1,736 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/cat.jpg">
+  <link rel="icon" href="/img/cat.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="胖树">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="信息《MySQL必知必会》 福塔 人民邮电出版社 摘录基本概念数据库 保存有组织的数据的容器（通常是一个文件或一组文件）。  表 某种特定类型数据的结构化清单。  模式 关于数据库和表的布局及特性的信息。有时，模式用作数据库的同义词。  主键 一列或一组列，其值可以唯一区分表中的每一行。应该总是定义主键。  使用连接使用mysql命令行连接或者图形化客户端连接，本人使用MySqlWorkbench">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mysql必知必会">
+<meta property="og:url" content="http://soatree.github.io/2022/11/23/mysql%E5%BF%85%E7%9F%A5%E5%BF%85%E4%BC%9A/index.html">
+<meta property="og:site_name" content="FatTree">
+<meta property="og:description" content="信息《MySQL必知必会》 福塔 人民邮电出版社 摘录基本概念数据库 保存有组织的数据的容器（通常是一个文件或一组文件）。  表 某种特定类型数据的结构化清单。  模式 关于数据库和表的布局及特性的信息。有时，模式用作数据库的同义词。  主键 一列或一组列，其值可以唯一区分表中的每一行。应该总是定义主键。  使用连接使用mysql命令行连接或者图形化客户端连接，本人使用MySqlWorkbench">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-11-23T13:48:37.000Z">
+<meta property="article:modified_time" content="2022-12-18T13:12:30.000Z">
+<meta property="article:author" content="胖树">
+<meta property="article:tag" content="mysql">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>mysql必知必会 - FatTree</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"soatree.github.io","root":"/","version":"1.9.2","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.2.0"><link rel="alternate" href="/atom.xml" title="FatTree" type="application/atom+xml">
+</head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>FAT TREE</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/light.JPG') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="mysql必知必会"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-11-23 21:48" pubdate>
+          2022年11月23日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          5.2k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          44 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">mysql必知必会</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="信息"><a href="#信息" class="headerlink" title="信息"></a>信息</h1><p>《MySQL必知必会》 福塔 人民邮电出版社</p>
+<h1 id="摘录"><a href="#摘录" class="headerlink" title="摘录"></a>摘录</h1><h2 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h2><h3 id="数据库"><a href="#数据库" class="headerlink" title="数据库"></a>数据库</h3><blockquote>
+<p>保存有组织的数据的容器（通常是一个文件或一组文件）。</p>
+</blockquote>
+<h3 id="表"><a href="#表" class="headerlink" title="表"></a>表</h3><blockquote>
+<p>某种特定类型数据的结构化清单。</p>
+</blockquote>
+<h3 id="模式"><a href="#模式" class="headerlink" title="模式"></a>模式</h3><blockquote>
+<p>关于数据库和表的布局及特性的信息。有时，模式用作数据库的同义词。</p>
+</blockquote>
+<h3 id="主键"><a href="#主键" class="headerlink" title="主键"></a>主键</h3><blockquote>
+<p>一列或一组列，其值可以唯一区分表中的每一行。应该总是定义主键。</p>
+</blockquote>
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><h3 id="连接"><a href="#连接" class="headerlink" title="连接"></a>连接</h3><p>使用mysql命令行连接或者图形化客户端连接，本人使用MySqlWorkbench图形化客户端。</p>
+<h3 id="选择库"><a href="#选择库" class="headerlink" title="选择库"></a>选择库</h3><p>在mysql命令行中通过<code>use xx</code>选择数据库，在MySqlWorkbench中通过双击库来选择数据库</p>
+<h2 id="检索"><a href="#检索" class="headerlink" title="检索"></a>检索</h2><figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs pgsql"><span class="hljs-keyword">SELECT</span> prod_id, prod_name, prod_price <span class="hljs-keyword">FROM</span> products;<br><span class="hljs-keyword">SELECT</span> * <span class="hljs-keyword">FROM</span> products;<br><span class="hljs-comment">-- 检索不同行</span><br><span class="hljs-keyword">SELECT</span> <span class="hljs-keyword">DISTINCT</span> vend_id <span class="hljs-keyword">FROM</span> products;<br><span class="hljs-keyword">SELECT</span> prod_name <span class="hljs-keyword">FROM</span> products <span class="hljs-keyword">LIMIT</span> <span class="hljs-number">5</span>;<br><span class="hljs-comment">-- 从行5开始最多展示5行，MySql的行从0开始计数</span><br><span class="hljs-keyword">SELECT</span> prod_name <span class="hljs-keyword">FROM</span> products <span class="hljs-keyword">LIMIT</span> <span class="hljs-number">5</span>, <span class="hljs-number">5</span>;<br><span class="hljs-comment">-- 全限定表明</span><br><span class="hljs-keyword">SELECT</span> products.prod_name <span class="hljs-keyword">FROM</span> crashcourse.products;<br></code></pre></td></tr></table></figure>
+
+<h3 id="排序"><a href="#排序" class="headerlink" title="排序"></a>排序</h3><figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs pgsql"><span class="hljs-comment">-- 只对prod_price倒序</span><br><span class="hljs-keyword">SELECT</span> prod_id, prod_price, prod_name <span class="hljs-keyword">FROM</span> products <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> prod_price <span class="hljs-keyword">DESC</span>, prod_name;<br><span class="hljs-comment">-- 最贵商品</span><br><span class="hljs-keyword">FROM</span> products <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> prod_price <span class="hljs-keyword">DESC</span> <span class="hljs-keyword">LIMIT</span> <span class="hljs-number">1</span>;<br></code></pre></td></tr></table></figure>
+
+<h3 id="过滤"><a href="#过滤" class="headerlink" title="过滤"></a>过滤</h3><figure class="highlight n1ql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs n1ql"><span class="hljs-keyword">SELECT</span> prod_name, prod_price <span class="hljs-keyword">FROM</span> products <span class="hljs-keyword">WHERE</span> prod_price = <span class="hljs-number">2.</span> <span class="hljs-number">50</span>;<br></code></pre></td></tr></table></figure>
+
+<p>WHERE 子句操作符 BETWEEN AND 在指定两个值之间（包含）</p>
+<figure class="highlight n1ql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs n1ql"><span class="hljs-keyword">SELECT</span> prod_name <span class="hljs-keyword">FROM</span> products <span class="hljs-keyword">WHERE</span> prod_price <span class="hljs-keyword">IS</span> <span class="hljs-literal">NULL</span>;<br></code></pre></td></tr></table></figure>
+
+<p>组合过滤，不要依赖默认计算次序，多用括号</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">SELECT</span> prod_name, prod_price FROM products WHERE (vend_id = <span class="hljs-number">1002</span> OR vend_id = <span class="hljs-number">1003</span>) AND prod_price &gt;= <span class="hljs-number">10</span>;<br></code></pre></td></tr></table></figure>
+
+<p>IN一般比OR执行更快</p>
+<figure class="highlight n1ql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs n1ql"><span class="hljs-keyword">SELECT</span> prod_name, prod_price <span class="hljs-keyword">FROM</span> products <span class="hljs-keyword">WHERE</span> vend_id <span class="hljs-keyword">IN</span> (<span class="hljs-number">1002</span>, <span class="hljs-number">1003</span>) <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> prod_name;<br></code></pre></td></tr></table></figure>
+
+<p>MySQL支持使用NOT对IN、BETWEEN和EXISTS子句取反</p>
+<figure class="highlight n1ql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs n1ql"><span class="hljs-keyword">SELECT</span> prod_name, prod_price <span class="hljs-keyword">FROM</span> products <span class="hljs-keyword">WHERE</span> vend_id <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">IN</span> (<span class="hljs-number">1002</span>, <span class="hljs-number">1003</span>) <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> prod_name;<br></code></pre></td></tr></table></figure>
+
+<h3 id="匹配"><a href="#匹配" class="headerlink" title="匹配"></a>匹配</h3><p>通配符LIKE</p>
+<p>正则表达式REGEXP</p>
+<h3 id="计算字段"><a href="#计算字段" class="headerlink" title="计算字段"></a>计算字段</h3><figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs pgsql"><span class="hljs-keyword">SELECT</span> Concat( RTrim( vend_name), <span class="hljs-string">&#x27; (&#x27;</span>, RTrim( vend_country), <span class="hljs-string">&#x27;)&#x27;</span>) <span class="hljs-keyword">AS</span> vend_title <span class="hljs-keyword">FROM</span> vendors <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> vend_name;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight n1ql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs n1ql"><span class="hljs-keyword">SELECT</span> prod_id, quantity, item_price, quantity* item_price <span class="hljs-keyword">AS</span> expanded_price <span class="hljs-keyword">FROM</span> orderitems <span class="hljs-keyword">WHERE</span> order_num = <span class="hljs-number">20005</span>;<br></code></pre></td></tr></table></figure>
+
+<h3 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h3><p>聚集函数</p>
+<p>AVG()\COUNT()\MAX()\MIN()\SUM()</p>
+<figure class="highlight n1ql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs n1ql"><span class="hljs-keyword">SELECT</span> <span class="hljs-built_in">AVG</span>( prod_price) <span class="hljs-keyword">AS</span> avg_price <span class="hljs-keyword">FROM</span> products;<br></code></pre></td></tr></table></figure>
+
+<p>使用COUNT(*)对表中行的数目进行计数, 使用COUNT(column) 对特定列中具有值的行进行计数，忽略NULL值。</p>
+<figure class="highlight n1ql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs n1ql"><span class="hljs-keyword">SELECT</span> <span class="hljs-built_in">SUM</span>( item_price*quantity) <span class="hljs-keyword">AS</span> total_price <span class="hljs-keyword">FROM</span> orderitems <span class="hljs-keyword">WHERE</span> order_num = <span class="hljs-number">20005</span>;<br></code></pre></td></tr></table></figure>
+
+<h3 id="分组"><a href="#分组" class="headerlink" title="分组"></a>分组</h3><p>除聚集计算语句外，SELECT语句中的每个列都必须在GROUP BY子句中给出。</p>
+<p>GROUP BY子句必须出现在WHERE子句之后，ORDER BY子句之前。</p>
+<p>WHERE在数据分组前进行过滤， HAVING在数据分组后进行过滤。</p>
+<figure class="highlight n1ql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs n1ql"><span class="hljs-keyword">SELECT</span> vend_id, <span class="hljs-built_in">COUNT</span>(*) <span class="hljs-keyword">AS</span> num_prods <span class="hljs-keyword">FROM</span> products <span class="hljs-keyword">GROUP</span> <span class="hljs-keyword">BY</span> vend_id;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight oxygene"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs oxygene"><span class="hljs-keyword">SELECT</span> vend_id, COUNT<span class="hljs-comment">(*) AS num_prods FROM products WHERE prod_price &gt;= 10 GROUP BY vend_id HAVING COUNT(*)</span> &gt;= <span class="hljs-number">2</span><span class="hljs-punctuation">;</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="查询子句顺序"><a href="#查询子句顺序" class="headerlink" title="查询子句顺序"></a>查询子句顺序</h3><p>SELECT | FROM | WHERE | GROUP BY | HAVING | ORDER BY | LIMIT</p>
+<h3 id="子查询"><a href="#子查询" class="headerlink" title="子查询"></a>子查询</h3><figure class="highlight n1ql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs n1ql"><span class="hljs-keyword">SELECT</span> cust_id <span class="hljs-keyword">FROM</span> orders <span class="hljs-keyword">WHERE</span> order_num <span class="hljs-keyword">IN</span> (<span class="hljs-keyword">SELECT</span> order_num <span class="hljs-keyword">FROM</span> orderitems <span class="hljs-keyword">WHERE</span> prod_id = <span class="hljs-string">&#x27;TNT2&#x27;</span>);<br></code></pre></td></tr></table></figure>
+
+<h3 id="联结"><a href="#联结" class="headerlink" title="联结"></a>联结</h3><h4 id="外键"><a href="#外键" class="headerlink" title="外键"></a>外键</h4><blockquote>
+<p>外键为某个表中的一列，它包含另一个表的主键，定义了两个表之间的关系</p>
+</blockquote>
+<p>存在一个商品表和一个供应商信息表，供应商ID是供应商信息表的主键，这个供应商ID是商品表的&#x3D;&#x3D;外键&#x3D;&#x3D;，它将商品表和供应商信息表关联。</p>
+<h4 id="联结样例"><a href="#联结样例" class="headerlink" title="联结样例"></a>联结样例</h4><figure class="highlight n1ql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs n1ql"><span class="hljs-keyword">SELECT</span> vend_name, prod_name, prod_price <span class="hljs-keyword">FROM</span> vendors <span class="hljs-keyword">INNER</span> <span class="hljs-keyword">JOIN</span> products <span class="hljs-keyword">ON</span> vendors.vend_id = products.vend_id;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight n1ql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs n1ql"><span class="hljs-keyword">SELECT</span> customers.cust_id, orders.order_num <span class="hljs-keyword">FROM</span> customers <span class="hljs-keyword">LEFT</span> <span class="hljs-keyword">OUTER</span> <span class="hljs-keyword">JOIN</span> orders <span class="hljs-keyword">ON</span> orders.cust_id = customers.cust_id;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight n1ql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs n1ql"><span class="hljs-keyword">SELECT</span> customers.cust_name, customers.cust_id, <span class="hljs-built_in">COUNT</span>( orders.order_num) <span class="hljs-keyword">AS</span> num_ord <span class="hljs-keyword">FROM</span> customers <span class="hljs-keyword">LEFT</span> <span class="hljs-keyword">OUTER</span> <span class="hljs-keyword">JOIN</span> orders <span class="hljs-keyword">ON</span> customers. cust_id = orders. cust_id <span class="hljs-keyword">GROUP</span> <span class="hljs-keyword">BY</span> customers.cust_id;<br></code></pre></td></tr></table></figure>
+
+<h3 id="组合"><a href="#组合" class="headerlink" title="组合"></a>组合</h3><figure class="highlight n1ql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs n1ql"><span class="hljs-keyword">SELECT</span> vend_id, prod_id, prod_price <span class="hljs-keyword">FROM</span> products <span class="hljs-keyword">WHERE</span> prod_price &lt;= <span class="hljs-number">5</span> <span class="hljs-keyword">UNION</span> <span class="hljs-keyword">SELECT</span> vend_id, prod_id, prod_price <span class="hljs-keyword">FROM</span> products <span class="hljs-keyword">WHERE</span> vend_id <span class="hljs-keyword">IN</span> (<span class="hljs-number">1001</span>, <span class="hljs-number">1002</span>);<br></code></pre></td></tr></table></figure>
+
+<p>如果使用UNION不想去重，应该使用UNION ALL</p>
+<p>在用UNION组合查询时，只能使用一条ORDER BY子句，它必须出现在最后一条SELECT语句之后。</p>
+<h2 id="插入"><a href="#插入" class="headerlink" title="插入"></a>插入</h2><figure class="highlight n1ql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs n1ql"><span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> customers( cust_name, cust_address, cust_city, cust_state, cust_zip, cust_country, cust_contact, cust_email) <span class="hljs-keyword">VALUES</span>(<span class="hljs-string">&#x27; Pep E. LaPew&#x27;</span>, <span class="hljs-string">&#x27;100 Main Street&#x27;</span>, <span class="hljs-string">&#x27;Los Angeles&#x27;</span>, <span class="hljs-string">&#x27;CA&#x27;</span>, <span class="hljs-string">&#x27;90046&#x27;</span>, <span class="hljs-string">&#x27;USA&#x27;</span>, <span class="hljs-literal">NULL</span>, <span class="hljs-literal">NULL</span>);<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight n1ql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs n1ql"><span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> customers( cust_name, cust_address, cust_city, cust_state, cust_zip, cust_country) <span class="hljs-keyword">VALUES</span>( <span class="hljs-string">&#x27;Pep E. LaPew&#x27;</span>, <span class="hljs-string">&#x27;100 Main Street&#x27;</span>, <span class="hljs-string">&#x27;Los Angeles&#x27;</span>, <span class="hljs-string">&#x27;CA&#x27;</span>, <span class="hljs-string">&#x27;90046&#x27;</span>, <span class="hljs-string">&#x27;USA&#x27;</span> ), ( <span class="hljs-string">&#x27;M. Martian&#x27;</span>, <span class="hljs-string">&#x27;42 Galaxy Way&#x27;</span>, <span class="hljs-string">&#x27;New York&#x27;</span>, <span class="hljs-string">&#x27;NY&#x27;</span>, <span class="hljs-string">&#x27;11213&#x27;</span>, <span class="hljs-string">&#x27;USA&#x27;</span> );<br></code></pre></td></tr></table></figure>
+
+<h2 id="更新和删除"><a href="#更新和删除" class="headerlink" title="更新和删除"></a>更新和删除</h2><h3 id="更新"><a href="#更新" class="headerlink" title="更新"></a>更新</h3><figure class="highlight n1ql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs n1ql"><span class="hljs-keyword">UPDATE</span> customers <span class="hljs-keyword">SET</span> cust_email = <span class="hljs-string">&#x27;elmer@ fudd. com&#x27;</span> <span class="hljs-keyword">WHERE</span> cust_id = <span class="hljs-number">10005</span>;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight n1ql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs n1ql"><span class="hljs-keyword">UPDATE</span> customers <span class="hljs-keyword">SET</span> cust_email = <span class="hljs-literal">NULL</span> <span class="hljs-keyword">WHERE</span> cust_id = <span class="hljs-number">10005</span>;<br></code></pre></td></tr></table></figure>
+
+<h3 id="删除"><a href="#删除" class="headerlink" title="删除"></a>删除</h3><figure class="highlight n1ql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs n1ql"><span class="hljs-keyword">DELETE</span> <span class="hljs-keyword">FROM</span> customers <span class="hljs-keyword">WHERE</span> cust_id &gt;= <span class="hljs-number">10010</span>;<br></code></pre></td></tr></table></figure>
+
+<p>全表删除使用<code>TRUNCATE TABLE</code>更快</p>
+<h3 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h3><p>使用UPDATE和DELETE使用WHERE之前，先用SELECT进行测试，MySQL没有撤销功能。</p>
+<h2 id="表-1"><a href="#表-1" class="headerlink" title="表"></a>表</h2><h3 id="建表"><a href="#建表" class="headerlink" title="建表"></a>建表</h3><figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs pgsql"><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> customers ( cust_id <span class="hljs-type">int</span> <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span> AUTO_INCREMENT, cust_name <span class="hljs-type">char</span>( <span class="hljs-number">50</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span> , cust_address <span class="hljs-type">char</span>( <span class="hljs-number">50</span>) , cust_city <span class="hljs-type">char</span>( <span class="hljs-number">50</span>) , cust_state <span class="hljs-type">char</span>( <span class="hljs-number">5</span>) , cust_zip <span class="hljs-type">char</span>( <span class="hljs-number">10</span>) , cust_country <span class="hljs-type">char</span>( <span class="hljs-number">50</span>) , cust_contact <span class="hljs-type">char</span>( <span class="hljs-number">50</span>) , cust_email <span class="hljs-type">char</span>( <span class="hljs-number">255</span>) , <span class="hljs-keyword">PRIMARY KEY</span> (cust_id) ) ENGINE= InnoDB;<br></code></pre></td></tr></table></figure>
+
+<h4 id="MySQL数据类型"><a href="#MySQL数据类型" class="headerlink" title="MySQL数据类型"></a>MySQL数据类型</h4><p>MySQL数据类型：字符串、数值、日期、二进制，具体再查询</p>
+<h4 id="联合主键"><a href="#联合主键" class="headerlink" title="联合主键"></a>联合主键</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> orderitems ( order_num <span class="hljs-type">int</span> <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span> , order_item <span class="hljs-type">int</span> <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span> , prod_id <span class="hljs-type">char</span>( <span class="hljs-number">10</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span> , quantity <span class="hljs-type">int</span> <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span> , item_price <span class="hljs-type">decimal</span>( <span class="hljs-number">8</span>, <span class="hljs-number">2</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span> , <span class="hljs-keyword">PRIMARY</span> KEY (order_num, order_item) ) ENGINE<span class="hljs-operator">=</span> InnoDB;<br></code></pre></td></tr></table></figure>
+
+<h4 id="自增长"><a href="#自增长" class="headerlink" title="自增长"></a>自增长</h4><p>每个表只允许一个AUTO_INCREMENT列，而且它必须被索引（如，通过使它成为主键）。</p>
+<h4 id="常用引擎"><a href="#常用引擎" class="headerlink" title="常用引擎"></a>常用引擎</h4><p>InnoDB是一个可靠的事务处理引擎，它不支持全文本搜索；<br>MEMORY在功能等同于MyISAM，但由于数据存储在内存（不是磁盘）中，速度很快（特别适合于临时表）；<br>MyISAM是一个性能极高的引擎，它支持全文本搜索，但不支持事务处理。</p>
+<h3 id="更新表"><a href="#更新表" class="headerlink" title="更新表"></a>更新表</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">ALTER</span> <span class="hljs-keyword">TABLE</span> vendors <span class="hljs-keyword">ADD</span> vend_phone <span class="hljs-type">CHAR</span>(<span class="hljs-number">20</span>);<br></code></pre></td></tr></table></figure>
+
+<h3 id="删除表"><a href="#删除表" class="headerlink" title="删除表"></a>删除表</h3><figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs pgsql"><span class="hljs-keyword">DROP</span> <span class="hljs-keyword">TABLE</span> customers2;<br></code></pre></td></tr></table></figure>
+
+<h3 id="重命名表"><a href="#重命名表" class="headerlink" title="重命名表"></a>重命名表</h3><figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs pgsql"><span class="hljs-keyword">RENAME</span> <span class="hljs-keyword">TABLE</span> customers2 <span class="hljs-keyword">TO</span> customers;<br></code></pre></td></tr></table></figure>
+
+<h2 id="视图"><a href="#视图" class="headerlink" title="视图"></a>视图</h2><p>视图可以看成虚拟表，仅仅是用来查看存储在别处的数据的一种设施，视图本身不包含数据，它们返回的数据是从其他表中检索出来的。在添加或更改这些表中的数据时，视图将返回改变过的数据。因为视图不包含数据，所以每次使用视图时，都必须处理查询执行时所需的任一个检索。</p>
+<figure class="highlight n1ql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs n1ql"><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">VIEW</span> orderitemsexpanded <span class="hljs-keyword">AS</span> <span class="hljs-keyword">SELECT</span> order_num, prod_id, quantity, item_price, quantity* item_price <span class="hljs-keyword">AS</span> expanded_price <span class="hljs-keyword">FROM</span> orderitems;<br></code></pre></td></tr></table></figure>
+
+<h2 id="事务"><a href="#事务" class="headerlink" title="事务"></a>事务</h2><p>事务处理（transactionprocessing）可以用来维护数据库的完整性，它保证成批的MySQL操作要么完全执行，要么完全不执行。</p>
+<p>事务（transaction）指一组SQL语句；<br>回退（rollback）指撤销指定SQL语句的过程；<br>提交（commit）指将未存储的SQL语句结果写入数据库表；<br>保留点（savepoint）指事务处理中设置的临时占位符（place-holder），你可以对它发布回退（与回退整个事务处理不同）</p>
+<h3 id="回退"><a href="#回退" class="headerlink" title="回退"></a>回退</h3><figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs pgsql"><span class="hljs-keyword">SELECT</span> * <span class="hljs-keyword">FROM</span> ordertotals; <br><span class="hljs-keyword">START</span> <span class="hljs-keyword">TRANSACTION</span>; <br><span class="hljs-keyword">DELETE</span> <span class="hljs-keyword">FROM</span> ordertotals; <br><span class="hljs-keyword">SELECT</span> * <span class="hljs-keyword">FROM</span> ordertotals; <br><span class="hljs-keyword">ROLLBACK</span>; <br><span class="hljs-keyword">SELECT</span> * <span class="hljs-keyword">FROM</span> ordertotals;<br></code></pre></td></tr></table></figure>
+
+<p>INSERT、UPDATE和DELETE可以回退，CREATE或DROP不能回退</p>
+<h3 id="提交"><a href="#提交" class="headerlink" title="提交"></a>提交</h3><figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs pgsql"><span class="hljs-keyword">START</span> <span class="hljs-keyword">TRANSACTION</span>; <br><span class="hljs-keyword">DELETE</span> <span class="hljs-keyword">FROM</span> orderitems <span class="hljs-keyword">WHERE</span> order_ num = <span class="hljs-number">20010</span>; <br><span class="hljs-keyword">DELETE</span> <span class="hljs-keyword">FROM</span> orders <span class="hljs-keyword">WHERE</span> order_ num = <span class="hljs-number">20010</span>; <br><span class="hljs-keyword">COMMIT</span>;<br></code></pre></td></tr></table></figure>
+
+<p>当COMMIT或ROLLBACK语句执行后，事务会自动关闭（将来的更改会隐含提交）。</p>
+<h3 id="保留点"><a href="#保留点" class="headerlink" title="保留点"></a>保留点</h3><figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs pgsql"><span class="hljs-keyword">SAVEPOINT</span> delete1;<br><span class="hljs-keyword">ROLLBACK</span> <span class="hljs-keyword">TO</span> delete1;<br></code></pre></td></tr></table></figure>
+
+<p>保留点在事务处理完成（执行一条ROLLBACK或COMMIT）后自动释放。</p>
+<h1 id="感想"><a href="#感想" class="headerlink" title="感想"></a>感想</h1><p>MySQL入门书籍，整理用于后续简单查阅。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="category-chain-item">数据库</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/mysql/">#mysql</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>mysql必知必会</div>
+      <div>http://soatree.github.io/2022/11/23/mysql必知必会/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>胖树</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年11月23日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+              <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                <i class="iconfont icon-nc"></i>
+              </span>
+              </a>
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+              <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                <i class="iconfont icon-sa"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/11/24/Markdown%E6%8B%BE%E9%81%97/" title="Markdown拾遗">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Markdown拾遗</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/11/01/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%8E%9F%E7%90%86/" title="操作系统原理">
+                        <span class="hidden-mobile">操作系统原理</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

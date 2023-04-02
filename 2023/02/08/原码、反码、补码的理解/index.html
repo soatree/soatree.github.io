@@ -1,0 +1,698 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/cat.jpg">
+  <link rel="icon" href="/img/cat.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="胖树">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="概念机器数、真值 机器数  一个数在计算机中的二进制表示形式，叫做这个数的机器数。机器数是带符号的，在计算机用机器数的最高位存放符号，正数为0，负数为1。 比如，十进制中的数 +3 ，计算机字长为8位，转换成二进制就是0000 0011。如果是 -3 ，就是 100 00011 。 那么，这里的 0000 0011 和 1000 0011 就是机器数。  真值  因为第一位是符号位，所以机器数的形">
+<meta property="og:type" content="article">
+<meta property="og:title" content="原码、反码、补码的理解">
+<meta property="og:url" content="http://soatree.github.io/2023/02/08/%E5%8E%9F%E7%A0%81%E3%80%81%E5%8F%8D%E7%A0%81%E3%80%81%E8%A1%A5%E7%A0%81%E7%9A%84%E7%90%86%E8%A7%A3/index.html">
+<meta property="og:site_name" content="FatTree">
+<meta property="og:description" content="概念机器数、真值 机器数  一个数在计算机中的二进制表示形式，叫做这个数的机器数。机器数是带符号的，在计算机用机器数的最高位存放符号，正数为0，负数为1。 比如，十进制中的数 +3 ，计算机字长为8位，转换成二进制就是0000 0011。如果是 -3 ，就是 100 00011 。 那么，这里的 0000 0011 和 1000 0011 就是机器数。  真值  因为第一位是符号位，所以机器数的形">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-02-08T13:49:32.000Z">
+<meta property="article:modified_time" content="2023-02-12T09:51:24.000Z">
+<meta property="article:author" content="胖树">
+<meta property="article:tag" content="计算机组成原理">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>原码、反码、补码的理解 - FatTree</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"soatree.github.io","root":"/","version":"1.9.2","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.2.0"><link rel="alternate" href="/atom.xml" title="FatTree" type="application/atom+xml">
+</head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>FAT TREE</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/light.JPG') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="原码、反码、补码的理解"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-02-08 21:49" pubdate>
+          2023年2月8日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.2k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          19 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">原码、反码、补码的理解</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h1><h2 id="机器数、真值"><a href="#机器数、真值" class="headerlink" title="机器数、真值"></a>机器数、真值</h2><ul>
+<li>机器数</li>
+</ul>
+<p>一个数在计算机中的二进制表示形式，叫做这个数的机器数。机器数是带符号的，在计算机用机器数的最高位存放符号，正数为0，负数为1。</p>
+<p>比如，十进制中的数 +3 ，计算机字长为8位，转换成二进制就是0000 0011。如果是 -3 ，就是 100 00011 。</p>
+<p>那么，这里的 0000 0011 和 1000 0011 就是机器数。</p>
+<ul>
+<li>真值</li>
+</ul>
+<p>因为第一位是符号位，所以机器数的形式值就不等于真正的数值。</p>
+<p>例如上面的有符号数 1000 0011，其最高位1代表负，其真正数值是 -3，而不是形式值131（1000 0011转换成十进制等于131）。所以，为区别起见，将带符号位的机器数对应的真正数值称为机器数的真值。</p>
+<p>例：0000 0001的真值 &#x3D; +000 0001 &#x3D; +1，1000 0001的真值 &#x3D; –000 0001 &#x3D; –1</p>
+<h2 id="原码、反码、补码"><a href="#原码、反码、补码" class="headerlink" title="原码、反码、补码"></a>原码、反码、补码</h2><p>原码、反码、补码是机器存储一个具体数字的编码方式。机器数包含了原码、反码、补码的表示形式。</p>
+<ul>
+<li>原码</li>
+</ul>
+<p>原码就是符号位加上真值的绝对值，即用第一位表示符号，其余位表示值。比如：如果是8位二进制：</p>
+<p>[+1]原&#x3D; 0000 0001</p>
+<p>[-1]原&#x3D; 1000 0001</p>
+<p>第一位是符号位，因为第一位是符号位，所以8位二进制数的取值范围就是：（即第一位不表示值，只表示正负。）</p>
+<p>[1111 1111 , 0111 1111]</p>
+<p>即</p>
+<p>[-127 , 127]</p>
+<ul>
+<li>反码</li>
+</ul>
+<p>反码的表示方法是：</p>
+<p>正数的反码是其本身；</p>
+<p>负数的反码是在其原码的基础上，符号位不变，其余各个位取反。</p>
+<p>[+1] &#x3D; [0000 0001]原&#x3D; [0000 0001]反</p>
+<p>[-1] &#x3D; [1000 0001]原&#x3D; [1111 1110]反</p>
+<p>可见如果一个反码表示的是负数，人脑无法直观的看出来它的数值。通常要将其转换成原码再计算。</p>
+<p><strong>反码表示在计算机中往往作为数码变换的中间环节。</strong></p>
+<ul>
+<li>补码</li>
+</ul>
+<p>补码的表示方法是：</p>
+<p>正数的补码就是其本身；</p>
+<p>负数的补码是在其原码的基础上，符号位不变，其余各位取反，最后+1。(也即在反码的基础上+1)</p>
+<p>[+1] &#x3D; [0000 0001]原&#x3D; [0000 0001]反&#x3D; [0000 0001]补</p>
+<p>[-1] &#x3D; [1000 0001]原&#x3D; [1111 1110]反&#x3D; [1111 1111]补</p>
+<p>对于负数，补码表示方式也是人脑无法直观看出其数值的。通常也需要转换成原码再计算其数值。</p>
+<h1 id="为什么用反码和补码"><a href="#为什么用反码和补码" class="headerlink" title="为什么用反码和补码"></a>为什么用反码和补码</h1><p>计算机辨别”符号位”显然会让计算机的基础电路设计变得十分复杂，所以要把对于负数的减法运算转成加法运算。</p>
+<p>将钟表想象成是一个1位的12进制数。例如钟表上的时间为6点，如果我们希望将时间设置为4点，那么我们可以将钟表往回拨2个小时，即“-2”，或者我们可以将钟表往前拨10个小时，即“+10”</p>
+<ol>
+<li>往回拨2个小时：6 - 2 &#x3D; 4</li>
+<li>往前拨10个小时：(6 + 10)mod 12 &#x3D; 4</li>
+</ol>
+<p>这样就将减法计算转成了加法计算。</p>
+<p>类似钟表，计算机中的数值也是有一定范围的，所以同样可以将计算机中的减法运算改为加法运算，即将真值为负的机器数转为补码形式再做加法，实际上是将负数转换成了这个它的<strong>同余数（概念自行百度）</strong>。</p>
+<p>补码举例：</p>
+<p>2-1 &#x3D; 2+(-1) &#x3D; [0000 0010]原+ [1000 0001]原&#x3D; [0000 0010]补 + [1111 1111]补</p>
+<p>如果把[1111 1111]当成原码，去除符号位，则[0111 1111]原 &#x3D; 127</p>
+<p>相当于</p>
+<p>2-1 ≡ 2+127 (mod 128)</p>
+<h1 id="到底什么是补码"><a href="#到底什么是补码" class="headerlink" title="到底什么是补码"></a>到底什么是补码</h1><p>所以到底什么是补码？</p>
+<p><strong>其实负数的补码等于反码+1只是补码的求法，而不是补码的定义，很多人以为求补码就要先求反码，其实并不是，那些计算机学家并不会心血来潮的把反码+1就定义为补码，只不过补码正好就等于反码+1而已。</strong></p>
+<p>其实负数的补码，是能够和其相反数相加通过溢出从而使计算机内计算结果变为0的二进制码。这是补码设计的初衷，具体目标就是让1+（-1）&#x3D;0，这利用原码是无法得到的：</p>
+<p>0001(1) + 1001(-1) &#x3D; 1010(-2)</p>
+<p>而在补码中：</p>
+<p>0001(1补) + 1111(-1补) &#x3D; 10000(1溢出)</p>
+<p>所以对于一个n位的负数-X，有如下关系</p>
+<p>X<del>补</del> + (-X)<del>补</del> &#x3D; 100…0(n个0) &#x3D; 2^n^</p>
+<p>假设寄存器是n位的，那么-X的补码应该是2^n^ - X的二进制编码</p>
+<p>例如：</p>
+<p>X &#x3D; - 0b11(-3) ，四比特表示原码 &#x3D; 1011(11)，对应反码为 &#x3D; 1100(12)，补码为1101(13);<br>如果寄存器4位，-3对应的补码二进制数为13，刚好是2^4^-3</p>
+<p>正十进制数X补码等于其本身，n位寄存器下-X的补码等于2^n^-X对应的二进制编码。</p>
+<h1 id="已知补码如何求原码"><a href="#已知补码如何求原码" class="headerlink" title="已知补码如何求原码"></a>已知补码如何求原码</h1><h2 id="二进制"><a href="#二进制" class="headerlink" title="二进制"></a>二进制</h2><p>补码的补码就是原码</p>
+<h2 id="十进制"><a href="#十进制" class="headerlink" title="十进制"></a>十进制</h2><p>n位寄存器下-X的补码等于2^n^-X对应的二进制编码。</p>
+<p>（1）十进制的情况下，如果给的补码是无符号数2^n^-X，那么原码即(2^n^-X) - 2^n^ &#x3D; -X:<br>例如前面-3补码无符号数是13，对应的原码就是13-2^4^&#x3D;-3</p>
+<p>（2）十进制的情况下，如果给的补码是有符号数-Y，对应的无符号数就是2^n-1^ + Y，那么原码就是(2^n-1^ + Y)- 2^n^&#x3D;Y-2^n-1^:<br>例如前面-3补码有符号数是-5，对应的原码就是5-2^3^ &#x3D; -3</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/118432554">原码、反码、补码</a><br><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/99082236">二进制的原码、反码、补码</a><br><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/376848035">补码的计算方法</a></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BB%84%E6%88%90%E5%8E%9F%E7%90%86/" class="category-chain-item">计算机组成原理</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BB%84%E6%88%90%E5%8E%9F%E7%90%86/">#计算机组成原理</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>原码、反码、补码的理解</div>
+      <div>http://soatree.github.io/2023/02/08/原码、反码、补码的理解/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>胖树</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年2月8日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+              <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                <i class="iconfont icon-nc"></i>
+              </span>
+              </a>
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+              <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                <i class="iconfont icon-sa"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2023/02/14/%E5%85%AB%E8%82%A1%E6%96%87-java%E5%A4%9A%E7%BA%BF%E7%A8%8B-%E5%90%8C%E6%AD%A5%E5%8D%8F%E4%BD%9C/" title="八股文-java多线程-同步协作">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">八股文-java多线程-同步协作</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/01/21/%E5%85%AB%E8%82%A1%E6%96%87-java%E5%A4%9A%E7%BA%BF%E7%A8%8B-%E5%9F%BA%E7%A1%80/" title="八股文-java多线程-基础">
+                        <span class="hidden-mobile">八股文-java多线程-基础</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

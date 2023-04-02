@@ -1,0 +1,707 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/cat.jpg">
+  <link rel="icon" href="/img/cat.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="胖树">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="前言java多线程基础相关面试题目整理 题目线程和进程的概念？守护线程是干什么的？常见的守护线程有哪些？线程和进程的概念进程是程序的运行实例，是程序向操作系统申请资源的基本单位，线程是进程的一条执行路径。Java的线程分为两种：用户线程和守护线程。守护线程作用是为其他线程提供服务，如果所有的用户线程死亡，后台线程都会死亡。 常见的守护线程有哪些守护线程最典型代表就是GC线程。 参考:Java 守护">
+<meta property="og:type" content="article">
+<meta property="og:title" content="八股文-java多线程-基础">
+<meta property="og:url" content="http://soatree.github.io/2023/01/21/%E5%85%AB%E8%82%A1%E6%96%87-java%E5%A4%9A%E7%BA%BF%E7%A8%8B-%E5%9F%BA%E7%A1%80/index.html">
+<meta property="og:site_name" content="FatTree">
+<meta property="og:description" content="前言java多线程基础相关面试题目整理 题目线程和进程的概念？守护线程是干什么的？常见的守护线程有哪些？线程和进程的概念进程是程序的运行实例，是程序向操作系统申请资源的基本单位，线程是进程的一条执行路径。Java的线程分为两种：用户线程和守护线程。守护线程作用是为其他线程提供服务，如果所有的用户线程死亡，后台线程都会死亡。 常见的守护线程有哪些守护线程最典型代表就是GC线程。 参考:Java 守护">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://soatree.github.io/2023/01/21/%E5%85%AB%E8%82%A1%E6%96%87-java%E5%A4%9A%E7%BA%BF%E7%A8%8B-%E5%9F%BA%E7%A1%80/java%E7%BA%BF%E7%A8%8B%E7%9A%84%E7%8A%B6%E6%80%81.png">
+<meta property="article:published_time" content="2023-01-21T13:41:42.000Z">
+<meta property="article:modified_time" content="2023-02-24T14:26:46.000Z">
+<meta property="article:author" content="胖树">
+<meta property="article:tag" content="多线程">
+<meta property="article:tag" content="面试">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://soatree.github.io/2023/01/21/%E5%85%AB%E8%82%A1%E6%96%87-java%E5%A4%9A%E7%BA%BF%E7%A8%8B-%E5%9F%BA%E7%A1%80/java%E7%BA%BF%E7%A8%8B%E7%9A%84%E7%8A%B6%E6%80%81.png">
+  
+  
+  
+  <title>八股文-java多线程-基础 - FatTree</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"soatree.github.io","root":"/","version":"1.9.2","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.2.0"><link rel="alternate" href="/atom.xml" title="FatTree" type="application/atom+xml">
+</head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>FAT TREE</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/light.JPG') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="八股文-java多线程-基础"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-01-21 21:41" pubdate>
+          2023年1月21日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          14k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          121 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">八股文-java多线程-基础</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>java多线程基础相关面试题目整理</p>
+<h1 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h1><h2 id="线程和进程的概念？守护线程是干什么的？常见的守护线程有哪些？"><a href="#线程和进程的概念？守护线程是干什么的？常见的守护线程有哪些？" class="headerlink" title="线程和进程的概念？守护线程是干什么的？常见的守护线程有哪些？"></a>线程和进程的概念？守护线程是干什么的？常见的守护线程有哪些？</h2><h3 id="线程和进程的概念"><a href="#线程和进程的概念" class="headerlink" title="线程和进程的概念"></a>线程和进程的概念</h3><p>进程是程序的运行实例，是程序向操作系统申请资源的基本单位，线程是进程的一条执行路径。<br>Java的线程分为两种：用户线程和守护线程。守护线程作用是为其他线程提供服务，如果所有的用户线程死亡，后台线程都会死亡。</p>
+<h3 id="常见的守护线程有哪些"><a href="#常见的守护线程有哪些" class="headerlink" title="常见的守护线程有哪些"></a>常见的守护线程有哪些</h3><p>守护线程最典型代表就是GC线程。</p>
+<p>参考:<br><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/f1723dfc0a9d">Java 守护线程Daemon</a><br>《Java多线程编程实战指南》黄文海<br>《Java疯狂讲义》李刚</p>
+<h2 id="并发和并行的概念？Java实现并发的方式？"><a href="#并发和并行的概念？Java实现并发的方式？" class="headerlink" title="并发和并行的概念？Java实现并发的方式？"></a>并发和并行的概念？Java实现并发的方式？</h2><h3 id="并发和并行的概念"><a href="#并发和并行的概念" class="headerlink" title="并发和并行的概念"></a>并发和并行的概念</h3><p>从软件的角度来说，并发就是在一段时间内以交替的方式去完成多个任务，而并行就是以齐头并进的方式去完成多个任务。<br>从硬件的角度来说，在一个处理器一次只能够运行一个线程的情况下，由于处理器可以使用时间片（Time-slice）分配的技术来实现在同一段时间内运行多个线程，因此一个处理器就可以实现并发。而并行则需要靠多个处理器在同一时刻各自运行一个线程来实现。</p>
+<h3 id="Java实现并发的方式"><a href="#Java实现并发的方式" class="headerlink" title="Java实现并发的方式"></a>Java实现并发的方式</h3><ul>
+<li>继承Thread类</li>
+</ul>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs scala"><span class="hljs-comment">//实现方法的类</span><br>public <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Demo1</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Thread</span> </span>&#123;<br>    public void run()&#123;<br>        <span class="hljs-type">System</span>.out.println(<span class="hljs-string">&quot;继承Thread类&quot;</span>);<br>    &#125;<br>&#125;<br><br><span class="hljs-comment">//执行的方法</span><br>public static void main(<span class="hljs-type">String</span>[] args) &#123;<br>        <span class="hljs-type">Demo1</span> demo1=<span class="hljs-keyword">new</span> <span class="hljs-type">Demo1</span>();<br>        demo1.start();<br>&#125;<br><br>执行结果：<br>继承<span class="hljs-type">Thread</span>类<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>实现Runnable接口</li>
+</ul>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs typescript"><span class="hljs-comment">//实现的方法类：</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Demo2</span> <span class="hljs-keyword">implements</span> <span class="hljs-title class_">Runnable</span> &#123;<br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-built_in">void</span> <span class="hljs-title function_">run</span>(<span class="hljs-params"></span>) &#123;<br>        <span class="hljs-title class_">System</span>.<span class="hljs-property">out</span>.<span class="hljs-title function_">println</span>(<span class="hljs-string">&quot;实现runnable接口&quot;</span>);<br>    &#125;<br><br>&#125;<br><br><span class="hljs-comment">//执行方法：</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-built_in">void</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"><span class="hljs-built_in">String</span>[] args</span>) &#123;<br>        <span class="hljs-title class_">Demo2</span> demo2=<span class="hljs-keyword">new</span> <span class="hljs-title class_">Demo2</span>();<br>        <span class="hljs-title class_">Thread</span> thread=<span class="hljs-keyword">new</span> <span class="hljs-title class_">Thread</span>(demo2);<br>        thread.<span class="hljs-title function_">start</span>();<br>&#125;<br>    <br>执行结果：<br>实现runnable接口<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>通过实现Callable接口</li>
+</ul>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs typescript"><span class="hljs-comment">//实现类方法：</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Demo3</span> <span class="hljs-keyword">implements</span> <span class="hljs-title class_">Callable</span> &#123;<br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-title class_">Object</span> <span class="hljs-title function_">call</span>(<span class="hljs-params"></span>) &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;1&quot;</span>;<br>    &#125;<br>&#125;<br><br><span class="hljs-comment">//执行方法：</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-built_in">void</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"><span class="hljs-built_in">String</span>[] args</span>) &#123;<br>		<span class="hljs-comment">//创建实现类对象</span><br>        <span class="hljs-title class_">Callable</span> demo3=<span class="hljs-keyword">new</span> <span class="hljs-title class_">Demo3</span>();<br>        <span class="hljs-title class_">FutureTask</span> oneTask = <span class="hljs-keyword">new</span> <span class="hljs-title class_">FutureTask</span>(demo3);<br>        <span class="hljs-title class_">Thread</span> thread = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Thread</span>(oneTask);<br>        thread.<span class="hljs-title function_">start</span>();<br>        <span class="hljs-title class_">Object</span> o = <span class="hljs-literal">null</span>;<br>        <span class="hljs-keyword">try</span> &#123;<br>        	<span class="hljs-comment">//获取返回值</span><br>            o = oneTask.<span class="hljs-title function_">get</span>();<br>        &#125; <span class="hljs-keyword">catch</span> (<span class="hljs-title class_">InterruptedException</span> e) &#123;<br>            e.<span class="hljs-title function_">printStackTrace</span>();<br>        &#125; <span class="hljs-keyword">catch</span> (<span class="hljs-title class_">ExecutionException</span> e) &#123;<br>            e.<span class="hljs-title function_">printStackTrace</span>();<br>        &#125;<br>        <span class="hljs-title class_">System</span>.<span class="hljs-property">out</span>.<span class="hljs-title function_">println</span>(o);<br><br>&#125;<br><br>执行结果：<br><span class="hljs-number">1</span><br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>通过线程池来实现多线程</li>
+</ul>
+<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs arduino"><span class="hljs-comment">//实现代码如下：</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Demo5</span> &#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-type">static</span> <span class="hljs-type">void</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-type">String</span>[] args)</span> </span>&#123;<br>        ExecutorService executorService = Executors.<span class="hljs-built_in">newFixedThreadPool</span>(<span class="hljs-number">5</span>);<br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i&lt;<span class="hljs-number">5</span>;i++)&#123;<br>            <span class="hljs-type">int</span> finalI = i;<br>            executorService.<span class="hljs-built_in">execute</span>(()-&gt; &#123;<br>                System.out.<span class="hljs-built_in">println</span>(finalI);<br>            &#125;);<br>        &#125;<br>    &#125;<br>&#125;<br><br>执行结果：<br><span class="hljs-number">2</span><br><span class="hljs-number">3</span><br><span class="hljs-number">4</span><br><span class="hljs-number">1</span><br><span class="hljs-number">0</span><br></code></pre></td></tr></table></figure>
+
+<p>参考:<br>《Java多线程编程实战指南》黄文海<br><a target="_blank" rel="noopener" href="https://blog.csdn.net/limingxingjy/article/details/102709756">浅谈实现并发的几种方式</a></p>
+<h2 id="native关键字的作用是什么？"><a href="#native关键字的作用是什么？" class="headerlink" title="native关键字的作用是什么？"></a>native关键字的作用是什么？</h2><ul>
+<li>作用</li>
+</ul>
+<p>使用native关键字说明这个方法是原生方法，也就是这个方法是用C&#x2F;C++语言实现的，并且被编译成了DLL，由java去调用。<br>这些函数的实现体在DLL中，JDK的源代码中并不包含。对于不同的平台它们也是不同的。这也是java的底层机制，实际上java就是在不同的平台上调用不同的native方法实现对操作系统的访问的。</p>
+<ul>
+<li>使用</li>
+</ul>
+<p>可以将native方法比作Java程序同Ｃ程序的接口，其实现步骤：<br>　　１、在Java中声明native()方法，然后编译；<br>　　２、用javac -h产生一个.h文件；<br>　　３、写一个.cpp文件实现native导出方法，其中需要包含第二步产生的.h文件（注意其中又包含了JDK带的jni.h文件）；<br>　　４、将第三步的.cpp文件编译成动态链接库文件；<br>　　５、在Java中用System.loadLibrary()方法加载第四步产生的动态链接库文件，这个native()方法就可以在Java中被访问了。</p>
+<p>参考：<br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/KingIceMou/p/7239668.html">Java中Native关键字的作用</a></p>
+<h2 id="线程的状态有哪些，是怎么转换的？Jvm怎么查看线程的运行状态？"><a href="#线程的状态有哪些，是怎么转换的？Jvm怎么查看线程的运行状态？" class="headerlink" title="线程的状态有哪些，是怎么转换的？Jvm怎么查看线程的运行状态？"></a>线程的状态有哪些，是怎么转换的？Jvm怎么查看线程的运行状态？</h2><h3 id="线程的状态有哪些，是怎么转换的"><a href="#线程的状态有哪些，是怎么转换的" class="headerlink" title="线程的状态有哪些，是怎么转换的"></a>线程的状态有哪些，是怎么转换的</h3><p>Java线程的状态可以使用监控工具查看，也可以通过Thread.getState()调用来获取。Thread.getState()的返回值类型Thread.State是一个枚举类型（Enum）。Thread.State所定义的线程状态包括以下几种。<br>NEW：一个已创建而未启动的线程处于该状态。由于一个线程实例只能够被启动一次，因此一个线程只可能有一次处于该状态。<br>RUNNABLE：该状态可以被看成一个复合状态。它包括两个子状态：READY和RUNNING。前者表示处于该状态的线程可以被线程调度器（Scheduler）进行调度而使之处于RUNNING状态。后者表示处于该状态的线程正在运行，即相应线程对象的run方法所对应的指令正在由处理器执行。执行Thread.yield()的线程，其状态可能会由RUNNING转换为READY。处于READY子状态的线程也被称为活跃线程。<br>BLOCKED：一个线程发起一个阻塞式I&#x2F;O（BlockingI&#x2F;O）操作后，或者申请一个由其他线程持有的独占资源（比如锁）时，相应的线程会处于该状态。处于BLOCKED状态的线程并不会占用处理器资源。当阻塞式I&#x2F;O操作完成后，或者线程获得了其申请的资源，该线程的状态又可以转换为RUNNABLE。<br>WAITING：一个线程执行了某些特定方法之后就会处于这种等待其他线程执行另外一些特定操作的状态。能够使其执行线程变更为WAITING状态的方法包括：Object.wait()、Thread.join()和LockSupport.park(Object)。能够使相应线程从WAITING变更为RUNNABLE的相应方法包括：Object.notify()&#x2F;notifyAll()和LockSupport.unpark(Object))。<br>TIMED_WAITING：该状态和WAITING类似，差别在于处于该状态的线程并非无限制地等待其他线程执行特定操作，而是处于带有时间限制的等待状态。当其他线程没有在指定时间内执行该线程所期望的特定操作时，该线程的状态自动转换为RUNNABLE。<br>TERMINATED：已经执行结束的线程处于该状态。由于一个线程实例只能够被启动一次，因此一个线程也只可能有一次处于该状态。Thread.run()正常返回或者由于抛出异常而提前终止都会导致相应线程处于该状态。一个线程在其整个生命周期中，只可能有一次处于NEW状态和TERMINATED状态。</p>
+<p><img src="/2023/01/21/%E5%85%AB%E8%82%A1%E6%96%87-java%E5%A4%9A%E7%BA%BF%E7%A8%8B-%E5%9F%BA%E7%A1%80/java%E7%BA%BF%E7%A8%8B%E7%9A%84%E7%8A%B6%E6%80%81.png" srcset="/img/loading.gif" lazyload></p>
+<h3 id="Jvm怎么查看线程的运行状态"><a href="#Jvm怎么查看线程的运行状态" class="headerlink" title="Jvm怎么查看线程的运行状态"></a>Jvm怎么查看线程的运行状态</h3><p>对线程进行监视的主要途径是获取并查看程序的线程转储（ThreadDump）。一个程序的线程转储包含了获取这个线程转储的那一刻该程序的线程信息。这些信息包括程序中有哪些线程以及这些线程的具体信息。常用线程转储的方法如下：</p>
+<ul>
+<li>jstack</li>
+</ul>
+<p>功能描述：<br>jstack用于生成java虚拟机当前时刻的线程快照。线程快照是当前java虚拟机内每一条线程正在执行的方法堆栈的集合，生成线程快照的主要目的是定位线程出现长时间停顿的原因，如线程间死锁、死循环、请求外部资源导致的长时间等待等。<br>命令用法：<br>jstack [ option ] vmid<br>主要选项：<br>-l 打印锁的额外信息<br>-e 打印线程的额外信息</p>
+<p>举例：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br></pre></td><td class="code"><pre><code class="hljs routeros">C:\Users\liuwe&gt;jstack -l 16788<br>2023-01-23 16:57:23<br>Full thread dump OpenJDK 64-Bit<span class="hljs-built_in"> Server </span>VM (11+28 mixed mode):<br><br>Threads class SMR info:<br><span class="hljs-attribute">_java_thread_list</span>=0x0000024591cff610, <span class="hljs-attribute">length</span>=11, elements=&#123;<br>0x00000245f256d000, 0x00000245911b3000, 0x00000245911b4000, 0x0000024591a43000,<br>0x00000245911e9000, 0x00000245911eb800, 0x00000245911f2000, 0x0000024591ab0000,<br>0x00000245f264d000, 0x0000024591d54000, 0x0000024591d2d800<br>&#125;<br><br><span class="hljs-string">&quot;main&quot;</span> #1 <span class="hljs-attribute">prio</span>=5 <span class="hljs-attribute">os_prio</span>=0 <span class="hljs-attribute">cpu</span>=20078.13ms <span class="hljs-attribute">elapsed</span>=28.27s <span class="hljs-attribute">tid</span>=0x00000245f256d000 <span class="hljs-attribute">nid</span>=0x3f48 runnable  [0x0000005b97bff000]<br>   java.lang.Thread.State: RUNNABLE<br>        at java.io.FileOutputStream.writeBytes(java.base@11/Native Method)<br>        at java.io.FileOutputStream.write(java.base@11/FileOutputStream.java:354)<br>        at java.io.BufferedOutputStream.flushBuffer(java.base@11/BufferedOutputStream.java:81)<br>        at java.io.BufferedOutputStream.flush(java.base@11/BufferedOutputStream.java:142)<br>        - locked &lt;0x00000000847e2818&gt; (a java.io.BufferedOutputStream)<br>        at java.io.PrintStream.write(java.base@11/PrintStream.java:561)<br>        - locked &lt;0x0000000084718cc8&gt; (a java.io.PrintStream)<br>        at sun.nio.cs.StreamEncoder.writeBytes(java.base@11/StreamEncoder.java:233)<br>        at sun.nio.cs.StreamEncoder.implFlushBuffer(java.base@11/StreamEncoder.java:312)<br>        at sun.nio.cs.StreamEncoder.flushBuffer(java.base@11/StreamEncoder.java:104)<br>        - locked &lt;0x0000000084718c88&gt; (a java.io.OutputStreamWriter)<br>        at java.io.OutputStreamWriter.flushBuffer(java.base@11/OutputStreamWriter.java:184)<br>        at java.io.PrintStream.newLine(java.base@11/PrintStream.java:625)<br>        - eliminated &lt;0x0000000084718cc8&gt; (a java.io.PrintStream)<br>        at java.io.PrintStream.println(java.base@11/PrintStream.java:883)<br>        - locked &lt;0x0000000084718cc8&gt; (a java.io.PrintStream)<br>        at TestClass.main(TestClass.java:7)<br><br>   Locked ownable synchronizers:<br>        - None<br><br><span class="hljs-string">&quot;Reference Handler&quot;</span> #2 daemon <span class="hljs-attribute">prio</span>=10 <span class="hljs-attribute">os_prio</span>=2 <span class="hljs-attribute">cpu</span>=0.00ms <span class="hljs-attribute">elapsed</span>=28.01s <span class="hljs-attribute">tid</span>=0x00000245911b3000 <span class="hljs-attribute">nid</span>=0x393c waiting on condition  [0x0000005b982ff000]<br>   java.lang.Thread.State: RUNNABLE<br>        at java.lang.ref.Reference.waitForReferencePendingList(java.base@11/Native Method)<br>        at java.lang.ref.Reference.processPendingReferences(java.base@11/Reference.java:241)<br>        at java.lang.ref.Reference<span class="hljs-variable">$ReferenceHandler</span>.<span class="hljs-built_in">run</span>(java.base@11/Reference.java:213)<br><br>   Locked ownable synchronizers:<br>        - None<br><br><span class="hljs-string">&quot;Finalizer&quot;</span> #3 daemon <span class="hljs-attribute">prio</span>=8 <span class="hljs-attribute">os_prio</span>=1 <span class="hljs-attribute">cpu</span>=0.00ms <span class="hljs-attribute">elapsed</span>=28.01s <span class="hljs-attribute">tid</span>=0x00000245911b4000 <span class="hljs-attribute">nid</span>=0x434c <span class="hljs-keyword">in</span> Object.wait()  [0x0000005b983fe000]<br>   java.lang.Thread.State: WAITING (on object monitor)<br>        at java.lang.Object.wait(java.base@11/Native Method)<br>        - waiting on &lt;0x0000000084729c70&gt; (a java.lang.ref.ReferenceQueue<span class="hljs-variable">$Lock</span>)<br>        at java.lang.ref.ReferenceQueue.<span class="hljs-built_in">remove</span>(java.base@11/ReferenceQueue.java:155)<br>        - waiting <span class="hljs-keyword">to</span> re-lock <span class="hljs-keyword">in</span> wait() &lt;0x0000000084729c70&gt; (a java.lang.ref.ReferenceQueue<span class="hljs-variable">$Lock</span>)<br>        at java.lang.ref.ReferenceQueue.<span class="hljs-built_in">remove</span>(java.base@11/ReferenceQueue.java:176)<br>        at java.lang.ref.Finalizer<span class="hljs-variable">$FinalizerThread</span>.<span class="hljs-built_in">run</span>(java.base@11/Finalizer.java:170)<br><br>   Locked ownable synchronizers:<br>        - None<br><br><span class="hljs-string">&quot;Signal Dispatcher&quot;</span> #4 daemon <span class="hljs-attribute">prio</span>=9 <span class="hljs-attribute">os_prio</span>=2 <span class="hljs-attribute">cpu</span>=0.00ms <span class="hljs-attribute">elapsed</span>=27.90s <span class="hljs-attribute">tid</span>=0x0000024591a43000 <span class="hljs-attribute">nid</span>=0x3938 runnable  [0x0000000000000000]<br>   java.lang.Thread.State: RUNNABLE<br><br>   Locked ownable synchronizers:<br>        - None<br><br><span class="hljs-string">&quot;Attach Listener&quot;</span> #5 daemon <span class="hljs-attribute">prio</span>=5 <span class="hljs-attribute">os_prio</span>=2 <span class="hljs-attribute">cpu</span>=62.50ms <span class="hljs-attribute">elapsed</span>=27.90s <span class="hljs-attribute">tid</span>=0x00000245911e9000 <span class="hljs-attribute">nid</span>=0x28fc waiting on condition  [0x0000000000000000]<br>   java.lang.Thread.State: RUNNABLE<br><br>   Locked ownable synchronizers:<br>        - None<br><br><span class="hljs-string">&quot;C2 CompilerThread0&quot;</span> #6 daemon <span class="hljs-attribute">prio</span>=9 <span class="hljs-attribute">os_prio</span>=2 <span class="hljs-attribute">cpu</span>=437.50ms <span class="hljs-attribute">elapsed</span>=27.90s <span class="hljs-attribute">tid</span>=0x00000245911eb800 <span class="hljs-attribute">nid</span>=0x2e78 waiting on condition  [0x0000000000000000]<br>   java.lang.Thread.State: RUNNABLE<br>   <span class="hljs-literal">No</span> compile task<br><br>   Locked ownable synchronizers:<br>        - None<br><br><span class="hljs-string">&quot;C1 CompilerThread0&quot;</span> #8 daemon <span class="hljs-attribute">prio</span>=9 <span class="hljs-attribute">os_prio</span>=2 <span class="hljs-attribute">cpu</span>=187.50ms <span class="hljs-attribute">elapsed</span>=27.90s <span class="hljs-attribute">tid</span>=0x00000245911f2000 <span class="hljs-attribute">nid</span>=0x4be0 waiting on condition  [0x0000000000000000]<br>   java.lang.Thread.State: RUNNABLE<br>   <span class="hljs-literal">No</span> compile task<br><br>   Locked ownable synchronizers:<br>        - None<br><br><span class="hljs-string">&quot;Sweeper thread&quot;</span> #9 daemon <span class="hljs-attribute">prio</span>=9 <span class="hljs-attribute">os_prio</span>=2 <span class="hljs-attribute">cpu</span>=15.63ms <span class="hljs-attribute">elapsed</span>=27.88s <span class="hljs-attribute">tid</span>=0x0000024591ab0000 <span class="hljs-attribute">nid</span>=0x13b8 runnable  [0x0000000000000000]<br>   java.lang.Thread.State: RUNNABLE<br><br>   Locked ownable synchronizers:<br>        - None<br><br><span class="hljs-string">&quot;Common-Cleaner&quot;</span> #10 daemon <span class="hljs-attribute">prio</span>=8 <span class="hljs-attribute">os_prio</span>=1 <span class="hljs-attribute">cpu</span>=0.00ms <span class="hljs-attribute">elapsed</span>=27.66s <span class="hljs-attribute">tid</span>=0x00000245f264d000 <span class="hljs-attribute">nid</span>=0x40e4 <span class="hljs-keyword">in</span> Object.wait()  [0x0000005b989ff000]<br>   java.lang.Thread.State: TIMED_WAITING (on object monitor)<br>        at java.lang.Object.wait(java.base@11/Native Method)<br>        - waiting on &lt;0x000000008472a448&gt; (a java.lang.ref.ReferenceQueue<span class="hljs-variable">$Lock</span>)<br>        at java.lang.ref.ReferenceQueue.<span class="hljs-built_in">remove</span>(java.base@11/ReferenceQueue.java:155)<br>        - waiting <span class="hljs-keyword">to</span> re-lock <span class="hljs-keyword">in</span> wait() &lt;0x000000008472a448&gt; (a java.lang.ref.ReferenceQueue<span class="hljs-variable">$Lock</span>)<br>        at jdk.internal.ref.CleanerImpl.<span class="hljs-built_in">run</span>(java.base@11/CleanerImpl.java:148)<br>        at java.lang.Thread.<span class="hljs-built_in">run</span>(java.base@11/Thread.java:834)<br>        at jdk.internal.misc.InnocuousThread.<span class="hljs-built_in">run</span>(java.base@11/InnocuousThread.java:134)<br><br>   Locked ownable synchronizers:<br>        - None<br><br><span class="hljs-string">&quot;Monitor Ctrl-Break&quot;</span> #11 daemon <span class="hljs-attribute">prio</span>=5 <span class="hljs-attribute">os_prio</span>=0 <span class="hljs-attribute">cpu</span>=0.00ms <span class="hljs-attribute">elapsed</span>=27.45s <span class="hljs-attribute">tid</span>=0x0000024591d54000 <span class="hljs-attribute">nid</span>=0x34b0 runnable  [0x0000005b98afe000]<br>   java.lang.Thread.State: RUNNABLE<br>        at java.net.SocketInputStream.socketRead0(java.base@11/Native Method)<br>        at java.net.SocketInputStream.socketRead(java.base@11/SocketInputStream.java:115)<br>        at java.net.SocketInputStream.read(java.base@11/SocketInputStream.java:168)<br>        at java.net.SocketInputStream.read(java.base@11/SocketInputStream.java:140)<br>        at sun.nio.cs.StreamDecoder.readBytes(java.base@11/StreamDecoder.java:284)<br>        at sun.nio.cs.StreamDecoder.implRead(java.base@11/StreamDecoder.java:326)<br>        at sun.nio.cs.StreamDecoder.read(java.base@11/StreamDecoder.java:178)<br>        - locked &lt;0x000000008471f758&gt; (a java.io.InputStreamReader)<br>        at java.io.InputStreamReader.read(java.base@11/InputStreamReader.java:185)<br>        at java.io.BufferedReader.fill(java.base@11/BufferedReader.java:161)<br>        at java.io.BufferedReader.readLine(java.base@11/BufferedReader.java:326)<br>        - locked &lt;0x000000008471f758&gt; (a java.io.InputStreamReader)<br>        at java.io.BufferedReader.readLine(java.base@11/BufferedReader.java:392)<br>        at com.intellij.rt.execution.application.AppMainV2<span class="hljs-variable">$1</span>.<span class="hljs-built_in">run</span>(AppMainV2.java:55)<br><br>   Locked ownable synchronizers:<br>        - None<br><br><span class="hljs-string">&quot;Service Thread&quot;</span> #12 daemon <span class="hljs-attribute">prio</span>=9 <span class="hljs-attribute">os_prio</span>=0 <span class="hljs-attribute">cpu</span>=0.00ms <span class="hljs-attribute">elapsed</span>=27.45s <span class="hljs-attribute">tid</span>=0x0000024591d2d800 <span class="hljs-attribute">nid</span>=0x3abc runnable  [0x0000000000000000]<br>   java.lang.Thread.State: RUNNABLE<br><br>   Locked ownable synchronizers:<br>        - None<br><br><span class="hljs-string">&quot;VM Thread&quot;</span> <span class="hljs-attribute">os_prio</span>=2 <span class="hljs-attribute">cpu</span>=31.25ms <span class="hljs-attribute">elapsed</span>=28.03s <span class="hljs-attribute">tid</span>=0x00000245911af000 <span class="hljs-attribute">nid</span>=0x41dc runnable<br><br><span class="hljs-string">&quot;GC Thread#0&quot;</span> <span class="hljs-attribute">os_prio</span>=2 <span class="hljs-attribute">cpu</span>=0.00ms <span class="hljs-attribute">elapsed</span>=28.19s <span class="hljs-attribute">tid</span>=0x00000245f2583000 <span class="hljs-attribute">nid</span>=0x3708 runnable<br><br><span class="hljs-string">&quot;GC Thread#1&quot;</span> <span class="hljs-attribute">os_prio</span>=2 <span class="hljs-attribute">cpu</span>=0.00ms <span class="hljs-attribute">elapsed</span>=25.42s <span class="hljs-attribute">tid</span>=0x0000024591dfd800 <span class="hljs-attribute">nid</span>=0x223c runnable<br><br><span class="hljs-string">&quot;GC Thread#2&quot;</span> <span class="hljs-attribute">os_prio</span>=2 <span class="hljs-attribute">cpu</span>=0.00ms <span class="hljs-attribute">elapsed</span>=25.42s <span class="hljs-attribute">tid</span>=0x0000024591dfe000 <span class="hljs-attribute">nid</span>=0x3e60 runnable<br><br><span class="hljs-string">&quot;G1 Main Marker&quot;</span> <span class="hljs-attribute">os_prio</span>=2 <span class="hljs-attribute">cpu</span>=0.00ms <span class="hljs-attribute">elapsed</span>=28.18s <span class="hljs-attribute">tid</span>=0x00000245f25b1800 <span class="hljs-attribute">nid</span>=0x4a5c runnable<br><br><span class="hljs-string">&quot;G1 Conc#0&quot;</span> <span class="hljs-attribute">os_prio</span>=2 <span class="hljs-attribute">cpu</span>=0.00ms <span class="hljs-attribute">elapsed</span>=28.18s <span class="hljs-attribute">tid</span>=0x00000245f25b4800 <span class="hljs-attribute">nid</span>=0x3378 runnable<br><br><span class="hljs-string">&quot;G1 Refine#0&quot;</span> <span class="hljs-attribute">os_prio</span>=2 <span class="hljs-attribute">cpu</span>=0.00ms <span class="hljs-attribute">elapsed</span>=28.18s <span class="hljs-attribute">tid</span>=0x00000245f2644000 <span class="hljs-attribute">nid</span>=0x1e0c runnable<br><br><span class="hljs-string">&quot;G1 Young RemSet Sampling&quot;</span> <span class="hljs-attribute">os_prio</span>=2 <span class="hljs-attribute">cpu</span>=0.00ms <span class="hljs-attribute">elapsed</span>=28.18s <span class="hljs-attribute">tid</span>=0x00000245f2647000 <span class="hljs-attribute">nid</span>=0x4054 runnable<br><span class="hljs-string">&quot;VM Periodic Task Thread&quot;</span> <span class="hljs-attribute">os_prio</span>=2 <span class="hljs-attribute">cpu</span>=0.00ms <span class="hljs-attribute">elapsed</span>=27.45s <span class="hljs-attribute">tid</span>=0x0000024591d93000 <span class="hljs-attribute">nid</span>=0x2c64 waiting on condition<br><br>JNI global refs: 15, weak refs: 0<br></code></pre></td></tr></table></figure>
+
+<p>线程中参数解释：<br>tid: Java memory address of its internal Thread control structure. 16进制的<br>nid: native thread id. 每一个nid对应于linux下的一个tid, 即lwp (light weight process, or thread). 16进制的，转到10进制后可以用ps命令找到它。<br>prio: java内定义的线程的优先级<br>os_prio: 操作系统级别的优先级<br>cpu: 为cpu运行时间<br>elapsed: 为实际运行时间<br>daemon: 说明是守护线程</p>
+<ul>
+<li>JvisualVm</li>
+</ul>
+<p>VisualVM是一款免费的\集成了多个JDK命令行工具的可视化工具，是功能最强大的运行监控和故障处理程序之一，曾经很长一段时间是oracle官方主力发展的虚拟机故障处理工具。功能包括生成和分析海量数据、跟踪内存泄漏、监控垃圾回收器、执行内存和CPU分析，同时它还支持在MBeans上进行浏览和操作。可以基于该工具实现线程转储和可视化监测。</p>
+<p>参考:<br>《Java多线程编程实战指南》黄文海<br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/lllliuxiaoxia/p/15799378.html">jvm监控工具小结</a></p>
+<h2 id="线程安全问题的三个方面"><a href="#线程安全问题的三个方面" class="headerlink" title="线程安全问题的三个方面"></a>线程安全问题的三个方面</h2><p>线程安全问题概括来说表现为3个方面：原子性、可见性和有序性。</p>
+<h3 id="原子性"><a href="#原子性" class="headerlink" title="原子性"></a>原子性</h3><p>原子操作的“不可分割”包括以下两层含义。</p>
+<ul>
+<li>访问（读、写）某个共享变量的操作从其执行线程以外的任何线程来看，该操作要么已经执行结束要么尚未发生，即其他线程不会“看到”该操作执行了部分的中间效果。</li>
+<li>访问同一组共享变量的原子操作是不能够被交错的。</li>
+</ul>
+<p>Java中有两种方式来实现原子性。一种是使用锁（Lock）。锁具有排他性，即它能够保障一个共享变量在任意一个时刻只能够被一个线程访问。这就排除了多个线程在同一时刻访问同一个共享变量而导致干扰与冲突的可能，即消除了竞态。另一种是利用处理器提供的专门CAS（Compare-and-Swap）指令，CAS算作乐观锁。</p>
+<p>Java语言中针对任何变量的读操作都是原子操作。在Java语言中，long型和double型以外的任何类型的变量的写操作都是原子操作。对long&#x2F;double型变量的写操作由于Java语言规范并不保障其具有原子性，因此在多个线程并发访问同一long&#x2F;double型变量的情况下，一个线程可能会读取到其他线程更新该变量的“中间结果”。尽管如此，Java语言规范特别地规定对于volatile关键字修饰的long&#x2F;double型变量的写操作具有原子性。</p>
+<h3 id="可见性"><a href="#可见性" class="headerlink" title="可见性"></a>可见性</h3><p>可见性就是指一个线程对共享变量的更新的结果对于读取相应共享变量的线程而言是否可见的问题。多线程程序在可见性方面存在问题意味着某些线程读取到了旧数据（StaleData）。导致可见性问题的原因分为两种，一种是JIT编译器的优化，需要基于一定机制避免多线程情况下的不正常编译优化；另一种是没有及时进行缓存同步，要通过使更新共享变量的处理器执行冲刷处理器缓存的动作，并使读取共享变量的处理器执行刷新处理器缓存的动作来保障可见性。</p>
+<p>可见性的保障仅仅意味着一个线程能够读取到共享变量的相对新值，而不能保障该线程能够读取到相应变量的最新值，即读到数据后到使用的时候，原来的数据可能已经发生了变化。</p>
+<h3 id="有序性"><a href="#有序性" class="headerlink" title="有序性"></a>有序性</h3><p>多种因素都可能导致程序的感知顺序与源代码顺序不一致，而这种不一致可能导致线程安全问题。避免这个问题实质上就是保证感知顺序与源代码顺序一致，即有序性。</p>
+<p>导致有序性问题的来源分为：（1）指令重排序。指令重排序主要来源于JIT的编译优化和处理器在判断语句场景的猜测执行技术；（2）存储系统重排序。即使在处理器严格依照程序顺序执行两个内存访问操作的情况下，在存储子系统的作用下其他处理器对这两个操作的感知顺序仍然可能与程序顺序不一致，即这两个操作的执行顺序看起来像是发生了变化。这种现象就是存储子系统重排序，也被称为内存重排序（MemoryOrdering）。</p>
+<p>单线程也会发生重排序，但是结果不会出现异常，就仿佛是串行执行的一样；要保证多线程的有序性，需要在逻辑上部分禁止重排序。</p>
+<p>参考:<br>《Java多线程编程实战指南》黄文海</p>
+<h2 id="Thread类中的start和run方法的区别是什么？"><a href="#Thread类中的start和run方法的区别是什么？" class="headerlink" title="Thread类中的start和run方法的区别是什么？"></a>Thread类中的start和run方法的区别是什么？</h2><p>Thread类的start方法的作用是启动相应的线程，并在这个新线程中执行run方法，线程属于“一次性用品”，start方法也只能够被调用一次，多次调用同一个Thread实例的start方法会导致其抛出IllegalThreadStateException异常。</p>
+<p>Thread类的run方法可以反复执行，但是是在当前线程中执行，不会创建新线程，一般不建议这样操作。</p>
+<p>参考:<br>《Java多线程编程实战指南》黄文海</p>
+<h2 id="Runnable和Callable？Future的作用是什么？"><a href="#Runnable和Callable？Future的作用是什么？" class="headerlink" title="Runnable和Callable？Future的作用是什么？"></a>Runnable和Callable？Future的作用是什么？</h2><h3 id="Runnable和Callable"><a href="#Runnable和Callable" class="headerlink" title="Runnable和Callable"></a>Runnable和Callable</h3><p>Runnable接口可以被看作对任务进行的抽象，任务的处理逻辑就体现在run方法之中。Thread类实际上是Runnable接口的一个实现类，其对Runnable接口的实现。</p>
+<p>Callable接口也是对任务的抽象，任务的处理逻辑可以在Callable接口实现类的call方法中实现。Callable接口相当于一个增强型的Runnable接口：call方法的返回值代表相应任务的处理结果，其类型V是通过Callable接口的类型参数指定的；call方法代表的任务在其执行过程中可以抛出异常。而Runnable接口中的run方法既无返回值也不能抛出异常。</p>
+<p>采用Runnable实例来表示异步任务，其优点是任务既可以交给一个专门的工作者线程执行（以相应的Runnable实例为参数创建并启动一个工作者线程），也可以交给一个线程池或者Executor的其他实现类来执行；其缺点是我们无法直接获取任务的执行结果。使用Callable实例来表示异步任务，其优点是我们可以通过ThreadPoolExecutor.submit(Callable<T>)的返回值获取任务的处理结果；其缺点是Callable实例表示的异步任务只能交给线程池执行，而无法直接交给一个专门的工作者线程或者Executor实现类执行。</T></p>
+<h3 id="Future"><a href="#Future" class="headerlink" title="Future"></a>Future</h3><p>Future接口实例可被看作任务的处理结果句柄（Handle），Future.get()方法可以用来获取task参数所指定的任务的处理结果，Future.get()是个阻塞方法，该方法能够抛出InterruptedException说明它可以响应线程中断，可以通过捕获Future.get()调用抛出的异常来知晓相应任务执行过程中抛出的异常。ThreadPoolExecutor线程池的一个submit方法声明如下：public<T>Future<T>submit(Callable<T>task)，可以通过提交Callable任务并通过Future.get()获取结果。</T></T></T></p>
+<p>java.util.concurrent.FutureTask类融合了Runnable接口和Callable接口的优点：FutureTask是java.util.concurrent.RunnableFuture接口的一个实现类，由于RunnableFuture接口继承了Future接口和Runnable接口，因此FutureTask既是Runnable接口的实现类也是Future接口的实现。因此FutureTask表示的异步任务可以交给专门的工作者线程执行，也可以交给Executor实例（比如线程池）执行，FutureTask还能够直接返回其代表的异步任务的处理结果。ThreadPoolExecutor.submit(Callable<T>task)的返回值就是一个FutureTask实例。</T></p>
+<p>FutureTask的一个构造器可以将Callable实例转换为Runnable实例，该构造器的声明如下：publicFutureTask(Callable<V>callable)。<br>我们可以将任务的处理逻辑封装在一个Callable实例中，并以该实例为参数创建一个FutureTask实例，我们可以用FutureTask实例（Runnable实例）为参数来创建并启动一个工作者线程以执行相应的任务，也可以将FutureTask实例交给Executor执行（通过Executor.execute(Runnabletask)调用），FutureTask类还实现了Future接口，这使得我们在调用Executor.execute(Runnabletask)这样只认Runnable接口的方法来执行任务的情况下依然能够获取任务的执行结果。</V></p>
+<p>参考:<br>《Java多线程编程实战指南》黄文海</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/54_bMeUwjxk-8DHa90heNQ">微信公众号:我的IT技术路</a></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/java/" class="category-chain-item">java</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/">#多线程</a>
+      
+        <a href="/tags/%E9%9D%A2%E8%AF%95/">#面试</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>八股文-java多线程-基础</div>
+      <div>http://soatree.github.io/2023/01/21/八股文-java多线程-基础/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>胖树</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年1月21日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+              <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                <i class="iconfont icon-nc"></i>
+              </span>
+              </a>
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+              <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                <i class="iconfont icon-sa"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2023/02/08/%E5%8E%9F%E7%A0%81%E3%80%81%E5%8F%8D%E7%A0%81%E3%80%81%E8%A1%A5%E7%A0%81%E7%9A%84%E7%90%86%E8%A7%A3/" title="原码、反码、补码的理解">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">原码、反码、补码的理解</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/01/05/%E9%81%93%E5%BE%B7%E7%BB%8F/" title="道德经">
+                        <span class="hidden-mobile">道德经</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
