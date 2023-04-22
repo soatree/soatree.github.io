@@ -13,6 +13,7 @@ categories:
 - 数据库
 - java
 - 生活
+- 读书
 tags:
 - git 
 - 哲学
@@ -29,4 +30,5 @@ tags:
 - web
 - 聊天
 - 历史
+- 运动
 ---
