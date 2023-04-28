@@ -269,12 +269,42 @@ DiscardPolicy：直接丢弃任务；
 
 
 
-Java的线程池是怎么实现的？其原理是什么？线程池怎么设计核心线程数和最大线程数，拒绝策略怎么选择？怎么优雅关闭一个线程池？
+Java的线程池是怎么实现的？其原理是什么？线程池怎么设计核心线程数和最大线程数，拒绝策略怎么选择？
+## 线程池原理
+
+通过submit向线程池提交Runnable 或 Callable<T> 任务后，任务都会被转化为FutureTask然后提交给execute方法。
+
+
+
+
+
+
 
 ### 优雅关闭线程池
 
+用shutdown + awaitTermination关闭线程池，如果检测线程池在指定时间范围内没有关闭，可以使用shutdownNow()来主动中断所有子线程。
 
+```
+    public static <T> void executeCallableCommand(Callable<T> callable) {
+        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(5,10,15,
+                TimeUnit.SECONDS, new ArrayBlockingQueue<>(5));
+        Future<T> submit = threadPoolExecutor.submit(callable);
+        threadPoolExecutor.shutdown();
+        try {
+            if(!threadPoolExecutor.awaitTermination(60, TimeUnit.SECONDS)){
+                // 超时的时候向线程池中所有的线程发出中断(interrupted)。
+                threadPoolExecutor.shutdownNow();
+            }
+            System.out.println("AwaitTermination Finished");
+        } catch (InterruptedException ignore) {
+            threadPoolExecutor.shutdownNow();
+        }
+    }
+```
 
+参考：
+[Java线程池的正确关闭方法，awaitTermination还不够](https://www.cnblogs.com/slankka/p/11609615.html)
+《Java多线程编程实战指南》黄文海
 
 # 参考
 
