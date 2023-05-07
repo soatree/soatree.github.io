@@ -223,6 +223,8 @@ Public Future<?> submit(Runnable task);
 Public Future< T > submit(Callable<T> task);
 ```
 
+通过submit向线程池提交Runnable 或 Callable<T> 任务后，任务都会被转化为FutureTask然后提交给execute方法。
+
 关于线程池线程数量有三个概念，当前线程池大小表示线程池中实际工作者线程的数量；最大线程池大小表示线程池中允许存在的工作者线程的数量上限；核心线程大小表示一个不大于最大线程池大小的工作者线程数量上限。
 三个线程池线程概念的关系如下：
 
@@ -266,19 +268,29 @@ CallerRunsPolicy：用调用者所在的线程来执行任务；
 DiscardOldestPolicy：丢弃阻塞队列中靠最前的任务，并执行当前任务；
 DiscardPolicy：直接丢弃任务；
 
+### 线程池怎么设计核心线程数和最大线程数
 
+暂时没有了解到最合理的线程设置原则。对于cpu核数为N的机器一般原则如下：cpu密集型程序可以设置核心线程为N+1，IO密集型程序可以设置核心线程为N*2。也可以参照《Java多线程编程实战指南》中的一些公式来计算核心线程数，可以设置最大线程数为核心线程数的2倍。
 
+对于快速响应用户请求的需求，一般设置缓冲队列为同步队列，即不缓存任务，尽可能调高核心线程和最大线程，实现快速响应。对于批量处理的需求，一般会设置一定容量的缓冲队列，过多的线程可能导致频繁上下文切换，影响程序运行的吞吐量。
 
-Java的线程池是怎么实现的？其原理是什么？线程池怎么设计核心线程数和最大线程数，拒绝策略怎么选择？
-## 线程池原理
+美团技术博客中也提到了传统线程池线程设置的困难，所以开发了一个线程池监控配置平台，用来实时监控线程池的负载，同时提供了实时变更线程池参数的界面。
 
-通过submit向线程池提交Runnable 或 Callable<T> 任务后，任务都会被转化为FutureTask然后提交给execute方法。
+### 拒绝策略怎么选择？
 
+没有最佳实践，只有更适合自身业务的策略。现在我们聊聊各种策略的适用场景。
 
+AbortPolicy 中止策略，线程池默认的拒绝策略，也是我们最常用的拒绝策略。当系统线程池满载的时候，可以通过异常的形式告知使用方，交由使用方自行处理。一般出现此异常时，我们可以提示用户稍后再试，或者我们把未执行的任务记录下来，等到适当时机再次执行。
 
+DiscardPolicy 丢弃策略，一般我们都不会选择它，因为它直接就把任务丢弃掉了，我们毫无感知。如果任务不重要，丢弃掉也没有没关系，就可以使用它。还有一种情况，我们也可以使用它，我们事后知道哪些任务没有执行，说明任务是被丢弃了，需要重新执行。
 
+DiscardOldestPolicy 丢弃最老任务策略，如果有这种业务场景：需要淘汰等待时间最长任务，就可以适用该策略。
 
+CallerRunsPolicy 调用者执行策略。为了保证所有任务都能执行，可以使用该策略。但是它也隐藏着非常大的风险。
 
+比如，我们在SpringWeb项目中，有一个web请求过来需要处理一个异步任务，正常情况下，我们是交由线程池来处理任务的，但是由于线程池满了，我们使用了CallerRunsPolicy策略，该异步任务就由web请求线程来处理。
+看起来好像没有什么问题，但实际情况是，web请求已经使用了tomcat的线程池中的线程来处理的了，异步任务也交由该线程处理，此时的线程资源就被此次的web请求长久占用了。如果这样的web请求有很多，Tomcat的可用线程将会变得很少，这导致整个服务器的qps大大降低，甚至系统奔溃。
+所以使用CallerRunsPolicy策略时，要站在更高的角度来评估，这会不会给系统带来其他问题！
 
 ### 优雅关闭线程池
 
@@ -304,19 +316,95 @@ Java的线程池是怎么实现的？其原理是什么？线程池怎么设计�
 
 参考：
 [Java线程池的正确关闭方法，awaitTermination还不够](https://www.cnblogs.com/slankka/p/11609615.html)
+[Java线程池实现原理及其在美团业务中的实践](https://tech.meituan.com/2020/04/02/java-pooling-pratice-in-meituan.html)
+[线程池拒绝策略最佳实践](https://juejin.cn/post/7090570473611722788)
+《Java多线程编程实战指南》黄文海
+
+## ConcurrenthashMap的put、get方法
+
+### jdk1.7的ConcurrenthashMap
+
+jdk1.7的ConcurrenthashMap由多个Segment组合而成，Segment相当于一个HashMap对象。同HashMap一样，Segment包含一个HashEntry数组，数组中的每一个HashEntry既是一个键值对，也是一个链表的头节点。可以说，ConcurrentHashMap是一个二级哈希表。在一个总的哈希表下面，有若干个子哈希表。
+
+```
+static final class Segment<K,V> extends ReentrantLock implements Serializable
+```
+
+Segment继承了ReentrantLock，所以在put中加锁的时候是以Segment为单元进行加锁的。
+
+- put操作
+
+1、通过key首先定位到Segment，然后在Segment中进行put；
+2、加锁操作（首先tryLock，如果没成功就自旋tryLock，如果还获取不到就lock阻塞获取）；
+3、定位到Segment中特定的位置的HashEntry；
+4、遍历该HashEntry，如果不为空则判断传入的key和当前遍历的key是否相等，相等则覆盖旧的value；
+5、为空则需要新建一个HashEntry并加入到Segment中，同时会先判断是否需要扩容；
+6、释放锁；
+
+- get操作
+
+1、Key通过Hash之后定位到具体的Segment；
+2、再通过一次Hash定位到具体的元素上；
+3、遍历HashEntry，如果找到则返回对应的value，否则返回null。由于HashEntry中的value属性是用volatile关键词修饰的，保证了内存可见性，所以每次获取时都是最新值。
+
+### jdk1.8的ConcurrenthashMap
+
+jdk1.8的ConcurrenthashMap的结构变得和jdk1.8的hashMap类似，取消了Segment结构，hash定位直接定位到某个Node上（1.8的元素由HashEntry改为了Node），在加锁的时候直接以Node为monitor加锁，加锁的粒度更细，且也有了长链表转红黑树的优化。
+
+- put操作
+
+1、求出hash值
+2、是否已经初始化数组，如果没有初始化，直接初始化
+3、是否该位置为空，空的话直接cas设置第一个节点
+4、判断是否正在扩容，如果正在扩容，就加入一起进行扩容
+5、如果不为空的话，锁住头结点，开始进行插入操作，如果是链表，就遍历是否相同，如果是红黑树就直接添加
+6、添加完成之后，判断是否需要扩容，如果超过阈值就扩容。
+
+- get操作
+
+1、获取hash值
+2、如果是第一个节点，直接返回
+3、如果不是，判断是否正在扩容或者是红黑树，那就调用find方法
+4、如果不是，那就是链表结构，直接while寻找。同样，node中的val是volatile，我们每次取出来的是最新的值，这里使用的是volatile的可见性。
+
+- jdk1.8的ConcurrentHashMap是怎么保证线程安全的？
+
+1、CAS操作数据：sizectl的修改，扩容数值等修改使用cas保证数据修改的原子性。
+2、synchronized互斥锁：put和扩容过程，使用synchronized保证线程只有一个操作，保证线程安全。
+3、volatile修饰变量：table、sizeCtl等变量用volatile修饰，保证可见性
+
+参考：
+[java 面试--concurrentHashMap](https://mp.weixin.qq.com/s/fxKmlW1Qt9tHfd22tILE1Q)
+[深入浅出ConcurrentHashMap详解](https://blog.csdn.net/qq_29051413/article/details/107869427)
+
+## 简述一下JMM，as-if-serial语义、happens-before模型？
+
+### JMM
+
+Java内存模型（JavaMemoryModel,JMM）是Java语言规范（The Java Language Specification,JLS）的一部分。Java内存模型定义了final、volatile和synchronized关键字的行为并确保正确同步（Correctly Synchronized）的Java程序能够正确地运行在不同架构的处理器之上，屏蔽了底层不同架构处理器带来的差异。
+
+### as-if-serial语义
+
+java单线程程序运行时并不是完全按照编码的代码顺序执行的，中间可能涉及到很多重排序等调整，但是最终的运行结果是和按照编码的代码顺序执行的一样，所以称为貌似串行语义。貌似串行语义只是从单线程程序的角度保证重排序后的运行结果不影响程序的正确性，它并不保证多线程环境下程序的正确性。
+
+### happens-before模型
+
+
+
+参考：
 《Java多线程编程实战指南》黄文海
 
 # 参考
 
 [微信公众号:我的IT技术路](https://mp.weixin.qq.com/s/54_bMeUwjxk-8DHa90heNQ)
 
-## ConcurrenthashMap的put方法？其扩容过程有了解过？
 
 
 
 
 
 
-## 简述一下JMM，as-if-serial语义、happens-before模型？
+
+
 
 ## 缓存的一致性协议是什么？
