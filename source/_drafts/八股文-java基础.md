@@ -291,8 +291,53 @@ Java技术使用finalize()方法在垃圾收集器将对象从内存中清除出
 
 ## Java的IO流有了解过，实现一个按行读取数据的方式。
 
+### Java的IO流体系
 
+在Java中，将不同的终端的输入输出源抽象为流的概念，通过这种方式可以将不同终端的数据进行交互。Java将传统的流类型都放在java.io包中，一般我们将IO以以下三种方式进行分类。
 
+1）按照流的方向：输入流和输出流
+
+输入输出流是针对程序运行的内存而言的，从内存输出到其他介质上称为输出流，从其他介质输入到程序内存中称为输入流。一般以inputstream/reader结尾的称为输入流，outputstream/writer结尾的称为输出流。
+
+2）按照操作单元分：字节流和字符流
+
+字节流是针对一个字节一个字节进行操作的，字符流最小的操作单元是一个字符。字节流以inputstream/outputstream结尾，字符流以writer/reader结尾。字符流和字节流的转换使用适配器模式进行，可以利用转换流将字符流、字节流相互转换。
+
+3）按照是否可以直接连接一个介质来划分：节点流和处理流
+
+节点流是指可以直接连接在一个介质上进行输入输出的，而处理流是将节点流进行包装而具有新的功能，节点流也被称为低级流，处理流因为有了新的功能特性（当然了也包含了原来的特性）被称为高级流。这里jdk使用装饰器模式进行。
+
+![IO流体系](./八股文-java基础/io流体系.png)
+
+### 关于转换流
+
+InputStreamReader 字节流转字符流
+OutputStreamWriter 字符流转字节流
+以上均需要注意指定或默认的字符集
+
+### 按行读取文件
+
+```
+public static void main(String[] args) {
+    BufferedReader reader;
+    try {
+        reader = new BufferedReader(new FileReader(
+                "D:\\git\\learning\\readtext.txt"));
+        String line = reader.readLine();
+        while (line != null) {
+            System.out.println(line);
+            line = reader.readLine();
+        }
+        reader.close();
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+}
+```
+
+参考：
+[Java IO流详解（六）----转换流（字节流和字符流之间的转换）](https://www.cnblogs.com/tanghaorong/p/12363660.html)
+[java逐行读取文件_Java逐行读取文件](https://blog.csdn.net/cunchi4221/article/details/107470903)
 
 ## Java的反射原理是什么？Getclass和classforName的区别是什么？
 ## 如何实现一个list类型的深拷贝？Java的clone接口的作用是什么？
