@@ -408,9 +408,17 @@ invoke()做的事情：（1）先获取Method的MethodAccessor（缓存中没有
 3.Class.forName("类名字符串") （注：类名字符串是包名+类名）：装入类，并做类的静态初始化，返回Class的对象
 4.实例对象.getClass()：对类进行静态初始化、非静态初始化；返回引用运行时真正所指的对象(因为:子对象的引用可能会赋给父对象的引用变量中)所属的类的Class的对象
 
+### 反射慢的原因
+
+1. 需要对比参数匹配方法；
+2. 需要进行权限检查；
+3. 中间产生很多中间对象（方法副本，方法代理），影响GC；
+4. 据说还影响JIT优化
+
 参考：
 [深入理解java反射原理](https://www.cnblogs.com/yougewe/p/10125073.html)
 [java中Class对象详解和类名.class, class.forName(), getClass()区别](https://www.cnblogs.com/Seachal/p/5371733.html)
+[都说 Java 反射效率低，究竟原因在哪里？](https://zhuanlan.zhihu.com/p/86993361)
 
 ## 如何实现一个list类型的深拷贝？Java的clone接口的作用是什么？
 ## Java的泛型的作用是什么？
