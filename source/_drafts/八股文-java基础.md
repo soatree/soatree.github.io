@@ -340,6 +340,78 @@ public static void main(String[] args) {
 [java逐行读取文件_Java逐行读取文件](https://blog.csdn.net/cunchi4221/article/details/107470903)
 
 ## Java的反射原理是什么？Getclass和classforName的区别是什么？
+
+```
+public class HelloReflect {
+    public static void main(String[] args) {
+        try {
+            // 1. 使用外部配置的实现，进行动态加载类
+            TempFunctionTest test = (TempFunctionTest)Class.forName("com.tester.HelloReflect").newInstance();
+            test.sayHello("call directly");
+            // 2. 根据配置的函数名，进行方法调用（不需要通用的接口抽象）
+            Object t2 = new TempFunctionTest();
+            Method method = t2.getClass().getDeclaredMethod("sayHello", String.class);
+            method.invoke(test, "method invoke");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e ) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public void sayHello(String word) {
+        System.out.println("hello," + word);
+    }
+
+}
+```
+
+### forName和newInstance
+
+forName()反射获取类信息，主要是先获取ClassLoader，然后调用native方法获取信息，最后，jvm又会回调ClassLoader进行类加载（双亲委派）
+newInstance() 主要做了三件事：（1）权限检测，如果不通过直接抛出异常；（2）查找无参构造器（1. 先尝试从缓存获取所有的constructors，如果没有缓存则重新从jvm中获取并用软引用缓存, 然后通过进行参数类型比较；2. 找到匹配后，通过 ReflectionFactory copy一份constructor返回；3. 否则抛出 NoSuchMethodException;），并将其缓存起来；（3）调用具体方法的无参构造方法，生成实例并返回；
+
+### getDeclaredMethod和invoke
+
+getDeclaredMethod()主要做了四件事：（1）先进行权限检查；（2）获取所有方法列表(也是先从缓存中取，没有则从jvm中获取)；（3）根据方法名称和方法列表，选出符合要求的方法（ReflectionFactory, copy方法后返回，实际返回的是一个方法的副本）；（4）如果没有找到相应方法，抛出异常，否则返回对应方法；
+
+invoke()做的事情：（1）先获取Method的MethodAccessor（缓存中没有则创建）;（2）调用MethodAccessor的invoke方法，底层交给JVM实现；
+
+### 反射小结
+
+最后，用几句话总结反射的实现原理：
+
+1. 反射类及反射方法的获取，都是通过从列表中搜寻查找匹配的方法，所以查找性能会随类的大小方法多少而变化；
+2. 每个类都会有一个与之对应的Class实例，从而每个类都可以获取method反射方法，并作用到其他实例身上；
+3. 反射也是考虑了线程安全的，放心使用；
+4. 反射使用软引用relectionData缓存class信息，避免每次重新从jvm获取带来的开销；
+5. 反射调用多次生成新代理Accessor, 而通过字节码生存的则考虑了卸载功能，所以会使用独立的类加载器；
+6. 当找到需要的方法，都会copy一份出来，而不是使用原来的实例，从而保证数据隔离；
+7. 调度反射方法，最终是由jvm执行invoke0()执行；
+
+### .class、class.forname()和getClass()的区别
+
+- 相同
+
+通过这几种方式，得到的都是java.lang.Class对象；都是类加载的产物
+
+- 差别
+
+1.出现的时期不同：Class.forname()在运行时加载（动态加载）；Class.class和对象名.getClass()是在编译时加载（静态加载）
+2.类名.class：JVM将使用类装载器，将类装入内存(前提是:类还没有装入内存)，不做类的初始化工作，返回Class的对象
+3.Class.forName("类名字符串") （注：类名字符串是包名+类名）：装入类，并做类的静态初始化，返回Class的对象
+4.实例对象.getClass()：对类进行静态初始化、非静态初始化；返回引用运行时真正所指的对象(因为:子对象的引用可能会赋给父对象的引用变量中)所属的类的Class的对象
+
+参考：
+[深入理解java反射原理](https://www.cnblogs.com/yougewe/p/10125073.html)
+[java中Class对象详解和类名.class, class.forName(), getClass()区别](https://www.cnblogs.com/Seachal/p/5371733.html)
+
 ## 如何实现一个list类型的深拷贝？Java的clone接口的作用是什么？
 ## Java的泛型的作用是什么？
 ## Java的注解有了解，其底层的实现原理是什么？怎么定义一个注解？
