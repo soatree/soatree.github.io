@@ -124,7 +124,7 @@ json序列化，java原生序列化等。关于选型可以参考美团技术博
 [一文搞懂序列化与反序列化](https://zhuanlan.zhihu.com/p/316200445)
 [IDEA 自动生成serialVersionUID](https://blog.csdn.net/Aphysia/article/details/80620804)
 [serialVersionUID作用是什么以及如何生成的](https://cloud.tencent.com/developer/article/1943450)
-
+[java序列化框架性能对比](https://www.bbsmax.com/A/8Bz841mVzx/)
 ## 重载和重写的区别？
 
 略
@@ -420,8 +420,64 @@ invoke()做的事情：（1）先获取Method的MethodAccessor（缓存中没有
 [java中Class对象详解和类名.class, class.forName(), getClass()区别](https://www.cnblogs.com/Seachal/p/5371733.html)
 [都说 Java 反射效率低，究竟原因在哪里？](https://zhuanlan.zhihu.com/p/86993361)
 
-## 如何实现一个list类型的深拷贝？Java的clone接口的作用是什么？
+## 拷贝
+
+### 深拷贝和浅拷贝
+
+而对于一个基础类型（包装类和非包装基本类型以及String），深拷贝和浅拷贝是一样的，都会复制一份新的，而对于一个对象类型，如果是浅拷贝的话，那其底层访问的是同一份对象，类似于对该对象起了个别名。而深拷贝的话才是我们真正说的复制，它会重新创建一个新的对象出来，和之前的对象的值一模一样，但是底层的地址是完全不同的。
+
+### 如何实现深拷贝
+
+一个类实现了Cloneable接口后，其对象即可调用clone()方法，此时为浅拷贝，被拷贝对象中的变量如果是基本类型及其包装类和String类会创建副本，其他类型的对象则是引用原对象的内存地址。
+
+如果要实现深拷贝，需要实现Cloneable接口，并且实现clone方法，如果对象中包含其他对象，其他对象也要实现。举例如下：
+
+```
+import lombok.AllArgsConstructor;  
+import lombok.Data;  
+import lombok.NoArgsConstructor;  
+@NoArgsConstructor  
+@AllArgsConstructor  
+@Data
+public class User implements Cloneable{  
+    private String name;  
+    private LoginInfo loginInfo;  
+    @Override  
+    protected Object clone() throws CloneNotSupportedException {  
+        User clone= (User)super.clone();  
+        //调用底层clone方法重新赋值，不然就是浅拷贝  
+        clone.loginInfo =(LoginInfo) clone.getLoginInfo().clone();  
+        return clone;  
+    }  
+
+    @NoArgsConstructor  
+    @AllArgsConstructor  
+    @Data  
+    public static class LoginInfo implements Cloneable{  
+        private String id;  
+        private String name;  
+        //也要实现clone接口  
+        @Override  
+        protected Object clone() throws CloneNotSupportedException {  
+            return super.clone();  
+        }  
+    }  
+ }  
+```
+
+当然除了上面的方式，如果底下对象很多的话，那调用也是相对麻烦过程，可以直接new一个对象也可以实现深拷贝，或者通过反序列化(gson\Jackson等)的方式来说实现。
+
+### 如何实现一个list类型的深拷贝
+
+new一个list，然后对象依次深拷贝clone即可
+
+参考：
+[java 面试--序列化、反射、拷贝](https://mp.weixin.qq.com/s/EVYDpDVJXx4X72MKLbNsrQ)
+
 ## Java的泛型的作用是什么？
+
+
+
 ## Java的注解有了解，其底层的实现原理是什么？怎么定义一个注解？
 ## Java中两个类的关系有多少种？有了解过设计模式么？
 ## Java的collection有几种？Collection和collections的区别是什么？
