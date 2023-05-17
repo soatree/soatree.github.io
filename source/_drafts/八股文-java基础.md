@@ -474,11 +474,149 @@ new一个list，然后对象依次深拷贝clone即可
 参考：
 [java 面试--序列化、反射、拷贝](https://mp.weixin.qq.com/s/EVYDpDVJXx4X72MKLbNsrQ)
 
-## Java的泛型的作用是什么？
+## 泛型
 
+### 作用和局限性
 
+- 作用
+
+使用泛型可以在编译时进行类型检查，可以大大减少类型转换的错误。
+
+- 局限性
+
+泛型不会被存入编码区，所以一个泛型的类型T是无法new出来的，我们不能使用T.class()。一个被经常使用的场景就是反序列化一个泛型T是不被允许的，这个时候，我们必须要传入T的具体类型，这样就增加了一个传参，具体如下：
+
+```
+public class GenericClass<T> {
+    public T getResult(String s) {
+        //报错，T不是一个类型
+        T t = JSON.parseObject(s, T.class);
+        return t;
+    }
+
+    //通过传入具体的类型，在强制转换
+    public T getResult(String s, Class cls) {
+        T t = (T) JSON.parseObject(s, cls);
+        return t;
+    }
+}
+```
+
+### 类型擦除
+
+Java的泛型类型在编译器阶段实现，编译过程泛型类型会被清除掉，生成的字节码中不包含任何的泛型信息，这个过程被称为类型擦除。
+
+`List<String> list = new ArrayList<>();` 
+
+上面定义的list为List<String>，经过编译之后就成了List，所以在方法区里面并没有存入String的相关信息。
+
+类型擦除例子：
+
+```
+public static void main(String[] args) throws Exception {
+    List<String> list = new ArrayList<>();
+    list.add("2");
+    //idea在做检查的时候会报错，无法通过编译
+    list.add(1);
+    //类型擦除之后，通过反射可以添加整型，这句话执行不会报错
+    list.getClass().getMethod("add", Object.class).invoke(list, 1);
+}
+```
+
+上面的反射可以添加任何类型，不会报错，但是要通过get方法取出来的时候会报错，因为get会进行强制类型转换为String。类型被擦除之后，在jvm中存入的是其限定类，如果没有限定，存入的是object类。
+
+### 获取泛型
+
+泛型的类型在编译的时候确实被擦除了，但可以通过签名来获取泛型的类型。
+
+```
+public class Test extends GenericClass<String> {
+}
+//获取类型
+ParameterizedType genericType =(ParameterizedType)Test.class.getGenericSuperclass();
+//输出字符串类型
+System.out.println(genericType.getActualTypeArguments()[0]);
+```
+
+参考：
+[java 面试--泛型、注解](https://mp.weixin.qq.com/s/1ZxBOtID64NEnwsXwOXTHg)
 
 ## Java的注解有了解，其底层的实现原理是什么？怎么定义一个注解？
+
+注解类似一种标记，在实战中，注解有助于我们代码的解耦和无侵入性，一般通过反射获取类、函数或成员上运行时注解信息，从而实现动态控制程序运行的逻辑。
+
+Java的注解有三类，分别是：元注解，自定义注解，jdk自带的注解。
+
+元注解是指在定义一个注解的时候，必须要使用元注解进行标注，@Target，@Retention，@Documented，@Inherited，这四个是java的元注解；
+
+jdk自带的注解是java已经定义好的注解，比如@override。
+
+自定义注解是开发者定义的注解。自定义注解至少需要使用到元注解的两个@Target和@Retention
+
+### 元注解
+
+@Target：运行地方。@Target的取值有以下：
+ElementType.CONSTRUCTOR 可以给构造方法进行注解
+ElementType.FIELD 可以给属性进行注解
+ElementType.LOCAL_VARIABLE 可以给局部变量进行注解
+ElementType.METHOD 可以给方法进行注解
+ElementType.PACKAGE 可以给一个包进行注解
+ElementType.PARAMETER 可以给一个方法内的参数进行注解
+ElementType.ANNOTATION_TYPE 可以给一个注解进行注解
+ElementType.TYPE 可以给一个类型进行注解，比如类、接口、枚举（常用）
+
+@Retention：保留时间，Source代码中，class编译后的类，runtime运行（常用）
+
+@Document：是否文档化
+
+@Inhrited：能否被继承
+
+
+### 自定义注解
+
+![自定义注解的语法要求](./八股文-java基础/自定义注解的语法要求.png)
+
+### 注解反射使用用例
+
+```
+package cn.gacl.annotation;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Retention(RetentionPolicy.RUNTIME)
+//Retention注解决定MyAnnotation注解的生命周期
+@Target( { ElementType.METHOD, ElementType.TYPE })
+public @interface MyAnnotation {
+    String color() default "blue";//为属性指定缺省值
+    String value();//定义一个名称为value的属性
+}
+```
+
+```
+package cn.gacl.annotation;
+
+@MyAnnotation("孤傲苍狼")//等价于@MyAnnotation(value="孤傲苍狼")
+public class MyAnnotationTest {
+    public static void main(String[] args) {
+        /**
+         * 用反射方式获得注解对应的实例对象后，在通过该对象调用属性对应的方法
+         */
+        MyAnnotation annotation = (MyAnnotation) MyAnnotationTest.class.getAnnotation(MyAnnotation.class);
+        System.out.println(annotation.color());//输出color属性的默认值：blue
+        System.out.println(annotation.value());
+
+    }
+}
+```
+
+参考：
+[java 面试--泛型、注解](https://mp.weixin.qq.com/s/1ZxBOtID64NEnwsXwOXTHg)
+[框架基础——全面解析Java注解](https://www.cnblogs.com/Qian123/p/5256084.html)
+[Java基础加强总结(一)——注解(Annotation) ](https://www.cnblogs.com/xdp-gacl/p/3622275.html)
+
 ## Java中两个类的关系有多少种？有了解过设计模式么？
 ## Java的collection有几种？Collection和collections的区别是什么？
 ## ArrayLsit、LinkedList和vector的区别？它们是线程安全的么？如果想要线程安全应该要怎么实现？

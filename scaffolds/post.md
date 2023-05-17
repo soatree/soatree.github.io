@@ -2,8 +2,8 @@
 title: {{ title }}
 date: {{ date }}
 categories:
-- 读书与做人 
 - 其他 
+- windows
 - linux 
 - vcs 
 - 数据结构与算法
@@ -31,4 +31,5 @@ tags:
 - 聊天
 - 历史
 - 运动
+- 快捷键
 ---
