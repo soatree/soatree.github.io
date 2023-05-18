@@ -617,9 +617,80 @@ public class MyAnnotationTest {
 [框架基础——全面解析Java注解](https://www.cnblogs.com/Qian123/p/5256084.html)
 [Java基础加强总结(一)——注解(Annotation) ](https://www.cnblogs.com/xdp-gacl/p/3622275.html)
 
-## Java中两个类的关系有多少种？有了解过设计模式么？
+## Java中两个类的关系有多少种？
+
+- 单向关联: 一个对象是另一个对象的成员变量
+- 双向关联：两个对象互为对方的成员变量
+- 自关联：一个对象是同类对象的成员变量
+- 聚合关系：单向关联，大雁和雁群
+- 组合关系：单向关联，大雁和翅膀
+- 依赖关系：一个类的方法使用另一个类的对象作为参数
+- 继承关系
+- 接口实现关系
+
+参考：
+[Java 类图(UML)梳理](https://www.cnblogs.com/lllliuxiaoxia/articles/16512406.html)
+
+## 有了解过设计模式么？
+
+### 线程安全的单例模式
+
+饿汉式
+
+```
+public class SingleHungry {
+    private static SingleHungry singleHungry = new SingleHungry();
+    private SingleHungry(){};
+    public static SingleHungry getInstance(){
+        return singleHungry;
+    }
+}
+```
+
+懒汉式，基于双重检查，此方式需要注意的是volatile关键字和双重检查
+
+```
+public class SingleLazy {
+    private static volatile SingleLazy singleLazy;
+    private SingleLazy(){};
+    public static SingleLazy getInstance(){
+        if (singleLazy == null){
+            synchronized (SingleLazy.class){
+                if (singleLazy == null){
+                    singleLazy = new SingleLazy();
+                }
+            }
+        }
+        return singleLazy;
+    }
+}
+```
+
+### 策略模式
+
+基于不同的标识，加载不同的策略进行处理。例如计算器加载加法策略进行加法计算，基于不同的子类标志采用不同的策略反射创建对象。
+
+### 观察者模式
+
+被观察者维护了一个观察者的列表，当被观察者的状态发生改变时通知所有的观察者做出相应的处理。
+
 ## Java的collection有几种？Collection和collections的区别是什么？
+
+### java集合框架
+
+![java集合框架](./八股文-java基础/java集合框架.gif)
+
+### Collection和Collections的区别是什么
+
+Collection是集合的接口，Collections是操作Collection的工具类，可以排序、填充、混排、最值、复制、线程安全包装等
+
+参考：
+[Java 集合框架](https://www.runoob.com/java/java-collections.html)
+[Collection和Collections的区别及Collections常用方法](https://www.jianshu.com/p/0494cce4312a)
+
 ## ArrayLsit、LinkedList和vector的区别？它们是线程安全的么？如果想要线程安全应该要怎么实现？
+
+
 ## HashMap扩容机制？hashMap是线程安全的么？它和hashtable的区别是什么？hashMap key和value可以是null么？Hashmap的扩容一定是2^n么？1.8版本的优化点在哪里？什么时候链表转换为红黑树？什么时候红黑树转换为链表？Hashmap的get和put方法是怎么实现的？
 ## Queue中poll和remove方法的区别是什么？
 ## Iterator是什么？和splitIterator的区别是什么？
