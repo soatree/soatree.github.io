@@ -690,6 +690,48 @@ Collection是集合的接口，Collections是操作Collection的工具类，可�
 
 ## ArrayLsit、LinkedList和vector的区别？它们是线程安全的么？如果想要线程安全应该要怎么实现？
 
+### ArrayLsit、LinkedList和vector
+
+ArrayList,LinkedList和Vector都继承自List接口。ArrayList和Vector的底层是动态数组，LinkedList的底层是双向链表。
+
+ArrayList和Vector的区别就是ArrayList是线程不安全的，Vector是线程安全的，Vector中的方法都是同步方法(synchronized),所以ArrayList的执行效率要高于Vector,它也是用的最广泛的一种集合。
+
+### 线程安全的List
+
+- Vector
+
+Vector大部分方法和ArrayList都是相同的，只是加上了synchronized关键字(同步在this上)
+
+- Collections.synchronizedList
+
+List list = Collections.synchronizedList(new ArrayList());
+转换包装后的list可以实现add，remove，get等操作的线程安全性（内部同步在mutex），但是对于迭代操作，Collections.synchronizedList并没有提供相关机制，所以迭代时需要对包装后的list（必须对包装后的list进行加锁，锁其他的不行,多线程需要保证monitor相同）进行手动加锁，使用方式如下
+```
+List list = Collections.synchronizedList(new ArrayList());
+//必须对list进行加锁
+synchronized (list) {
+  Iterator i = list.iterator();
+  while (i.hasNext())
+      foo(i.next());
+}
+```
+
+- CopyOnWriteArrayList
+
+是java并发包里类，用可重入锁
+每次修改都会生成一个新的Array,同时利用Arrays.copyOf复制，最后更新
+修改的时候加锁，读的时候不加锁，读写分离
+
+- 对比
+
+Collections.synchronizedList和Vector性能接近，但是Collections.synchronizedList可以包装多种List，兼容性和拓展性更强，一般推荐Collections.synchronizedList
+
+CopyOnWriteArrayList会有一段时间的数据更新延迟，不是强同步，适用读多写少的非严格同步环境，非此场景建议用Collections.synchronizedList
+
+参考：
+[ArrayList,LinkedList和Vector的区别](https://zhuanlan.zhihu.com/p/79624468?utm_id=0)
+[Collections.synchronizedList 、CopyOnWriteArrayList、Vector介绍、源码浅析与性能对比](https://www.cnblogs.com/lkxsnow/p/12247524.html)
+
 
 ## HashMap扩容机制？hashMap是线程安全的么？它和hashtable的区别是什么？hashMap key和value可以是null么？Hashmap的扩容一定是2^n么？1.8版本的优化点在哪里？什么时候链表转换为红黑树？什么时候红黑树转换为链表？Hashmap的get和put方法是怎么实现的？
 ## Queue中poll和remove方法的区别是什么？
