@@ -733,7 +733,111 @@ CopyOnWriteArrayList会有一段时间的数据更新延迟，不是强同步，
 [Collections.synchronizedList 、CopyOnWriteArrayList、Vector介绍、源码浅析与性能对比](https://www.cnblogs.com/lkxsnow/p/12247524.html)
 
 
-## HashMap扩容机制？hashMap是线程安全的么？它和hashtable的区别是什么？hashMap key和value可以是null么？Hashmap的扩容一定是2^n么？1.8版本的优化点在哪里？什么时候链表转换为红黑树？什么时候红黑树转换为链表？Hashmap的get和put方法是怎么实现的？
+## hashmap 
+
+### HashMap扩容机制？
+
+元素数量大于阈值，阈值是总容量*负载因子
+
+### 它和Hashtable的区别是什么？
+
+都实现了Map接口，Hashtable线程安全，而HashMap线程不安全。
+
+HashTable的类注释说明HashTable已经被淘汰，如果你不需要线程安全，那么使用HashMap，如果需要线程安全，那么使用ConcurrentHashMap。应该是加锁比较粗暴的原因，性能估计较低。
+
+### hashMap key和value可以是null么？
+
+可以，一般不这么操作
+
+### Hashmap的扩容一定是2^n么？
+
+HashMap的初始化的数组长度一定是2的n次的，每次扩容仍是原来的2倍的话，就不会破坏这个规律，每次扩容后，原数据都会进行数据迁移，根据二进制的计算，扩容后数据要么在原来位置，要么在【原来位置+扩容长度】，这样就不需要重新hash，效率上更高。
+
+### 1.8版本的优化点在哪里？
+
+resize 扩容优化，不用rehash，快速寻址
+引入了红黑树，目的是避免单条链表过长而影响查询效率
+解决了resize时多线程死循环问题，但仍是非线程安全的
+
+### 什么时候链表转换为红黑树？什么时候红黑树转换为链表？
+
+链表长度大于 8 并且 表的长度大于 64 的时候会转化红黑树;
+链表长度低于6，就把红黑树转回链表;
+
+### 平时在使用HashMap时一般使用什么类型的元素作为Key？
+
+选择Integer，String这种不可变的类型，像对String的一切操作都是新建一个String对象，对新的对象进行拼接分割等，这些类已经很规范的覆写了hashCode()以及equals()方法。作为不可变类天生是线程安全的，
+
+### Hashmap的get和put方法是怎么实现的？
+
+存储对象时，将 K/V 键值传给 put() 方法：
+
+1. 调用 hash(K) 方法计算 K 的 hash 值，然后结合数组长度，计算得数组下标；
+2. 调整数组大小（当容器中的元素个数大于 capacity * loadfactor 时，容器会进行扩容resize 为 2n）；
+3. (1)如果 K 的 hash 值在 HashMap 中不存在，则执行插入，若存在，则发生碰撞；(2)如果 K 的 hash 值在 HashMap 中存在，且它们两者 equals 返回 true，则更新键值对；(3) 如果 K 的 hash 值在 HashMap 中存在，且它们两者 equals 返回 false，则插入链表的尾部（尾插法）或者红黑树中（树的添加方式）。
+
+（JDK 1.7 之前使用头插法、JDK 1.8 使用尾插法）（注意：当碰撞导致链表大于 TREEIFY_THRESHOLD = 8 时，就把链表转换成红黑树）
+
+获取对象时，将 K 传给 get() 方法：
+1. 调用 hash(K) 方法（计算 K 的 hash 值）从而获取该键值所在链表的数组下标；
+2. 顺序遍历链表，equals()方法查找相同 Node 链表中 K 值对应的 V 值。
+
+hashCode 是定位的，存储位置；equals是定性的，比较两者是否相等。
+
+参考：
+[为什么HashMap的数组长度一定是2的次幂？](https://zhuanlan.zhihu.com/p/567114632)
+[2021年大厂必备HashMap夺命连环问！转红黑树的阈值为什么是8？红黑树转链表为什么是6？](https://zhuanlan.zhihu.com/p/410319925)
+[JDK1.8 HashMap源码分析](https://www.cnblogs.com/xiaoxi/p/7233201.html)
+[Java集合：HashMap底层实现和原理](https://www.cnblogs.com/better-farther-world2099/p/9258605.html)
+[HashMap 1.7和1.8的区别](https://blog.csdn.net/weixin_44141495/article/details/108402128)
+
+## 什么是不可变类型
+
+不可变数据类型：当该数据类型对应的变量的值发生了改变，那么它对应的内存地址也发生改变，对于这种数据类型，就称不可变数据类型。即：原有内存地址中的内容不变，为变化后的值分配了新的内存。
+可变数据类型：当该数据类型对应的变量的值发生了改变，那么它对应的内存地址不发生改变，对于这种数据类型，就称之为可变数据类型。可变数据类型改变时实际上更改了内存中的内容。
+
+样例1：
+```
+public class Test {
+  public int num;
+
+  public static void main(String[] args) {
+    Test t = new Test();
+    t.num = 11;
+    
+    Test t1 = t;
+    t1.num = 111;
+
+    System.out.println(t.num);
+  }
+}
+```
+//输出结果是111
+
+样例2：
+```
+public class Test_1 {
+  public static void main(String[] args) {
+    int i = 0;
+
+    int i1 = i;
+    i1 = 10;
+
+    System.out.println(i);
+  }
+}
+```
+//输出结果仍然是0
+
+如上样例1中：
+t是Test类型，属于可变数据类型。对象t和t1的值其实是一个地址，也可以看成一个指向堆内存中某个对象的指针。让t1=t时，实际上也是让t1指向t指向的对象，通过t1改变num的值，也就是改变了堆内存中的对象的值，通过t再调用时，num的值自然也是改变后的结果。
+
+如上样例2中：
+虽然i1=i的时候，i1和i共用0，但是一旦i1赋值10，此时不是将内存中的0改成10，而是又创建一个10，让i1指向10，而i还是指向0的，所以最后的结果还是0
+
+参考：
+[Java中的不可变类型](https://www.cnblogs.com/yickel/p/14593913.html)
+
 ## Queue中poll和remove方法的区别是什么？
 ## Iterator是什么？和splitIterator的区别是什么？
 ## ArrayList中怎么一边遍历一边删除？

@@ -14,6 +14,7 @@ categories:
 - java
 - 生活
 - 读书
+- 记录
 tags:
 - git 
 - 哲学
