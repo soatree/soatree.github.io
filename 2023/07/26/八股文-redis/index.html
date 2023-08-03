@@ -1,0 +1,805 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/cat.jpg">
+  <link rel="icon" href="/img/cat.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="胖树">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="前言整理redis的相关面试题，题目来源微信公众号。 题目Redis的高性能体现在哪些方面？ 纯内存访问 非阻塞I&#x2F;O，Redis使用epoll作为I&#x2F;O多路复用技术的实现，再加上Redis自身的事件处理模型将epoll中的连接、读写、关闭都转换为事件，不在网络I&#x2F;O上浪费过多的时间 单线程避免了线程切换和竞态产生的消耗  参考：《Redis开发与运维》 付磊　张益军">
+<meta property="og:type" content="article">
+<meta property="og:title" content="八股文-redis">
+<meta property="og:url" content="http://soatree.github.io/2023/07/26/%E5%85%AB%E8%82%A1%E6%96%87-redis/index.html">
+<meta property="og:site_name" content="FatTree">
+<meta property="og:description" content="前言整理redis的相关面试题，题目来源微信公众号。 题目Redis的高性能体现在哪些方面？ 纯内存访问 非阻塞I&#x2F;O，Redis使用epoll作为I&#x2F;O多路复用技术的实现，再加上Redis自身的事件处理模型将epoll中的连接、读写、关闭都转换为事件，不在网络I&#x2F;O上浪费过多的时间 单线程避免了线程切换和竞态产生的消耗  参考：《Redis开发与运维》 付磊　张益军">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://soatree.github.io/2023/07/26/%E5%85%AB%E8%82%A1%E6%96%87-redis/redis%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84.png">
+<meta property="og:image" content="http://soatree.github.io/2023/07/26/%E5%85%AB%E8%82%A1%E6%96%87-redis/redis%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%86%85%E9%83%A8%E7%BC%96%E7%A0%81.png">
+<meta property="og:image" content="http://soatree.github.io/2023/07/26/%E5%85%AB%E8%82%A1%E6%96%87-redis/pipeline.png">
+<meta property="og:image" content="http://soatree.github.io/2023/07/26/%E5%85%AB%E8%82%A1%E6%96%87-redis/eval.png">
+<meta property="og:image" content="http://soatree.github.io/2023/07/26/%E5%85%AB%E8%82%A1%E6%96%87-redis/evalsha.png">
+<meta property="og:image" content="http://soatree.github.io/2023/07/26/%E5%85%AB%E8%82%A1%E6%96%87-redis/AOF%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B.png">
+<meta property="og:image" content="http://soatree.github.io/2023/07/26/%E5%85%AB%E8%82%A1%E6%96%87-redis/%E6%8C%81%E4%B9%85%E5%8C%96%E6%96%87%E4%BB%B6%E5%8A%A0%E8%BD%BD.png">
+<meta property="article:published_time" content="2023-07-26T00:48:28.000Z">
+<meta property="article:modified_time" content="2023-08-03T13:01:56.799Z">
+<meta property="article:author" content="胖树">
+<meta property="article:tag" content="面试">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://soatree.github.io/2023/07/26/%E5%85%AB%E8%82%A1%E6%96%87-redis/redis%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84.png">
+  
+  
+  
+  <title>八股文-redis - FatTree</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"soatree.github.io","root":"/","version":"1.9.2","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.2.0"><link rel="alternate" href="/atom.xml" title="FatTree" type="application/atom+xml">
+</head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>FAT TREE</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/light.JPG') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="八股文-redis"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-07-26 08:48" pubdate>
+          2023年7月26日 早上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          7.6k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          64 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">八股文-redis</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>整理redis的相关面试题，题目来源微信公众号。</p>
+<h1 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h1><h2 id="Redis的高性能体现在哪些方面？"><a href="#Redis的高性能体现在哪些方面？" class="headerlink" title="Redis的高性能体现在哪些方面？"></a>Redis的高性能体现在哪些方面？</h2><ol>
+<li>纯内存访问</li>
+<li>非阻塞I&#x2F;O，Redis使用epoll作为I&#x2F;O多路复用技术的实现，再加上Redis自身的事件处理模型将epoll中的连接、读写、关闭都转换为事件，不在网络I&#x2F;O上浪费过多的时间</li>
+<li>单线程避免了线程切换和竞态产生的消耗</li>
+</ol>
+<p>参考：<br>《Redis开发与运维》 付磊　张益军 机械工业出版社</p>
+<h2 id="Redis的常见数据类型？底层是怎么实现的？"><a href="#Redis的常见数据类型？底层是怎么实现的？" class="headerlink" title="Redis的常见数据类型？底层是怎么实现的？"></a>Redis的常见数据类型？底层是怎么实现的？</h2><p><img src="/2023/07/26/%E5%85%AB%E8%82%A1%E6%96%87-redis/redis%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84.png" srcset="/img/loading.gif" lazyload alt="redis数据结构"><br><img src="/2023/07/26/%E5%85%AB%E8%82%A1%E6%96%87-redis/redis%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%86%85%E9%83%A8%E7%BC%96%E7%A0%81.png" srcset="/img/loading.gif" lazyload alt="redis数据结构内部编码"></p>
+<p>type命令实际返回的就是当前键的数据结构类型，它们分别是：string（字符串）、hash（哈希）、list（列表）、set（集合）、zset（有序集合），但这些只是Redis对外的数据结构。</p>
+<p>实际上每种数据结构都有自己底层的内部编码实现，而且是多种实现，这样Redis会在合适的场景选择合适的内部编码。</p>
+<p>参考：<br>《Redis开发与运维》 付磊　张益军 机械工业出版社</p>
+<h2 id="Redis的pipeline机制有了解过？"><a href="#Redis的pipeline机制有了解过？" class="headerlink" title="Redis的pipeline机制有了解过？"></a>Redis的pipeline机制有了解过？</h2><h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><p>Pipeline（流水线）能将一组Redis命令进行组装，通过一次RTT传输给Redis，再将这组Redis命令的执行结果按顺序返回给客户端。</p>
+<p><img src="/2023/07/26/%E5%85%AB%E8%82%A1%E6%96%87-redis/pipeline.png" srcset="/img/loading.gif" lazyload alt="pipeline"></p>
+<figure class="highlight processing"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs processing"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">mdel</span>(List&lt;<span class="hljs-built_in">String</span>&gt; keys) &#123;<br>    Jedis jedis = <span class="hljs-keyword">new </span><span class="hljs-class title_">Jedis</span>(<span class="hljs-string">&quot;127.0.0.1&quot;</span>);<br>    <span class="hljs-comment">// 1)生成pipeline对象</span><br>    Pipeline pipeline = jedis.<span class="hljs-property">pipelined</span>();<br>    <span class="hljs-comment">// 2)pipeline执行命令，注意此时命令并未真正执行</span><br>    <span class="hljs-keyword">for</span> (<span class="hljs-built_in">String</span> <span class="hljs-built_in">key</span> : keys) &#123;<br>        pipeline.<span class="hljs-property">del</span>(<span class="hljs-built_in">key</span>);<br>    &#125;<br>    <span class="hljs-comment">// 3)执行命令</span><br>    pipeline.<span class="hljs-property">sync</span>();<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="原生批量命令与Pipeline对比"><a href="#原生批量命令与Pipeline对比" class="headerlink" title="原生批量命令与Pipeline对比"></a>原生批量命令与Pipeline对比</h3><p>可以使用Pipeline模拟出批量操作的效果，但是在使用时要注意它与原生批量命令的区别，具体包含以下几点：</p>
+<ul>
+<li><p>原生批量命令是原子的，Pipeline是非原子的。</p>
+</li>
+<li><p>原生批量命令是一个命令对应多个key，Pipeline支持多个命令。</p>
+</li>
+<li><p>原生批量命令是Redis服务端支持实现的，而Pipeline需要服务端和客户端的共同实现。</p>
+</li>
+</ul>
+<h3 id="集群pipeline"><a href="#集群pipeline" class="headerlink" title="集群pipeline"></a>集群pipeline</h3><ul>
+<li>串行IO</li>
+</ul>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><code class="hljs reasonml">Map&lt;String, String&gt; serial<span class="hljs-constructor">IOMget(List&lt;String&gt; <span class="hljs-params">keys</span>)</span> &#123;<br>    <span class="hljs-comment">// 结果集</span><br>    Map&lt;String, String&gt; keyValueMap = <span class="hljs-keyword">new</span> HashMap&lt;String, String&gt;<span class="hljs-literal">()</span>;<br>    <span class="hljs-comment">// 属于各个节点的key列表,JedisPool要提供基于ip和port的hashcode方法</span><br>    Map&lt;JedisPool, List&lt;String&gt;&gt; nodeKeyListMap = <span class="hljs-keyword">new</span> HashMap&lt;JedisPool, List&lt;String&gt;&gt;<span class="hljs-literal">()</span>;<br>    <span class="hljs-comment">// 遍历所有的key</span><br>    <span class="hljs-keyword">for</span> (String key : keys) &#123;<br>        <span class="hljs-comment">// 使用CRC16本地计算每个key的slot</span><br>        <span class="hljs-built_in">int</span> slot = <span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">JedisClusterCRC16</span>.</span></span>get<span class="hljs-constructor">Slot(<span class="hljs-params">key</span>)</span>;<br>        <span class="hljs-comment">// 通过jedisCluster本地slot-&gt;node映射获取slot对应的node</span><br>        JedisPool jedisPool = jedisCluster.get<span class="hljs-constructor">ConnectionHandler()</span>.getJedisPoolFrom<br>            <span class="hljs-constructor">Slot(<span class="hljs-params">slot</span>)</span>;<br>        <span class="hljs-comment">// 归档</span><br>        <span class="hljs-keyword">if</span> (nodeKeyListMap.contains<span class="hljs-constructor">Key(<span class="hljs-params">jedisPool</span>)</span>) &#123;<br>            nodeKeyListMap.get(jedisPool).add(key);<br>        &#125; <span class="hljs-keyword">else</span> &#123;<br>            List&lt;String&gt; <span class="hljs-built_in">list</span> = <span class="hljs-keyword">new</span> ArrayList&lt;String&gt;<span class="hljs-literal">()</span>;<br>            <span class="hljs-built_in">list</span>.add(key);<br>            nodeKeyListMap.put(jedisPool, <span class="hljs-built_in">list</span>);<br>        &#125;<br>    &#125;<br>    <span class="hljs-comment">// 从每个节点上批量获取，这里使用mget也可以使用pipeline</span><br>    <span class="hljs-keyword">for</span> (Entry&lt;JedisPool, List&lt;String&gt;&gt; entry : nodeKeyListMap.entry<span class="hljs-constructor">Set()</span>) &#123;<br>        JedisPool jedisPool = entry.get<span class="hljs-constructor">Key()</span>;<br>       List&lt;String&gt; nodeKeyList = entry.get<span class="hljs-constructor">Value()</span>;<br>        <span class="hljs-comment">// 列表变为数组</span><br>        String<span class="hljs-literal">[]</span> nodeKeyArray = nodeKeyList.<span class="hljs-keyword">to</span><span class="hljs-constructor">Array(<span class="hljs-params">new</span> String[<span class="hljs-params">nodeKeyList</span>.<span class="hljs-params">size</span>()</span>]);<br>        <span class="hljs-comment">// 批量获取，可以使用mget或者Pipeline</span><br>        List&lt;String&gt; nodeValueList = jedisPool.get<span class="hljs-constructor">Resource()</span>.mget(nodeKeyArray);<br>        <span class="hljs-comment">// 归档</span><br>        <span class="hljs-keyword">for</span> (<span class="hljs-built_in">int</span> i = <span class="hljs-number">0</span>; i &lt; nodeKeyList.size<span class="hljs-literal">()</span>; i++) &#123;<br>            keyValueMap.put(nodeKeyList.get(i), nodeValueList.get(i));<br>        &#125;<br>    &#125;<br>    return keyValueMap;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>并行IO</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-title class_">Map</span>&lt;<span class="hljs-title class_">String</span>, <span class="hljs-title class_">String</span>&gt; <span class="hljs-title function_">parallelIOMget</span>(<span class="hljs-params">List&lt;<span class="hljs-built_in">String</span>&gt; keys</span>) &#123;<br>    <span class="hljs-comment">// 结果集</span><br>    <span class="hljs-title class_">Map</span>&lt;<span class="hljs-title class_">String</span>, <span class="hljs-title class_">String</span>&gt; keyValueMap = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;<span class="hljs-title class_">String</span>, <span class="hljs-title class_">String</span>&gt;();<br>    <span class="hljs-comment">// 属于各个节点的key列表</span><br>    <span class="hljs-title class_">Map</span>&lt;<span class="hljs-title class_">JedisPool</span>, <span class="hljs-title class_">List</span>&lt;<span class="hljs-title class_">String</span>&gt;&gt; nodeKeyListMap = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;<span class="hljs-title class_">JedisPool</span>, <span class="hljs-title class_">List</span>&lt;<span class="hljs-title class_">String</span>&gt;&gt;();<br>    ...和前面一样<br>    <span class="hljs-comment">// 多线程mget，最终汇总结果，也可pipeline</span><br>    <span class="hljs-keyword">for</span> (<span class="hljs-title class_">Entry</span>&lt;<span class="hljs-title class_">JedisPool</span>, <span class="hljs-title class_">List</span>&lt;<span class="hljs-title class_">String</span>&gt;&gt; entry : nodeKeyListMap.<span class="hljs-title function_">entrySet</span>()) &#123;<br>        <span class="hljs-comment">// 多线程实现</span><br>    &#125;<br>    <span class="hljs-keyword">return</span> keyValueMap;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>hash_tag</li>
+</ul>
+<p>将多个key强制分配到一个节点上，它的操作时间&#x3D;1次网络时间+n次命令时间，这里换成pipeline即可</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-title class_">List</span>&lt;<span class="hljs-title class_">String</span>&gt; <span class="hljs-title function_">hashTagMget</span>(<span class="hljs-params"><span class="hljs-built_in">String</span>[] hashTagKeys</span>) &#123;<br>    <span class="hljs-keyword">return</span> jedisCluster.<span class="hljs-title function_">mget</span>(hashTagKeys);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>参考：<br>《Redis开发与运维》 付磊　张益军 机械工业出版社</p>
+<h2 id="事务"><a href="#事务" class="headerlink" title="事务"></a>事务</h2><p>为了保证多条命令组合的原子性，Redis提供了简单的事务功能以及集成Lua脚本来解决这个问题。</p>
+<h3 id="Redis的事务怎么实现？有什么缺点？"><a href="#Redis的事务怎么实现？有什么缺点？" class="headerlink" title="Redis的事务怎么实现？有什么缺点？"></a>Redis的事务怎么实现？有什么缺点？</h3><ul>
+<li>事务实现</li>
+</ul>
+<p>Redis提供了简单的事务功能，将一组需要一起执行的命令放到multi和exec两个命令之间。multi命令代表事务开始，exec命令代表事务结束，它们之间的命令是原子顺序执行的</p>
+<figure class="highlight accesslog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs accesslog"><span class="hljs-number">127.0.0.1:6379</span>&gt; multi<br>OK<br><span class="hljs-number">127.0.0.1:6379</span>&gt; sadd user:a:follow user:b<br>QUEUED<br><span class="hljs-number">127.0.0.1:6379</span>&gt; sadd user:b:fans user:a<br>QUEUED<br></code></pre></td></tr></table></figure>
+
+<p>可以看到sadd命令此时的返回结果是QUEUED，代表命令并没有真正执行，而是暂时保存在Redis中。如果此时另一个客户端执行sismember user：a：follow user：b返回结果应该为0。</p>
+<figure class="highlight accesslog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs accesslog"><span class="hljs-number">127.0.0.1:6379</span>&gt; sismember user:a:follow user:b<br>(integer) <span class="hljs-number">0</span><br></code></pre></td></tr></table></figure>
+
+<p>只有当exec执行后，用户A关注用户B的行为才算完成，如下所示返回的两个结果对应sadd命令。</p>
+<figure class="highlight accesslog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs accesslog"><span class="hljs-number">127.0.0.1:6379</span>&gt; exec<br><span class="hljs-number">1</span>) (integer) <span class="hljs-number">1</span><br><span class="hljs-number">2</span>) (integer) <span class="hljs-number">1</span><br><span class="hljs-number">127.0.0.1:6379</span>&gt; sismember user:a:follow user:b<br>(integer) <span class="hljs-number">1</span><br></code></pre></td></tr></table></figure>
+
+<p>如果要停止事务的执行，可以使用discard命令代替exec命令即可。</p>
+<p>命令语法错误将导致事务无法执行；非语法错误将正常执行</p>
+<p>watch命令可以提供类似乐观锁的功能，会在exec执行前观察watch 的 key是否发生变化，如果变化则不会执行事务</p>
+<ul>
+<li>缺点</li>
+</ul>
+<p>不支持事务中的回滚特性，同时无法实现命令之间的逻辑关系计算</p>
+<h3 id="Redis结合lua有什么作用？Eval和evalsha的区别？"><a href="#Redis结合lua有什么作用？Eval和evalsha的区别？" class="headerlink" title="Redis结合lua有什么作用？Eval和evalsha的区别？"></a>Redis结合lua有什么作用？Eval和evalsha的区别？</h3><h4 id="Redis结合lua有什么作用"><a href="#Redis结合lua有什么作用" class="headerlink" title="Redis结合lua有什么作用"></a>Redis结合lua有什么作用</h4><p>Lua脚本在Redis中是原子执行的，执行过程中间不会插入其他命令，实现事务功能。</p>
+<p>Lua脚本可以帮助开发和运维人员创造出自己定制的命令，并可以将这些命令常驻在Redis内存中，实现复用的效果。</p>
+<p>Lua脚本可以将多条命令一次性打包，有效地减少网络开销。</p>
+<h4 id="Eval和evalsha的区别"><a href="#Eval和evalsha的区别" class="headerlink" title="Eval和evalsha的区别"></a>Eval和evalsha的区别</h4><ul>
+<li>eval</li>
+</ul>
+<figure class="highlight maxima"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs maxima"><span class="hljs-built_in">eval</span> 脚本内容 <span class="hljs-built_in">key</span>个数 <span class="hljs-built_in">key</span>列表 参数列表<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight accesslog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs accesslog"><span class="hljs-number">127.0.0.1:6379</span>&gt; eval &#x27;return <span class="hljs-string">&quot;hello &quot;</span> .. KEYS<span class="hljs-string">[1]</span> .. ARGV<span class="hljs-string">[1]</span>&#x27; <span class="hljs-number">1</span> redis world<br><span class="hljs-string">&quot;hello redisworld&quot;</span><br></code></pre></td></tr></table></figure>
+
+<p>如果Lua脚本较长，还可以使用redis-cli–eval直接执行文件。eval命令和–eval参数本质是一样的，客户端如果想执行Lua脚本，首先在客户端编写好Lua脚本代码，然后把脚本作为字符串发送给服务端，服务端会将执行结果返回给客户端</p>
+<p><img src="/2023/07/26/%E5%85%AB%E8%82%A1%E6%96%87-redis/eval.png" srcset="/img/loading.gif" lazyload alt="eval"></p>
+<ul>
+<li>evalsha</li>
+</ul>
+<p>除了使用eval，Redis还提供了evalsha命令来执行Lua脚本。首先要将Lua脚本加载到Redis服务端，得到该脚本的SHA1校验和，evalsha命令使用SHA1作为参数可以直接执行对应Lua脚本，避免每次发送Lua脚本的开销。这样客户端就不需要每次执行脚本内容，而脚本也会常驻在服务端，脚本功能得到了复用</p>
+<p>加载脚本：script load命令可以将脚本内容加载到Redis内存中，例如下面将lua_get.lua加载到Redis中，得到SHA1为：”7413dc2440db1fea7c0a0bde841fa68eefaf149c”</p>
+<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs arduino"><span class="hljs-meta"># redis-cli script load <span class="hljs-string">&quot;$(cat lua_get.lua)&quot;</span></span><br><span class="hljs-string">&quot;7413dc2440db1fea7c0a0bde841fa68eefaf149c&quot;</span><br></code></pre></td></tr></table></figure>
+
+<p>执行脚本：evalsha的使用方法如下，参数使用SHA1值，执行逻辑和eval一致。</p>
+<figure class="highlight gauss"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs gauss">evalsha 脚本SHA1值 <span class="hljs-built_in">key</span>个数 <span class="hljs-built_in">key</span>列表 参数列表<br></code></pre></td></tr></table></figure>
+
+<p>所以只需要执行如下操作，就可以调用lua_get.lua脚本：</p>
+<figure class="highlight accesslog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs accesslog"><span class="hljs-number">127.0.0.1:6379</span>&gt; evalsha 7413dc2440db1fea7c0a0bde841fa68eefaf149c <span class="hljs-number">1</span> redis world<br><span class="hljs-string">&quot;hello redisworld&quot;</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="/2023/07/26/%E5%85%AB%E8%82%A1%E6%96%87-redis/evalsha.png" srcset="/img/loading.gif" lazyload alt="evalsha"></p>
+<p>参考：<br>《Redis开发与运维》 付磊　张益军 机械工业出版社</p>
+<h2 id="hyperloglog"><a href="#hyperloglog" class="headerlink" title="hyperloglog"></a>hyperloglog</h2><p>HyperLogLog并不是一种新的数据结构（实际类型为字符串类型），而是一种基数算法，通过HyperLogLog可以利用极小的内存空间完成独立总数的统计，数据集可以是IP、Email、ID等。</p>
+<p>HyperLogLog提供了3个命令：pfadd、pfcount、pfmerge</p>
+<ul>
+<li>添加</li>
+</ul>
+<p>pfadd key element [element …]</p>
+<ul>
+<li>计算独立用户数</li>
+</ul>
+<p>pfcount key [key …]</p>
+<ul>
+<li>合并</li>
+</ul>
+<p>pfmerge destkey sourcekey [sourcekey …]</p>
+<p>HyperLogLog内存占用量非常小，但是存在错误率，开发者在进行数据结构选型时只需要确认如下两条即可：</p>
+<ul>
+<li><p>只为了计算独立总数，不需要获取单条数据。</p>
+</li>
+<li><p>可以容忍一定误差率，毕竟HyperLogLog在内存的占用量上有很大的优势。</p>
+</li>
+</ul>
+<p>参考：<br>《Redis开发与运维》 付磊　张益军 机械工业出版社</p>
+<h2 id="持久化"><a href="#持久化" class="headerlink" title="持久化"></a>持久化</h2><h3 id="RDB"><a href="#RDB" class="headerlink" title="RDB"></a>RDB</h3><h4 id="触发机制"><a href="#触发机制" class="headerlink" title="触发机制"></a>触发机制</h4><p>RDB持久化是把当前进程数据生成快照保存到硬盘的过程，触发RDB持久化过程分为手动触发和自动触发。</p>
+<p>手动触发分别对应save和bgsave命令。save命令已经废弃。bgsave命令使Redis进程执行fork操作创建子进程，RDB持久化过程由子进程负责，完成后自动结束，阻塞只发生在fork阶段，一般时间很短。</p>
+<p>除了执行命令手动触发之外，Redis内部还存在自动触发RDB的持久化机制，例如以下场景：</p>
+<ul>
+<li>使用save相关配置，如“save m n”。表示m秒内数据集存在n次修改时，自动触发bgsave。</li>
+<li>如果从节点执行全量复制操作，主节点自动执行bgsave生成RDB文件并发送给从节点，更多细节见6.3节介绍的复制原理。</li>
+<li>默认情况下执行shutdown命令时，如果没有开启AOF持久化功能则自动执行bgsave。</li>
+</ul>
+<h4 id="RDB优缺点"><a href="#RDB优缺点" class="headerlink" title="RDB优缺点"></a>RDB优缺点</h4><p>RDB的优点：</p>
+<ul>
+<li>RDB是一个紧凑压缩的二进制文件，代表Redis在某个时间点上的数据快照。非常适用于备份，全量复制等场景。</li>
+<li>Redis加载RDB恢复数据远远快于AOF的方式。</li>
+</ul>
+<p>RDB的缺点：</p>
+<ul>
+<li>RDB方式数据没办法做到实时持久化&#x2F;秒级持久化。因为bgsave每次运行都要执行fork操作创建子进程，属于重量级操作，频繁执行成本过高。</li>
+<li>Redis版本演进过程中有多个格式的RDB版本，存在老版本Redis服务无法兼容新版RDB格式的问题。</li>
+</ul>
+<p>针对RDB不适合实时持久化的问题，Redis提供了AOF持久化方式来解决。</p>
+<h3 id="AOF"><a href="#AOF" class="headerlink" title="AOF"></a>AOF</h3><p>AOF（append only file）持久化：以独立日志的方式记录每次写命令，重启时再重新执行AOF文件中的命令达到恢复数据的目的。AOF的主要作用是解决了数据持久化的实时性，目前已经是Redis持久化的主流方式。开启AOF功能需要设置配置：appendonly yes，默认不开启。</p>
+<h4 id="AOF的工作流程如下"><a href="#AOF的工作流程如下" class="headerlink" title="AOF的工作流程如下"></a>AOF的工作流程如下</h4><p><img src="/2023/07/26/%E5%85%AB%E8%82%A1%E6%96%87-redis/AOF%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B.png" srcset="/img/loading.gif" lazyload alt="AOF工作流程"></p>
+<ol>
+<li>所有的写入命令会追加到aof_buf（缓冲区）中。</li>
+<li>AOF缓冲区根据对应的策略向硬盘做同步操作。</li>
+<li>随着AOF文件越来越大，需要定期对AOF文件进行重写，达到压缩的目的。</li>
+<li>当Redis服务器重启时，可以加载AOF文件进行数据恢复。</li>
+</ol>
+<h4 id="AOF为什么把命令追加到aof-buf中？"><a href="#AOF为什么把命令追加到aof-buf中？" class="headerlink" title="AOF为什么把命令追加到aof_buf中？"></a>AOF为什么把命令追加到aof_buf中？</h4><p>Redis使用单线程响应命令，如果每次写AOF文件命令都直接追加到硬盘，那么性能完全取决于当前硬盘负载。先写入缓冲区aof_buf中，还有另一个好处，Redis可以提供多种缓冲区同步硬盘的策略，在性能和安全性方面做出平衡。</p>
+<h4 id="Redis提供了多种AOF缓冲区同步文件策略，由参数appendfsync控制"><a href="#Redis提供了多种AOF缓冲区同步文件策略，由参数appendfsync控制" class="headerlink" title="Redis提供了多种AOF缓冲区同步文件策略，由参数appendfsync控制"></a>Redis提供了多种AOF缓冲区同步文件策略，由参数appendfsync控制</h4><p>配置为always时，每次写入都要同步AOF文件，在一般的SATA硬盘上，Redis只能支持大约几百TPS写入，显然跟Redis高性能特性背道而驰，不建议配置。</p>
+<p>配置为no，由于操作系统每次同步AOF文件的周期不可控，而且会加大每次同步硬盘的数据量，虽然提升了性能，但数据安全性无法保证。</p>
+<p>配置为everysec，是建议的同步策略，也是默认配置，做到兼顾性能和数据安全性。理论上只有在系统突然宕机的情况下丢失1秒的数据。</p>
+<h4 id="重写机制"><a href="#重写机制" class="headerlink" title="重写机制"></a>重写机制</h4><p>随着命令不断写入AOF，文件会越来越大，为了解决这个问题，Redis引入AOF重写机制压缩文件体积。AOF文件重写是把Redis进程内的数据转化为写命令同步到新AOF文件的过程。</p>
+<p>重写后的AOF文件为什么可以变小？有如下原因：</p>
+<ul>
+<li>进程内已经超时的数据不再写入文件。</li>
+<li>旧的AOF文件含有无效命令，如del key1、hdel key2、srem keys、set a111、set a222等。重写使用进程内数据直接生成，这样新的AOF文件只保留最终数据的写入命令。</li>
+<li>多条写命令可以合并为一个，如：lpush list a、lpush list b、lpush list c可以转化为：lpush list a b c。为了防止单条命令过大造成客户端缓冲区溢出，对于list、set、hash、zset等类型操作，以64个元素为界拆分为多条。</li>
+</ul>
+<p>AOF重写降低了文件占用空间，除此之外，另一个目的是：更小的AOF文件可以更快地被Redis加载。</p>
+<p>AOF重写过程可以手动触发和自动触发：</p>
+<ul>
+<li>手动触发：直接调用bgrewriteaof命令。</li>
+<li>自动触发：根据auto-aof-rewrite-min-size和auto-aof-rewrite-percentage参数确定自动触发时机。auto-aof-rewrite-min-size：表示运行AOF重写时文件最小体积，默认为64MB。auto-aof-rewrite-percentage：代表当前AOF文件空间（aof_current_size）和上一次重写后AOF文件空间（aof_base_size）的比值。自动触发时机&#x3D;aof_current_size&gt;auto-aof-rewrite-min-size&amp;&amp;（aof_current_size-aof_base_size）&#x2F;aof_base_size&gt;&#x3D;auto-aof-rewrite-percentage。其中aof_current_size和aof_base_size可以在info Persistence统计信息中查看。</li>
+</ul>
+<h4 id="重启加载"><a href="#重启加载" class="headerlink" title="重启加载"></a>重启加载</h4><p>总体看来优先加载AOF文件，其次加载RDB文件。</p>
+<p><img src="/2023/07/26/%E5%85%AB%E8%82%A1%E6%96%87-redis/%E6%8C%81%E4%B9%85%E5%8C%96%E6%96%87%E4%BB%B6%E5%8A%A0%E8%BD%BD.png" srcset="/img/loading.gif" lazyload alt="持久化文件加载"></p>
+<p>参考：<br>《Redis开发与运维》 付磊　张益军 机械工业出版社</p>
+<ol start="2">
+<li>Redis的主备同步流程？</li>
+</ol>
+<p>书 6.3</p>
+<ol start="4">
+<li>Redis有几种部署模式？重点讲下集群和哨兵机制的实现？</li>
+</ol>
+<p>集群放key流程</p>
+<ol start="14">
+<li>如果Redis主备切换回发生什么问题？</li>
+</ol>
+<p>网络<br>17. Redis的reactor模型能否介绍下？</p>
+<p>实践<br>8. 常见的Redis的优化方案？<br>9. 常见的Redis问题？缓存击穿，缓存雪崩，热点key问题解决方案？<br>10. Redis在集群下做分布式锁有什么优缺点？<br>12. Redis的过期策略怎么实现的？Redis的淘汰策略是怎么实现的？<br>16. Redis如果cpu过高，怎么解决？在使用中有出现什么问题？是怎么解决的？<br>20. 如果有海量的数据，怎么查询某个key是否存在？<br>21. 如果要统计某一天的页面访问量怎么实现？</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/54_bMeUwjxk-8DHa90heNQ">微信公众号:我的IT技术路</a></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E4%B8%AD%E9%97%B4%E4%BB%B6/" class="category-chain-item">中间件</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E9%9D%A2%E8%AF%95/">#面试</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>八股文-redis</div>
+      <div>http://soatree.github.io/2023/07/26/八股文-redis/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>胖树</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年7月26日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+              <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                <i class="iconfont icon-nc"></i>
+              </span>
+              </a>
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+              <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                <i class="iconfont icon-sa"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2023/07/28/%E7%93%A6%E5%B0%94%E7%99%BB%E6%B9%96/" title="瓦尔登湖">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">瓦尔登湖</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/06/24/TCP%E8%BF%9E%E6%8E%A5%E7%9A%84TIME-WAIT%E5%92%8CCLOSE-WAIT%E7%8A%B6%E6%80%81%E8%A7%A3%E8%AF%B4-%E8%BD%AC%E8%BD%BD/" title="TCP连接的TIME_WAIT和CLOSE_WAIT状态解说(转载)">
+                        <span class="hidden-mobile">TCP连接的TIME_WAIT和CLOSE_WAIT状态解说(转载)</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
