@@ -18,6 +18,7 @@ categories:
 - 中间件
 tags:
 - git 
+- 饮食
 - 哲学
 - ubuntu 
 - 养生 
