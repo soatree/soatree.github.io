@@ -234,7 +234,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2023/09/13/%E5%85%AB%E8%82%A1%E6%96%87-elasticsearch/" target="_self">
         <div>
-          写入过程，查询过程，底层实现，为什么这么设计 脑裂问题，怎么产生的，如何解决 elasticsearch为什么检索快，它的底层数据结构是怎么样的？ ES的检索机制(query-then-fetch) 如果现在要搜一个词，按相关度排序，如何获取排名在(100-120)之间的文档 针对于“用户打车付款-滴滴后台-支付宝后台”设计一个一致性处理方案 我说es，redis，聊了聊使用场景，怎样同步mysq
+          前言整理ES的相关面试题，题目来源微信公众号。 题目写入过程，查询过程索引过程1、客户端发送索引请求2、参数检查3、数据预处理4、判断索引是否存在5、创建索引判断索引是否存在。如果索引不存在，则判断是否能够自动创建，可以通过action.auto_create_index设置能否自动创建索引；如果节点支持Dynamic Mapping，写入文档时，如果字段尚未在mapping中定义，则会根据索引文
         </div>
       </a>
 
@@ -258,7 +258,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/ES/" class="category-chain-item">ES</a>
+  <a href="/categories/elasticsearch/" class="category-chain-item">elasticsearch</a>
   
   
 
@@ -273,7 +273,9 @@
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
             
-              <a href="/tags/ES/">#ES</a>
+              <a href="/tags/%E9%9D%A2%E8%AF%95/">#面试</a>
+            
+              <a href="/tags/elasticsearch/">#elasticsearch</a>
             
           </div>
         
@@ -394,6 +396,8 @@
         
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E9%9D%A2%E8%AF%95/">#面试</a>
             
               <a href="/tags/kafka/">#kafka</a>
             

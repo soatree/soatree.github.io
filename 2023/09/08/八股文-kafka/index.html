@@ -41,8 +41,9 @@
 <meta property="og:image" content="http://soatree.github.io/2023/09/08/%E5%85%AB%E8%82%A1%E6%96%87-kafka/%E4%BA%8B%E5%8A%A1%E4%BB%A3%E7%A0%81.png">
 <meta property="og:image" content="http://soatree.github.io/2023/09/08/%E5%85%AB%E8%82%A1%E6%96%87-kafka/%E4%B8%BB%E6%B5%81MQ.png">
 <meta property="article:published_time" content="2023-09-08T13:49:46.000Z">
-<meta property="article:modified_time" content="2023-09-19T12:58:59.992Z">
+<meta property="article:modified_time" content="2023-09-20T13:13:41.112Z">
 <meta property="article:author" content="胖树">
+<meta property="article:tag" content="面试">
 <meta property="article:tag" content="kafka">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="http://soatree.github.io/2023/09/08/%E5%85%AB%E8%82%A1%E6%96%87-kafka/%E4%BC%A0%E7%BB%9F%E6%95%B0%E6%8D%AE%E6%8B%B7%E8%B4%9D.png">
@@ -238,7 +239,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          23k 字
+          24k 字
         
       </span>
     
@@ -249,7 +250,7 @@
         
         
         
-          191 分钟
+          203 分钟
         
       </span>
     
@@ -584,7 +585,113 @@
 </ul>
 <p>(1)、RocketMQ（阿里开源的），git活跃度还可以。基本上你push了自己的bug确认了有问题都有阿里大佬跟你试试解答并修复的。<br>(2)、Kafka，这是个大哥，号称最好的mq。应用于大数据领域，公司的日志采集，实时计算等场景，都离不开他的身影，他基本上算得上是世界范围级别的消息队列标杆了。</p>
 <p>参考：<br><a target="_blank" rel="noopener" href="https://juejin.cn/post/6844904168797241358">几种消息中间件的对比</a></p>
-<h2 id="调优"><a href="#调优" class="headerlink" title="调优"></a>调优</h2><h3 id="吞吐量"><a href="#吞吐量" class="headerlink" title="吞吐量"></a>吞吐量</h3><p>9</p>
+<h2 id="调优"><a href="#调优" class="headerlink" title="调优"></a>调优</h2><h3 id="吞吐量"><a href="#吞吐量" class="headerlink" title="吞吐量"></a>吞吐量</h3><p><strong>broker端</strong></p>
+<ul>
+<li><p>适当增加num.replica.fetchers，但不要超过CPU核数。</p>
+</li>
+<li><p>调优GC避免经常性的Full GC。</p>
+</li>
+</ul>
+<p><strong>producer端</strong></p>
+<ul>
+<li><p>适当增加batch.size，比如100～512KB。</p>
+</li>
+<li><p>适当增加linger.ms，比如10～100毫秒。</p>
+</li>
+<li><p>设置compression.type&#x3D;lz4。</p>
+</li>
+<li><p>acks&#x3D;0或1。</p>
+</li>
+<li><p>retries&#x3D;0。</p>
+</li>
+<li><p>若多线程共享producer或分区数很多，增加buffer.memory。</p>
+</li>
+</ul>
+<p><strong>consumer端</strong></p>
+<ul>
+<li><p>采用多consumer实例。</p>
+</li>
+<li><p>增加fetch.min.bytes，比如100000。</p>
+</li>
+</ul>
+<h3 id="延迟"><a href="#延迟" class="headerlink" title="延迟"></a>延迟</h3><p><strong>broker端</strong></p>
+<ul>
+<li><p>适度增加num.replica.fetchers。</p>
+</li>
+<li><p>避免创建过多topic分区。</p>
+</li>
+</ul>
+<p><strong>producer端</strong></p>
+<ul>
+<li><p>设置linger.ms&#x3D;0。</p>
+</li>
+<li><p>设置compression.type&#x3D;none。</p>
+</li>
+<li><p>设置acks&#x3D;1或0。</p>
+</li>
+</ul>
+<p><strong>consumer端</strong></p>
+<ul>
+<li>设置fetch.min.bytes&#x3D;1。</li>
+</ul>
+<h3 id="持久性"><a href="#持久性" class="headerlink" title="持久性"></a>持久性</h3><p><strong>broker端</strong></p>
+<ul>
+<li><p>设置unclean.leader.election.enable&#x3D;false（0.11.0.0之前版本）。</p>
+</li>
+<li><p>设置auto.create.topics.enable&#x3D;false。</p>
+</li>
+<li><p>设置replication.factor &#x3D; 3,min.insync.replicas &#x3D; replication.factor-1。</p>
+</li>
+<li><p>设置default.replication.factor &#x3D; 3。</p>
+</li>
+<li><p>设置broker.rack属性分散分区数据到不同机架。</p>
+</li>
+<li><p>设置log.flush.interval.message和log.flush.interval.ms为一个较小的值。</p>
+</li>
+</ul>
+<p><strong>producer端</strong></p>
+<ul>
+<li><p>设置acks&#x3D;all。</p>
+</li>
+<li><p>设置retries为一个较大的值，比如10～30。</p>
+</li>
+<li><p>设置max.in.flight.requests.per.connection&#x3D;1。</p>
+</li>
+<li><p>设置enable.idempotence&#x3D;true启用幂等性。</p>
+</li>
+</ul>
+<p><strong>consumer端</strong></p>
+<ul>
+<li><p>设置auto.commit.enable&#x3D;false。</p>
+</li>
+<li><p>消息消费成功后调用commitSync提交位移。</p>
+</li>
+</ul>
+<h3 id="可用性"><a href="#可用性" class="headerlink" title="可用性"></a>可用性</h3><p><strong>broker端</strong></p>
+<ul>
+<li><p>避免创建过多分区。</p>
+</li>
+<li><p>设置unclean.leader.election.enable&#x3D;true。</p>
+</li>
+<li><p>设置min.insync.replicas&#x3D;1。</p>
+</li>
+<li><p>设置num.recovery.threads.per.data.dir&#x3D;broker端参数log.dirs中设置的目录数。</p>
+</li>
+</ul>
+<p><strong>producer端</strong></p>
+<ul>
+<li>设置acks&#x3D;1，若一定要设置为all，则遵循上面broker端的min.insyn.replicas配置。</li>
+</ul>
+<p><strong>consumer端</strong></p>
+<ul>
+<li><p>设置session.timeout.ms为较低的值，比如10000。</p>
+</li>
+<li><p>（0.10.1.0及之后版本）设置max.poll.interval.ms为比消息平均处理时间稍大的值。</p>
+</li>
+<li><p>（0.10.1.0之前版本）设置max.poll.records和max.partition.fetch.bytes减少consumer处理消息的总时长，避免频繁rebalance。</p>
+</li>
+</ul>
+<p>参考：<br>《Apache Kafka实战》 胡夕 电子工业出版社</p>
 <h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/54_bMeUwjxk-8DHa90heNQ">微信公众号:我的IT技术路</a></p>
 
                 
@@ -618,6 +725,8 @@
   
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E9%9D%A2%E8%AF%95/">#面试</a>
       
         <a href="/tags/kafka/">#kafka</a>
       

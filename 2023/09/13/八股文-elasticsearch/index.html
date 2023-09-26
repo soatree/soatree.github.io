@@ -16,18 +16,35 @@
   <meta name="author" content="胖树">
   <meta name="keywords" content="">
   
-    <meta name="description" content="写入过程，查询过程，底层实现，为什么这么设计 脑裂问题，怎么产生的，如何解决 elasticsearch为什么检索快，它的底层数据结构是怎么样的？ ES的检索机制(query-then-fetch) 如果现在要搜一个词，按相关度排序，如何获取排名在(100-120)之间的文档 针对于“用户打车付款-滴滴后台-支付宝后台”设计一个一致性处理方案 我说es，redis，聊了聊使用场景，怎样同步mysq">
+    <meta name="description" content="前言整理ES的相关面试题，题目来源微信公众号。 题目写入过程，查询过程索引过程1、客户端发送索引请求2、参数检查3、数据预处理4、判断索引是否存在5、创建索引判断索引是否存在。如果索引不存在，则判断是否能够自动创建，可以通过action.auto_create_index设置能否自动创建索引；如果节点支持Dynamic Mapping，写入文档时，如果字段尚未在mapping中定义，则会根据索引文">
 <meta property="og:type" content="article">
 <meta property="og:title" content="八股文-elasticsearch">
 <meta property="og:url" content="http://soatree.github.io/2023/09/13/%E5%85%AB%E8%82%A1%E6%96%87-elasticsearch/index.html">
 <meta property="og:site_name" content="FatTree">
-<meta property="og:description" content="写入过程，查询过程，底层实现，为什么这么设计 脑裂问题，怎么产生的，如何解决 elasticsearch为什么检索快，它的底层数据结构是怎么样的？ ES的检索机制(query-then-fetch) 如果现在要搜一个词，按相关度排序，如何获取排名在(100-120)之间的文档 针对于“用户打车付款-滴滴后台-支付宝后台”设计一个一致性处理方案 我说es，redis，聊了聊使用场景，怎样同步mysq">
+<meta property="og:description" content="前言整理ES的相关面试题，题目来源微信公众号。 题目写入过程，查询过程索引过程1、客户端发送索引请求2、参数检查3、数据预处理4、判断索引是否存在5、创建索引判断索引是否存在。如果索引不存在，则判断是否能够自动创建，可以通过action.auto_create_index设置能否自动创建索引；如果节点支持Dynamic Mapping，写入文档时，如果字段尚未在mapping中定义，则会根据索引文">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://soatree.github.io/2023/09/13/%E5%85%AB%E8%82%A1%E6%96%87-elasticsearch/ES%E7%B4%A2%E5%BC%95%E5%85%A8%E8%BF%87%E7%A8%8B.png">
+<meta property="og:image" content="http://soatree.github.io/2023/09/13/%E5%85%AB%E8%82%A1%E6%96%87-elasticsearch/ES%E7%B4%A2%E5%BC%95%E7%AE%80%E5%8C%96%E8%BF%87%E7%A8%8B.png">
+<meta property="og:image" content="http://soatree.github.io/2023/09/13/%E5%85%AB%E8%82%A1%E6%96%87-elasticsearch/ES%E6%90%9C%E7%B4%A2%E8%BF%87%E7%A8%8B.png">
+<meta property="og:image" content="http://soatree.github.io/2023/09/13/%E5%85%AB%E8%82%A1%E6%96%87-elasticsearch/%E6%90%9C%E7%B4%A2%E6%9C%BA%E5%88%B6.png">
+<meta property="og:image" content="http://soatree.github.io/2023/09/13/%E5%85%AB%E8%82%A1%E6%96%87-elasticsearch/%E5%80%92%E6%8E%92%E7%B4%A2%E5%BC%95.png">
+<meta property="og:image" content="http://soatree.github.io/2023/09/13/%E5%85%AB%E8%82%A1%E6%96%87-elasticsearch/%E9%9B%86%E7%BE%A4%E3%80%81%E8%8A%82%E7%82%B9%E3%80%81%E7%B4%A2%E5%BC%95%E3%80%81%E5%88%86%E7%89%87.png">
+<meta property="og:image" content="http://soatree.github.io/2023/09/13/%E5%85%AB%E8%82%A1%E6%96%87-elasticsearch/ES%E6%96%87%E6%A1%A3%E5%AD%98%E5%82%A8.png">
+<meta property="og:image" content="http://soatree.github.io/2023/09/13/%E5%85%AB%E8%82%A1%E6%96%87-elasticsearch/%E8%8A%82%E7%82%B9%E7%B1%BB%E5%9E%8B.png">
+<meta property="og:image" content="http://soatree.github.io/2023/09/13/%E5%85%AB%E8%82%A1%E6%96%87-elasticsearch/%E5%80%92%E6%8E%92%E7%B4%A2%E5%BC%95%E9%A1%B9.png">
+<meta property="og:image" content="http://soatree.github.io/2023/09/13/%E5%85%AB%E8%82%A1%E6%96%87-elasticsearch/n1.png">
+<meta property="og:image" content="http://soatree.github.io/2023/09/13/%E5%85%AB%E8%82%A1%E6%96%87-elasticsearch/n2.png">
+<meta property="og:image" content="http://soatree.github.io/2023/09/13/%E5%85%AB%E8%82%A1%E6%96%87-elasticsearch/filter%E5%92%8Cquery.png">
+<meta property="og:image" content="http://soatree.github.io/2023/09/13/%E5%85%AB%E8%82%A1%E6%96%87-elasticsearch/ES%E5%86%B2%E5%88%B7.png">
+<meta property="og:image" content="http://soatree.github.io/2023/09/13/%E5%85%AB%E8%82%A1%E6%96%87-elasticsearch/%E5%86%B2%E5%88%B7%E6%9D%A1%E4%BB%B6.png">
+<meta property="og:image" content="http://soatree.github.io/2023/09/13/%E5%85%AB%E8%82%A1%E6%96%87-elasticsearch/%E5%88%86%E5%B1%82%E5%90%88%E5%B9%B6.png">
 <meta property="article:published_time" content="2023-09-13T12:01:57.000Z">
-<meta property="article:modified_time" content="2023-09-19T13:01:51.074Z">
+<meta property="article:modified_time" content="2023-09-26T11:37:31.043Z">
 <meta property="article:author" content="胖树">
-<meta property="article:tag" content="ES">
+<meta property="article:tag" content="面试">
+<meta property="article:tag" content="elasticsearch">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://soatree.github.io/2023/09/13/%E5%85%AB%E8%82%A1%E6%96%87-elasticsearch/ES%E7%B4%A2%E5%BC%95%E5%85%A8%E8%BF%87%E7%A8%8B.png">
   
   
   
@@ -220,7 +237,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          269 字
+          14k 字
         
       </span>
     
@@ -231,7 +248,7 @@
         
         
         
-          3 分钟
+          119 分钟
         
       </span>
     
@@ -274,15 +291,224 @@
             
               <div class="markdown-body">
                 
-                <p>写入过程，查询过程，底层实现，为什么这么设计</p>
-<p>脑裂问题，怎么产生的，如何解决</p>
-<p>elasticsearch为什么检索快，它的底层数据结构是怎么样的？</p>
-<p>ES的检索机制(query-then-fetch)</p>
-<p>如果现在要搜一个词，按相关度排序，如何获取排名在(100-120)之间的文档</p>
-<p>针对于“用户打车付款-滴滴后台-支付宝后台”设计一个一致性处理方案</p>
-<p>我说es，redis，聊了聊使用场景，怎样同步mysql数据到es的，这样的架构有没有遇到问题</p>
-<p>es倒排索引介绍下，range和filter的区别，查询性能飘高怎么解决</p>
-<p>es字段设计有什么要点，和数据库对比下</p>
+                <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>整理ES的相关面试题，题目来源微信公众号。</p>
+<h1 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h1><h2 id="写入过程，查询过程"><a href="#写入过程，查询过程" class="headerlink" title="写入过程，查询过程"></a>写入过程，查询过程</h2><h3 id="索引过程"><a href="#索引过程" class="headerlink" title="索引过程"></a>索引过程</h3><p>1、客户端发送索引请求<br>2、参数检查<br>3、数据预处理<br>4、判断索引是否存在<br>5、创建索引<br>判断索引是否存在。如果索引不存在，则判断是否能够自动创建，可以通过action.auto_create_index设置能否自动创建索引；如果节点支持Dynamic Mapping，写入文档时，如果字段尚未在mapping中定义，则会根据索引文档信息推算字段的类型，但并不能完全推算正确。<br>6、请求预处理<br>7、路由计算<br>根据请求的routing、id信息计算文档应该被索引到哪个分片，计算公式为：shard_num &#x3D; hash(_routing) % num_primary_shards。<br>其中_routing默认值为文档id，num_primary_shards是主分片个数，所以从算法中即可以看出索引的主分片个数一旦指定便无法修改，因为文档利用主分片的个数来进行定位。<br>定位到分片序号后，还需要定位分片所属的数据节点；从集群状态的内容路由表获取主分片所在的节点，并将请求转发至节点。需要注意的是分片到数据节点的映射关系不是固定的，当检测到数据分布不均匀、新节点加入或者节点宕掉等会进行分片的重新分配。<br>8、主分片索引分档<br>当主分片所在节点接受到请求后，节点开始进行本节点的文档写入，文档写入过程：<br>（1）文档写入时，不会直接写入到磁盘中，而是先将文档写入到Index Buffer内存空间中，到一定的时间，Index Buffer会Refresh把内存中的文档写入Segment中。当文档在Index Buffer中时，是无法被查询到的，这就是ES不是实时搜索，而是近实时搜索的原因。<br>（2）文档写入时，先写入到内存中，当文档落盘之前，节点出现故障重启、宕机等，会造成内存中的数据丢失，所以索引写入的同时会同步向Transaction Log写入操作内容。<br>（3）每隔固定的时间间隔ES会将Index Buffer中的文档写入到Segment中，这个写入的过程叫做Refresh，Refresh的时间可以通过index.refresh_interval设置，默认情况下为1秒。<br>（4）写入到Segment中并不代表文档已经落盘，因为Segment写入磁盘的过程相对耗时，Refresh时会先将Segment写入缓存，开放查询，也就是说当文档写入Segment后就可以被查询到。每次refresh的时候都会生成一个新的segment，太多的Segment会占用过多的资源，而且每个搜索请求都会遍历所有的Segment，Segment过多会导致搜索变慢，所以ES会定期合并Segment，减少Segment的个数，并将Segment合并为一个大的Segment；在操作Segment时，会维护一个Commit Point文件，其中记录了所有Segment的信息；同时维护.del文件用于记录所有删除的Segment信息。单个倒排索引文件被称为Segment。多个Segment汇总在一起，就是Lucene的索引，对应的就是ES中的shard。<br>（5）每隔一定的时间（默认30分钟），ES会调用Flush操作，Flush操作会调用Refresh将Index Buffer清空；然后调用fsync将缓存中的Segments写入磁盘；随后清空Transaction Log。当Transaction Log空间（默认512M）满后也会触发Flush操作。<br>9、副本分片索引文档<br>当主分片完成索引操作后，会循环处理要写的所有副本分片，向副本分片所在的节点发送请求。副本分片执行和主分片一样的文档写入流程，然后返回写入结果给主分片节点。<br>10、请求返回<br>主分片收到副本分片的响应后，执行finish()操作，将收到响应信息返回给Coordinate节点，告知Coordinate节点文档写入的情况；coordinate节点收到响应后，将索引执行情况返回给客户端。至此一个文档索引的全过程结束，用户可通过ElasticSearch提供的接口进行数据的查询。</p>
+<p><img src="/2023/09/13/%E5%85%AB%E8%82%A1%E6%96%87-elasticsearch/ES%E7%B4%A2%E5%BC%95%E5%85%A8%E8%BF%87%E7%A8%8B.png" srcset="/img/loading.gif" lazyload alt="ES索引全过程"></p>
+<p><strong>ES索引简化过程</strong></p>
+<p>接受索引请求的Elasticsearch节点首先选择文档索引到哪个分片。默认地，文档在分片中均匀分布：对于每篇文档，分片是通过其ID字符串的散列决定的。每份分片拥有相同的散列范围，接收新文档的机会均等。一旦目标分片确定，接受请求的节点将文档转发到该分片所在的节点。随后，索引操作在所有目标分片的所有副本分片中进行。在所有可用副本分片完成文档的索引后，索引命令就会成功返回。</p>
+<p><img src="/2023/09/13/%E5%85%AB%E8%82%A1%E6%96%87-elasticsearch/ES%E7%B4%A2%E5%BC%95%E7%AE%80%E5%8C%96%E8%BF%87%E7%A8%8B.png" srcset="/img/loading.gif" lazyload alt="ES索引简化过程"></p>
+<h3 id="搜索过程"><a href="#搜索过程" class="headerlink" title="搜索过程"></a>搜索过程</h3><p>在搜索的时候，接受请求的节点将请求转发到一组包含所有数据的分片。Elasticsearch使用round-robin的轮询机制选择可用的分片（主分片或副本分片），并将搜索请求转发过去。如下图所示，Elasticsearch然后从这些分片收集结果，将其聚集到单一的回复，然后将回复返回给客户端应用程序。</p>
+<p><img src="/2023/09/13/%E5%85%AB%E8%82%A1%E6%96%87-elasticsearch/ES%E6%90%9C%E7%B4%A2%E8%BF%87%E7%A8%8B.png" srcset="/img/loading.gif" lazyload alt="ES搜索过程"></p>
+<p><strong>ES的检索机制(query-then-fetch)</strong></p>
+<p>REST API搜索请求被发送到所连接的节点，该节点根据要查询的索引，将这个请求依次发送到所有的相关分片（主分片或者副本分片）。从所有分片收集到足够的排序和排名信息之后，只有包含所需文档的分片才被要求返回相关内容。</p>
+<p>这种搜索路由的行为是可以配置的。下图展示了默认的行为，称为查询后获取 （query_ then_fetch）。现在先看看所有Elasticsearch搜索请求所共有的基本结构。</p>
+<p><img src="/2023/09/13/%E5%85%AB%E8%82%A1%E6%96%87-elasticsearch/%E6%90%9C%E7%B4%A2%E6%9C%BA%E5%88%B6.png" srcset="/img/loading.gif" lazyload alt="搜索机制"></p>
+<p>参考：<br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/xfeiyun/p/15887142.html">ElasticSearch概述</a><br>《Elasticsearch实战》  拉杜•乔戈  人民邮电出版社</p>
+<h2 id="elasticsearch为什么检索快，它的底层数据结构是怎么样的？"><a href="#elasticsearch为什么检索快，它的底层数据结构是怎么样的？" class="headerlink" title="elasticsearch为什么检索快，它的底层数据结构是怎么样的？"></a>elasticsearch为什么检索快，它的底层数据结构是怎么样的？</h2><h3 id="elasticsearch为什么检索快"><a href="#elasticsearch为什么检索快" class="headerlink" title="elasticsearch为什么检索快"></a>elasticsearch为什么检索快</h3><p>Lucene使用的是倒排索引， 这意味着它将创建一个数据结构，并在其中保存记录每个单词出现在哪些数据中的清单。例如，如果你想按照标签来搜索博客文章，倒排索引看上去就会如下图所示。</p>
+<p><img src="/2023/09/13/%E5%85%AB%E8%82%A1%E6%96%87-elasticsearch/%E5%80%92%E6%8E%92%E7%B4%A2%E5%BC%95.png" srcset="/img/loading.gif" lazyload alt="倒排索引"></p>
+<p>如果搜索含有elections（ 选举）标签的帖子，那么相对查找原始数据而言，查找倒排索引后的数据会更快捷。因为只需要查看标签是elections 这一栏，然后获得相应所有的文章ID（这里是1和3）。在搜索引擎的应用场景下，这种速度的提升是非常必要的。在现实世界中，你基本不会只查询1个关键词。例如，如果搜“Elasticsearch in Action”，3个词就意味着查询速度提升了3倍。</p>
+<p>即使考虑到相关性，倒排索引对于搜索引擎而言也是一个适合的方案。举个例子，当查找“peace”（和平）这样的单词时，你不仅可以看到哪些文档是匹配的，还能获得这些文档的总数。这一点很关键，原因是一个词如果出现在很多文档中，那么它很可能和每个文档都不太相关了。就说搜索的“Elasticsearch in Action”吧，有个文档包括“in”这个单词（当然还有上百万个文档也包括“in”）。你会意识到“in”是个常见词，即使这个文档因为包含“in”而匹配成功，也不代表它和查询有多相关。对比之下，如果这个文档包含“Elasticsearch”（可能还有数百个文档也包含“Elasticsearch”），你就知道离相关文档不远了。其实，知道离答案更进一步的并不是“你”，而是Elasticsearch替你完成了。</p>
+<p>默认情况下，计算文档相关性得分的算法是TF-IDF（term frequency-inverse document frequency，词频-逆文档频率）。下面是会影响相关性得分的两个因素。</p>
+<p>词频 —— 所查找的单词在文档中出现的次数越多，得分越高。<br>逆文档词频 —— 如果某个单词在所有文档中比较少见，那么该词的权重越高，得分也会越高。</p>
+<p>此外底层还有跳表、BKD树、各种缓存优化，最后成就了es的快速查询</p>
+<h3 id="底层数据结构"><a href="#底层数据结构" class="headerlink" title="底层数据结构"></a>底层数据结构</h3><p><img src="/2023/09/13/%E5%85%AB%E8%82%A1%E6%96%87-elasticsearch/%E9%9B%86%E7%BE%A4%E3%80%81%E8%8A%82%E7%82%B9%E3%80%81%E7%B4%A2%E5%BC%95%E3%80%81%E5%88%86%E7%89%87.png" srcset="/img/loading.gif" lazyload alt="集群、节点、索引、分片"><br><img src="/2023/09/13/%E5%85%AB%E8%82%A1%E6%96%87-elasticsearch/ES%E6%96%87%E6%A1%A3%E5%AD%98%E5%82%A8.png" srcset="/img/loading.gif" lazyload alt="ES文档存储"></p>
+<ul>
+<li>集群</li>
+</ul>
+<p>集群由一个或多个节点组成，对外提供服务，索引和搜索功能。在所有的节点中，一个集群有一个唯一的名称默认为“elasticsearch”，此名称很重要，因为每个节点只能是集群的一部分，当该节点被设置为相同的集群名称时，就会自动加入集群。当需要多个集群的时候，要确保每个集群的名称不能重复，否则，节点可能会加入错误的集群。</p>
+<p>当集群中有节点停止或丢失时不会影响集群服务或造成数据丢失；同时当访问量或数据量增加时可用采用横向扩展的方式增加节点，将请求或数据分散到集群的各个节点上。</p>
+<ul>
+<li>节点</li>
+</ul>
+<p>一个节点是你集群中的一个服务器，作为集群的一部分，它存储你的数据，参与集群的索引和搜索功能。和集群类似，一个节点也是由一个名字来标识的。</p>
+<p>一个节点是一个ElasticSearch的实例，本质上是一个Java进程。ES根据功能不同分为不同的节点类型，在生产环境中，建议根据数据量，写入及查询吞吐量，选择合适的部署方式，最好将节点设置为单一角色。</p>
+<p><img src="/2023/09/13/%E5%85%AB%E8%82%A1%E6%96%87-elasticsearch/%E8%8A%82%E7%82%B9%E7%B1%BB%E5%9E%8B.png" srcset="/img/loading.gif" lazyload alt="节点类型"></p>
+<p>主节点的主要职责是负责集群层面的相关操作，管理集群变更，如创建或删除索引，跟踪哪些节点是群集的一部分，并决定哪些分片分配给相关的节点。</p>
+<p>主节点也可以作为数据节点，但稳定的主节点对集群的健康是非常重要的，默认情况下任何一个集群中的节点都有可能被选为主节点，索引数据和搜索查询等操作会占用大量的cpu，内存，io资源，为了确保一个集群的稳定，分离主节点和数据节点是一个比较好的选择。</p>
+<p>通过配置node.master:true(默认)使节点具有被选举为Master的资格。主节点使全局唯一的，将从有资格成为Master的节点中选举。</p>
+<ul>
+<li>索引</li>
+</ul>
+<p>一个索引就是一个拥有几份相似特征的文档的集合。比如说，你可以有一个客户数据的索引，一个产品目录的索引，还有一个订单数据的索引。一个索引由一个名字来标识（必须全部是小写字母的），并且当我们要对对应于这个索引中的文档进行索引、搜索、更新和删除的时候，都要使用到这个名字。在一个集群中，可以定义任意多的索引。</p>
+<ul>
+<li>类型</li>
+</ul>
+<p>类型是文档的逻辑容器，类似于数据库中的表，类型在 Elasticsearch中表示一类相似的文档，每个类型中字段的定义称为映射。ES7.x已经将类型移除，7.x中一个索引只能有一个类型，默认为_doc。</p>
+<ul>
+<li>文档</li>
+</ul>
+<p>文档是存储在ES中的一个JSON字符串，相当于数据库中表的一行，ES是一个非结构化的数据库，每一个文档可以有不同的字段，并且有一个唯一的标识符。</p>
+<ul>
+<li>字段</li>
+</ul>
+<p>类似关系型数据库的某一列，这是ES数据存储的最小单位。</p>
+<ul>
+<li>映射</li>
+</ul>
+<p>mapping映射, 就像数据库中的 schema ，定义索引中字段的名称、字段的数据类型（如 string, integer 或 date），设置字段倒排索引的相关配置。当索引文档遇到未定义的字段，会使用dynamic mapping 来确定字段的数据类型，并自动把新增加的字段添加到类型映射。在实际生产中一般或禁用dynamic mapping，避免过多的字段导致cluster state占用过多，同时禁止自动创建索引的功能，创建索引时必须提供Mapping信息或者通过Index Template创建。</p>
+<ul>
+<li>分片</li>
+</ul>
+<p>一个分片是一个运行的Lucene的实例，是一个包含倒排索引的文件目录。一个ES索引由一个或多个主分片以及零个或多个副本分片组成，主分片数在索引创建时指定，后续不允许修改；副本分片主要用于解决数据高可用的问题，是主分片的拷贝，一定程度上提高服务的可读性。分片的设定：生产环境中主分片数的设定，需要提前做好容量规划，因为主分片的数量是不可修改的。如果分片数设置过小，则无法通过增加节点实现水平扩展，单个分片的数据量太大，导致数据重新分片耗时；如果分片数设置过大，则会影响搜索结果的相关性打分，浪费资源，同时影响性能。</p>
+<ul>
+<li>备份</li>
+</ul>
+<p>拷贝一个分片就完成了分片的备份，备份的好处：当主分片失败或者挂掉, 备份就可以代替分片进行操作, 进而提高了es的可用性, 备份的分片还可以进行搜索操作, 以分摊搜索的压力。ES在创建索引时, 默认创建5个分片, 一份备份, 可以修改, 分片的数量只能在创建索引的时候指定, 索引创建后就不能修改分片的数量了, 而备份是可以动态修改的。</p>
+<ul>
+<li>segment</li>
+</ul>
+<p>每个分片包含多个segment（段），每一个segment都是一个倒排索引。在查询的时，会把所有的segment查询结果汇总归并为最终的分片查询结果返回。</p>
+<p><strong>为什么段是不可变的</strong></p>
+<p>在 lucene 中，为了实现高索引速度，故使用了segment 分段架构存储。一批写入数据保存在一个段中，其中每个段是磁盘中的单个文件。由于两次写入之间的文件操作非常繁重，因此将一个段设为不可变的，以便所有后续写入都转到New段。</p>
+<p><strong>什么是段合并</strong></p>
+<p>由于自动刷新流程每秒会创建一个新的段（由动态配置参数：refresh_interval 决定），这样会导致短时间内的段数量暴增。而段数目太多会带来较大的麻烦。消耗资源：每一个段都会消耗文件句柄、内存和cpu运行周期；搜索变慢：每个搜索请求都必须轮流检查每个段；所以段越多，搜索也就越慢。Elasticsearch 通过在后台进行段合并来解决这个问题。小的段被合并到大的段，然后这些大的段再被合并到更大的段。</p>
+<p><strong>段合并做了什么</strong></p>
+<p>段合并的时候会将那些旧的已删除文档从文件系统中清除。被删除的文档（或被更新文档的旧版本）不会被拷贝到新的大段中。启动段合并不需要你做任何事。进行索引和搜索时会自动进行。合并进程选择一小部分大小相似的段，并且在后台将它们合并到更大的段中。这并不会中断索引和搜索。</p>
+<p><strong>段合并可能带来的问题</strong></p>
+<p>磁盘IO操作的代价；速度慢的系统中，段合并会显著影响性能。</p>
+<ul>
+<li>倒排索引</li>
+</ul>
+<p>一个分片为一个Lucene索引，每个Lucene倒排索引由单词词典及倒排列表组成：</p>
+<p>单词词典：记录所有文档的单词，记录单词到倒排列表的关系，数据量比较大，一般采用B+树，哈希拉链法实现。<br>倒排列表：记录单词对应的文档集合，由倒排索引项组成。<br>倒排索引项结构如表所示：文档ID：记录单词所在文档的ID；词频：记录单词在文档中出现的次数；位置：记录单词在文档中的位置；偏移：记录单词的开始位置，结束位置。</p>
+<p><img src="/2023/09/13/%E5%85%AB%E8%82%A1%E6%96%87-elasticsearch/%E5%80%92%E6%8E%92%E7%B4%A2%E5%BC%95%E9%A1%B9.png" srcset="/img/loading.gif" lazyload alt="倒排索引项"></p>
+<p>参考：<br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/xfeiyun/p/15887142.html">ElasticSearch概述</a><br><a target="_blank" rel="noopener" href="https://cloud.tencent.com/developer/article/1730206">关于 Elasticsearch 段合并，这一篇说透了</a><br>《Elasticsearch实战》  拉杜•乔戈  人民邮电出版社</p>
+<h2 id="脑裂问题，怎么产生的，如何解决"><a href="#脑裂问题，怎么产生的，如何解决" class="headerlink" title="脑裂问题，怎么产生的，如何解决"></a>脑裂问题，怎么产生的，如何解决</h2><h3 id="什么是脑裂问题"><a href="#什么是脑裂问题" class="headerlink" title="什么是脑裂问题"></a>什么是脑裂问题</h3><p>ES在主节点上产生分歧，产生多个主节点，从而使集群分裂，使得集群处于异常状态。这个现象叫做脑裂。脑裂问题其实就是同一个集群的不同节点对于整个集群的状态有不同的理解，导致操作错乱，类似于精神分裂</p>
+<p>举个栗子：</p>
+<p>下图是一个有两个节点的elasticsearch集群。集群维护一个单个索引并有一个分片和一个复制节点。节点1在启动时被选举为主节点并保存主分片（在下面的schema里标记为0P），而节点2保存复制分片（0R）</p>
+<p><img src="/2023/09/13/%E5%85%AB%E8%82%A1%E6%96%87-elasticsearch/n1.png" srcset="/img/loading.gif" lazyload alt="elasticsearch集群1"></p>
+<p>这时如果在两个节点之间的通讯中断了（网络问题或只是因为其中一个节点无响应（例如stop-the-world垃圾回收，es进程被占用，内存溢出等））</p>
+<p>此时，两个节点都会觉得对方挂了。</p>
+<p>对于节点1来说，他自己就是master，所以不需要做什么</p>
+<p>对于节点2，因为此时集群就只有他一个节点，当他选举一个节点当master，那就只会是他自己。在elasticsearch集群，是由主节点来决定将分片平均的分布到节点上的。节点2保存的是复制分片，但它相信主节点不可用了。所以它会自动提升复制节点为主节点。</p>
+<p><img src="/2023/09/13/%E5%85%AB%E8%82%A1%E6%96%87-elasticsearch/n2.png" srcset="/img/loading.gif" lazyload alt="elasticsearch集群2"></p>
+<p>那么此时，整个es集群就会出现两个master，打在节点1上的索引请求会将索引数据分配在主节点，同时打在节点2的请求会将索引数据放在分片上。</p>
+<p>也就是说，如果数据添加到es集群，就会出现分散到两个分片中，分片的两份数据分开了，不做一个全量的重索引很难对它们进行重排序。查询集群数据的请求都会成功完成，但是请求返回的结果是不同的。访问不同的节点，会发现集群状态不一样，可用节点数不一样，而且结果数据也会不一样</p>
+<h3 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h3><p>Elasticsearch出现查询非常缓慢的情况，通过命令查看集群的状态<code>curl -XGET ‘http://localhost:9200/_cluster/health’</code>，发现集群状态为red，且集群数量明显错误，再向不同的节点查询集群状态的时候，总体状态都是red，但是返回的集群数量却不太一样。正常情况下，访问每一个节点，对集群中的状态返回应该是一致的。不一致的信息表示集群中不同节点对master节点的选择出现了问题，导致集群不能正常工作。</p>
+<h3 id="原因与解决思路"><a href="#原因与解决思路" class="headerlink" title="原因与解决思路"></a>原因与解决思路</h3><p>脑裂主要是在master节点挂掉或子节点联系不上master时出现，那么我们就要尽可能保证不会出现节点挂掉的情况</p>
+<ol>
+<li>网络问题</li>
+</ol>
+<p>保证网络稳定，及时预警，重启集群</p>
+<ol start="2">
+<li>master节点负载过大</li>
+</ol>
+<p>避免master节点因为工作负载过大出现响应中断从而引发脑裂</p>
+<ol start="3">
+<li>内存回收</li>
+</ol>
+<p>data节点上的ES进程占用的内存较大，引发JVM的大规模内存回收，造成ES进程失去响应。</p>
+<p>解决思路</p>
+<ol>
+<li><p>减少误判：discovery.zen.ping_timeout节点状态的响应时间，默认为3s，可以适当调大，如果master在该响应时间的范围内没有做出响应应答，判断该节点已经挂掉了。调大参数（如6s，discovery.zen.ping_timeout:6），可适当减少误判。</p>
+</li>
+<li><p>选举触发 discovery.zen.minimum_master_nodes:1</p>
+</li>
+</ol>
+<p>该参数是用于控制选举行为发生的最小集群主节点数量。</p>
+<p>当备选主节点的个数大于等于该参数的值，且备选主节点中有该参数个节点认为主节点挂了，进行选举。官方建议为（n&#x2F;2）+1，n为主节点个数（即有资格成为主节点的节点个数）。同时建议节点数大于等于3。</p>
+<p>这样不会出现多主的情况，因为小部分节点因为数量不足（n&#x2F;2）+1，无法进行选举，只能保证集群的一部分有主节点。</p>
+<ol start="3">
+<li>可以在jvm.options中增加堆内存大小或者修改合适的GC处理器</li>
+</ol>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs elixir">-<span class="hljs-title class_">Xms4g</span>  <br>-<span class="hljs-title class_">Xmx4g</span>  <br><span class="hljs-comment">## G1GC Configuration # to use G1GC, uncomment the next two lines and update the version on the </span><br><span class="hljs-comment"># following three lines to your version of the JDK </span><br><span class="hljs-comment"># 8-13:-XX:-UseConcMarkSweepGC </span><br><span class="hljs-comment"># 8-13:-XX:-UseCMSInitiatingOccupancyOnly  </span><br><span class="hljs-number">14</span>-<span class="hljs-symbol">:-XX</span><span class="hljs-symbol">:+UseG1GC</span><br></code></pre></td></tr></table></figure>
+
+<ol start="4">
+<li>也可以对集群的节点做读写分离，master节点专门做集群master管理，master节点配置</li>
+</ol>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">node.master:</span> <span class="hljs-literal">true</span>  <br><span class="hljs-attr">node.data:</span> <span class="hljs-literal">false</span><br></code></pre></td></tr></table></figure>
+
+<p>同时设置一批data节点负责存储数据和处理请求</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">node.master:</span> <span class="hljs-literal">false</span>   <br><span class="hljs-attr">node.data:</span> <span class="hljs-literal">true</span><br></code></pre></td></tr></table></figure>
+
+<p>如果确实还是顶不住，那么就可以再设置一批client节点只负责处理用户请求，实现请求转发，负载均衡等功能，让data节点只负责存储数据</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">node.master:</span> <span class="hljs-literal">false</span>   <br><span class="hljs-attr">node.data:</span> <span class="hljs-literal">false</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="脑裂修复"><a href="#脑裂修复" class="headerlink" title="脑裂修复"></a>脑裂修复</h3><p>当elasticsearch集群重新选举出一个master节点时，由于之前索引的两份拷贝已经不一样了，elasticsearch会认为选出来的master保留的分片是“主拷贝”并将这份拷贝推送给集群中的其他节点。</p>
+<p>这种情况就很容易导致正确的节点上的数据被选举出来的master节点的错误数据覆盖掉，造成数据丢失。</p>
+<p>所以需要</p>
+<p>1、给所有数据重新索引</p>
+<figure class="highlight fsharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs fsharp">POST <span class="hljs-keyword">_reindex</span><br>&#123;<br>  <span class="hljs-string">&quot;source&quot;</span><span class="hljs-operator">:</span> &#123;<br>    <span class="hljs-string">&quot;index&quot;</span><span class="hljs-operator">:</span> <span class="hljs-string">&quot;old_index&quot;</span><br>  &#125;,<br>  <span class="hljs-string">&quot;dest&quot;</span><span class="hljs-operator">:</span> &#123;<br>    <span class="hljs-string">&quot;index&quot;</span><span class="hljs-operator">:</span> <span class="hljs-string">&quot;new_index&quot;</span><br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>2、逐个关闭节点并备份数据，分析比对数据是否是最新的。如果是保存的数据是最新的，启动它并且让它被选为主节点。然后就可以启动集群的其他节点了</p>
+<p>参考：<br><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/471040063">Elasticsearch高可用之集群脑裂问题详解</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/zh-ch/p/14166079.html">Elasticsearch脑裂问题详细分析以及解决方案</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/kakaluoteyy/article/details/81068387">ES脑裂问题分析及优化_kakaluoteyy的博客</a></p>
+<h2 id="filter和query"><a href="#filter和query" class="headerlink" title="filter和query"></a>filter和query</h2><p><img src="/2023/09/13/%E5%85%AB%E8%82%A1%E6%96%87-elasticsearch/filter%E5%92%8Cquery.png" srcset="/img/loading.gif" lazyload alt="filter和query"></p>
+<p><strong>filter和query的差别</strong></p>
+<ol>
+<li>filter查询会缓存结果，不计算相关度分数，查询效率更高</li>
+<li>query查询不缓存结果，且会计算相关度分数，查询效率会比filter查询低。</li>
+</ol>
+<p>在实际查询中，我们可以灵活选用fitler和query查询，并且二者还能组合在一起使用。</p>
+<p>最佳实践。除了需要计算相关性打分的检索条件，其他的检索条件尽量采用filter过滤器查询，以提升查询性能。</p>
+<p><strong>filter查询详解</strong></p>
+<p>filter并不是每次执行都会进行cache，而是当执行一定次数的时候才会进行cache一个二进制数组，1表示匹配，2表示不匹配。这个次数是不固定的。<br>filter会从优先过滤掉稀疏的数据中，保留匹配的cache数组。<br>filter cache保存的是匹配的结果，不需要再从倒排索引中去查找比对，大大提高查询效率。<br>filter一般会在query之前执行，过滤掉一部分数据，从而提高query速度。<br>filter不计算相关度分数，在执行效率上较query更高。<br>当元数据发生改变时，cache也会更新。<br>filter中不能使用match全文检索查询。</p>
+<p><strong>范围查询</strong></p>
+<p>数字字符化，前缀树查询，Lucene在6.0版本以及以后为了解决多维空间位置搜索问题，改用新的数据结构——BKD树来实现位置搜索，带来了很大的性能提升。开发者发现这种实现也能用于一维数据搜索，于是用新的数据结构代替了现在的字符串的实现。</p>
+<p>参考：<br><a target="_blank" rel="noopener" href="https://blog.csdn.net/w1014074794/article/details/119735270">ES经典面试题：谈谈filter和query有什么区别？</a><br><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/137576216">十分钟帮你搞懂Elasticsearch数字搜索原理</a></p>
+<h2 id="如果现在要搜一个词，按相关度排序，如何获取排名在-100-120-之间的文档"><a href="#如果现在要搜一个词，按相关度排序，如何获取排名在-100-120-之间的文档" class="headerlink" title="如果现在要搜一个词，按相关度排序，如何获取排名在(100-120)之间的文档"></a>如果现在要搜一个词，按相关度排序，如何获取排名在(100-120)之间的文档</h2><p>一旦选择了要搜索的索引，就需要配置搜索请求中最为重要的模块。这些模块涉及文档返回的数量，选择最佳的文档返回，以及配置不希望哪些文档出现在结果中。</p>
+<p><strong>query</strong>：这是搜索请求中最重要的组成部分，它配置了基于评分返回的最佳文档，也包括了你不希望返回哪些文档。该模块使用查询DSL和过滤器DSL来配置。一个例子就是使用标题中的关键词“elasticsearch”来搜索全部的事件，限定到了今年的事件。<br><strong>size</strong>：代表了返回文档的数量。<br><strong>from</strong>：和size 一起使用，from 用于分页操作。需要注意的是，为了确定第2页的10项结果，Elasticsearch必须要计算前20个结果。如果结果集合不断增加，获取某些靠后的翻页将会成为代价高昂的操作。<br><strong>_source</strong>：指定_source字段如何返 回。默认是返回完整的_source 字段。通过配置_source， 将过滤返回的字段。如果索引的文档很大，而且无须结果中的全部内容，就使用这个功能。请注意，如果想使用它，就不能在索引映射中关闭_source 字段。请参考下面的注意事项，来看看使用field 和_source 之间的区别。<br><strong>sort</strong>：默认的排序是基于文档的得分。如果并不关心得分，或者期望许多文档的得分相同，添加额外的sort 将帮助你控制哪些文档被返回。</p>
+<p>命名适宜的from和size字段 ，用于指定结果的开始点，以及每“页”结果的数量。举个例子，如果发送的from值是7，size值 是5，那么Elasticsearch将返回第8、9、10、11和12项结果（由于from 参数是从0开始，指定7就是从第8项结果开始）。如果没有发送这两个参数，Elasticsearch默认从第一项结果开始（第0项结果），在回复中返回10项结果。</p>
+<p>参考：<br>《Elasticsearch实战》  拉杜•乔戈  人民邮电出版社</p>
+<h2 id="性能优化"><a href="#性能优化" class="headerlink" title="性能优化"></a>性能优化</h2><h3 id="请求合并"><a href="#请求合并" class="headerlink" title="请求合并"></a>请求合并</h3><p>为了获得更快的索引速度，你能做的一项优化是通过bulk批量API，一次发送多篇文档进行索引。这个操作将节省网络来回的开销，并产生更大的索引吞吐量。一个单独的批量可以接受任何索引操作。例如，你可以创建或者重写文档。也可以将update 或delete 操作加入批量，不限于索引操作。</p>
+<p>如果应用需要一次发送多条get 或search 操作，也有对应的批量处理：多条获取和多条搜索API。</p>
+<h3 id="优化Lucene分段的处理"><a href="#优化Lucene分段的处理" class="headerlink" title="优化Lucene分段的处理"></a>优化Lucene分段的处理</h3><p>一旦Elasticsearch接收到了应用所发送的文档，它会将其索引到内存中称为分段 （segments）的倒排索引。这些分段会不时地写入磁盘。这些分段是不能改变的，只能被删除，这是为了操作系统更好地缓存它们。另外，较大的分段会定期从较小的分段创建而来，用于优化倒排索引，使搜索更快。</p>
+<p>有很多调节的方式来影响每一个环节中Elasticsearch对于这些分段的处理，根据你的使用场景来配置这些，常常会带来意义重大的性能提升，可以将它们分为以下3类：</p>
+<p>刷新（refresh）和冲刷（flush）的频率 ——刷新会让Elasticsearch重新打开索引，让新建的文档可用于搜索。冲刷是将索引的数据从内存写入磁盘。从性能的角度来看，刷新和冲刷操作都是非常消耗资源的，所以为你的应用正确地配置它们是十分重要的。</p>
+<p>合并的策略 ——Lucene（Elasticsearch也是如此）将数据存储在不可变的一组文件中，也就是分段中。随着索引的数据越来越多，系统会创建更多的分段。由于在过多的分段中搜索是很慢的，因此在后台小分段会被合并为较大的分段，保持分段的数量可控。不过，合并也是十分消耗性能的，对于I&#x2F;O子系统尤其如此。你可以调节合并的策略，来确定合并多久发生一次，而且分段应该合并到多大。</p>
+<p>存储和存储限流 ——Elasticsearch调节每秒写入的字节数，来限制合并对于I&#x2F;O系统的影响。根据硬件和应用，你可以调整这个限制。还有一些其他的选项告诉Elasticsearch如何使用存储。例如，可以选择只在内存中存放索引。</p>
+<p>这3个分类中，通常有一类会给你带来最大的性能收益，我们就从它开始：选择刷新和冲刷的频率。</p>
+<h4 id="刷新和冲刷的阈值"><a href="#刷新和冲刷的阈值" class="headerlink" title="刷新和冲刷的阈值"></a>刷新和冲刷的阈值</h4><ul>
+<li>何时刷新</li>
+</ul>
+<p>Elasticsearch通常被称为近实时（或准实时）系统。这是因为搜索不是经常运行于最新的索引数据之上（这个数据是实时的），但是很接近了。</p>
+<p>打上近实时的标签是因为通常Elasticsearch保持了某个时间点索引打开的快照，所以多个搜索会命中同一个文件并重用相同的缓存。在这个时间段中，新建的文档对于那些搜索是不可见的，直到你再次刷新。</p>
+<p>刷新，正如其名，是在某个时间点刷新索引的快照，这样你的搜索就可以命中新索引的数据。这是其优点。其不足是每次刷新都会影响性能：某些缓存将失效，拖慢搜索请求，而且重新打开索引的过程本身也需要一些处理能力，拖慢了索引的建立。</p>
+<p>默认的行为是每秒自动地刷新每份索引。你可以修改其设置，改变每份索引的刷新间隔，这个是可以在运行时完成的。例如，下面的命令将自动刷新的间隔设置为了5秒。</p>
+<figure class="highlight dsconfig"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs dsconfig">% <span class="hljs-string">curl</span> -<span class="hljs-string">XPUT</span> <span class="hljs-string">localhost:9200/</span><span class="hljs-built_in">get-together/_settings</span> -<span class="hljs-string">d</span> <span class="hljs-string">&#x27;&#123;</span><br><span class="hljs-string">　　&quot;index.refresh_interval&quot;: &quot;5s&quot;</span><br><span class="hljs-string">&#125;&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>提示</strong>:</p>
+<p>为了确定你的修改生效了，可以运行如下命令来获得全部的索引设置：curl localhost: 9200&#x2F;get-together&#x2F;_settings?pretty 。</p>
+<p>当增加refresh_interval 的值时，你将获得更大的索引吞吐量，因为花费在刷新上的系统资源更少了。</p>
+<p>或者你也可以将refresh_interval 设置为-1 ，彻底关闭自动刷新并依赖手动刷新。这对于索引只是定期批量变化的应用非常有效，如产品和库存每晚更新的零售供应链。索引的吞吐量是非常重要的，因为你总想快速地进行更新，但是数据刷新不一定是最重要的，因为无论如何都不可能获得完全实时的更新。所以每晚你可以关闭自动刷新，进行批量的bulk索引和更新，完成后再进行手动刷新。</p>
+<p>为了实现手动刷新，访问待刷新索引的_refresh 端点。</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs awk">% curl localhost:<span class="hljs-number">9200</span><span class="hljs-regexp">/get-together/</span>_refresh<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>何时冲刷</li>
+</ul>
+<p>对于Elasticsearch（还有4.0及之后版本的Solr）而言，刷新的过程和内存分段写入磁盘的过程是相互独立的。实际上，数据首先索引到内存中，经过一次刷新后，Elasticsearch也会开心地搜索相应的内存分段。将内存中的分段提交到磁盘上的Lucene索引的过程，被称为冲刷 （flush），无论分段是否能被搜到，冲刷都会发生。</p>
+<p>为了确保某个节点宕机或分片移动位置的时候，内存数据不会丢失，Elasticsearch将使用事物日志来跟踪尚未冲刷的索引操作。除了将内存分段提交到磁盘，冲刷还会清理事物日志。</p>
+<p><img src="/2023/09/13/%E5%85%AB%E8%82%A1%E6%96%87-elasticsearch/ES%E5%86%B2%E5%88%B7.png" srcset="/img/loading.gif" lazyload alt="ES冲刷"></p>
+<p>满足下列条件之一就会触发冲刷操作。</p>
+<p>内存缓冲区已满。<br>自上次冲刷后超过了一定的时间。<br>事物日志达到了一定的阈值。</p>
+<p><img src="/2023/09/13/%E5%85%AB%E8%82%A1%E6%96%87-elasticsearch/%E5%86%B2%E5%88%B7%E6%9D%A1%E4%BB%B6.png" srcset="/img/loading.gif" lazyload alt="冲刷条件"></p>
+<p>内存缓冲区的大小在elasticsearch.yml配置文件中定义，通过indices.memory.index_ buffer_size 来设置。这个设置控制了整个节点的缓冲区，其值可以是全部JVM堆内存的百分比，如10%，也可以是100 MB这样的固定值。</p>
+<p>事物日志的设置是具体到索引上的，而且同时控制了触动冲刷的规模（通过index.translog. flushthreshold_size ）和冲刷之间的时间间隔（通过index.translog.flush threshold_period ）。和多数索引设置一样，你可以在运行时修改它们。</p>
+<figure class="highlight dsconfig"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs dsconfig">% <span class="hljs-string">curl</span> -<span class="hljs-string">XPUT</span> <span class="hljs-string">localhost:9200/</span><span class="hljs-built_in">get-together/_settings</span> -<span class="hljs-string">d</span> <span class="hljs-string">&#x27;&#123;</span><br><span class="hljs-string">　&quot;index.translog&quot;: &#123;</span><br><span class="hljs-string">　　&quot;flush_threshold_size&quot;: &quot;500mb&quot;,</span><br><span class="hljs-string">　　&quot;flush_threshold_period&quot;: &quot;10m&quot;</span><br><span class="hljs-string">　&#125;</span><br><span class="hljs-string">&#125;&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<p>当冲刷发生的时候，它会在磁盘上创建一个或多个分段。执行一个查询的时候，Elasticsearch（通过Lucene）查看所有的分段，然后将结果合并到一个整体的分片中。搜索的时候每个分片上的结果将被聚集为一个完整的结果集合，然后返回给应用程序。</p>
+<p>关于分段，这里需要记住的关键点是你需要搜索的分段越多，搜索的速度就越慢。为了防止分段的数量失去控制，Elasticsearch（也是通过Lucene）在后台将多组较小的分段合并为较大的分段。</p>
+<h4 id="合并以及合并策略"><a href="#合并以及合并策略" class="headerlink" title="合并以及合并策略"></a>合并以及合并策略</h4><p>分段是不变的一组文件，Elasticsearch用其存储索引的数据。由于分段是不变的，它们很容易被缓存，使得搜索更快。此外，修改数据集时，如添加一篇文档，无须重建现有分段中的数据索引。这使得新文档的索引也是很快的，但也不都是好消息。更新文档不能修改实际的文档，只是索引一篇新的文档。如此处理还需要删除原有的文档。接下来，删除也不能从分段中移除文档（这需要重建倒排索引），只是在单独的.del文件中将其标记为“已被删除”。文档只会在分段合并的时候真正地被移除。</p>
+<p>这告诉我们合并分段的两个目的：第一个是将分段的总数量保持在受控的范围内（这用来保障查询的性能）。第二个是真正地删除文档。</p>
+<p>按照已定义的合并策略，分段是在后台进行的。默认的合并策略是分层配置，如图所示，该策略将分段划分为多个层次，如果你的分段多于某一层中所设置的最大分段数，该层的合并就会被触发。</p>
+<p><img src="/2023/09/13/%E5%85%AB%E8%82%A1%E6%96%87-elasticsearch/%E5%88%86%E5%B1%82%E5%90%88%E5%B9%B6.png" srcset="/img/loading.gif" lazyload alt="分层合并"></p>
+<p>合并的最终目的是提升搜索的性能而均衡I&#x2F;O和CPU计算能力。合并发生在索引、更新或者删除文档的时候，所以合并的越多、这些操作的成本就越昂贵。反之，如果想快速地索引，你需要较少的合并，而且牺牲一些查询的性能。</p>
+<p>分段数量配置参数见相关资料。</p>
+<p>有了刷新和冲刷，你可以手动触发一次合并。一次强制性的合并也被称为优化 （optimize），之所以起这样的名字是因为通常是在一个今后不会更改的索引上运行这个操作，将其优化到一定（较低）数量的分段，使得更快的搜索成为可能。</p>
+<p>为了优化，你需要访问待优化索引的_optimize 端点。选项max_num_segments 表示每个分片最终拥有多少分段。</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs awk">% curl localhost:<span class="hljs-number">9200</span><span class="hljs-regexp">/get-together/</span>_optimize?max_num_segments=<span class="hljs-number">1</span><br></code></pre></td></tr></table></figure>
+
+<p>在一个大型索引上进行的优化操作可能需要花费很长时间。你可以通过设置 wait_for_merge 为false ，将操作发送到后台进行。</p>
+<p>导致优化（或合并）操作缓慢的可能原因之一是，默认情况下Elasticsearch限制了合并操作所能使用的I&#x2F;O吞吐量的份额。</p>
+<h4 id="存储和存储限流"><a href="#存储和存储限流" class="headerlink" title="存储和存储限流"></a>存储和存储限流</h4><p>基于Lucene 5.0的Elasticsearch 2.0，将使用Lucene的自动I&#x2F;O限流特性。该特性会依据索引的情况，自动地对合并进行限流。如果索引的量很小，合并会受到较大程度的限流，以确保它们不会影响搜索。如果索引的量较大，那么对于合并的限制就较小，这样合并才不会落后于索引。</p>
+<h3 id="利用缓存"><a href="#利用缓存" class="headerlink" title="利用缓存"></a>利用缓存</h3><p>在符合需求的情况下多使用过滤器而不是查询器，进行过滤器缓存。<br>合理设置分片缓存。<br>堆内存不要超过31G，正好32 GB的时候你已经失去了压缩指针，所以最多只用31 GB。<br>使用预热器进行预热。</p>
+<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><p>分片数，副本数，索引规模的合理评估：集群总分片数建议控制在5w以内，单个索引的规模控制在 1TB 以内，单个分片大小控制在30 ~ 50GB ，docs数控制在10亿内，如果超过建议滚动；分片的数量通常建议小于或等于ES 的数据节点数量，最大不超过总节点数的2倍，通过增加分片数可以提升并发；<br>指定自定义路由等等。</p>
+<p>参考：<br>《Elasticsearch实战》  拉杜•乔戈  人民邮电出版社<br><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/647279604">让你的ES查询性能起飞：Elasticsearch 查询优化攻略“一网打尽”</a></p>
+<h2 id="ES使用场景"><a href="#ES使用场景" class="headerlink" title="ES使用场景"></a>ES使用场景</h2><p>ES是分布式搜索和分析引擎,大概类似于百度搜索,淘宝搜索一类的,它的作用是对大量数据进行快速检索,并且根据要求对检索出来的数据进行评分,你可以按照评分或者其它规则对其进行排序,并且它的数据存储采用主分片,副分片的形式.有利于做大数据的搜索功能.并且可以对数据进行聚合等操作。</p>
+<p>ES可以用于做一些低质量,大数据记录的检索功能,所谓低质量就是这些数据并不是要求很严密的或者说实时的,ES数据被称为准实时,也就是离实时数据还有不少差距。类似于信息检索,用户日志检索,商品检索数据可以放在ES中。</p>
+<p>ES和mysql对比：<br>mysql定位是数据库，支持事务，适合严格数据增删改查，但是对于海量数据查询支持不如ES，主要因为正派索引，且需要回表。<br>ES定位是准实时搜索引擎，适用于海量数据查询，数据删除、修改操作成本较高，不支持事务，分布式架构可以提高可用性和搜索查询效率，倒排索引也是提高海量数据搜索效率的主要基础，可以支持复杂的查询条件且效率更高。</p>
+<p>参考：<br><a target="_blank" rel="noopener" href="https://blog.csdn.net/xiaodong_xi/article/details/121264198">Elasticsearch和mysql最直观的区别介绍</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_29862655/article/details/132270899">MongoDB:MySQL,Redis,ES,MongoDB的应用场景</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/zhanlanlubai/article/details/104908607">ElasticSearch和Mysql查询原理分析与对比</a></p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/54_bMeUwjxk-8DHa90heNQ">微信公众号:我的IT技术路</a></p>
 
                 
               </div>
@@ -301,7 +527,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/ES/" class="category-chain-item">ES</a>
+  <a href="/categories/elasticsearch/" class="category-chain-item">elasticsearch</a>
   
   
 
@@ -316,7 +542,9 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/ES/">#ES</a>
+        <a href="/tags/%E9%9D%A2%E8%AF%95/">#面试</a>
+      
+        <a href="/tags/elasticsearch/">#elasticsearch</a>
       
     </div>
   
