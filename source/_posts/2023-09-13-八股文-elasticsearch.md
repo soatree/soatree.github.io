@@ -1,10 +1,9 @@
 ---
 title: 八股文-elasticsearch
 categories:
-  - elasticsearch
+  - 面试
 tags:
   - elasticsearch
-  - 面试
 date: 2023-09-13 20:01:57
 ---
 
