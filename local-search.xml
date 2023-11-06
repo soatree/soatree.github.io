@@ -4,11 +4,36 @@
   
   
   <entry>
+    <title>八股文-spring</title>
+    <link href="/2023/10/22/%E5%85%AB%E8%82%A1%E6%96%87-spring/"/>
+    <url>/2023/10/22/%E5%85%AB%E8%82%A1%E6%96%87-spring/</url>
+    
+    <content type="html"><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>整理spring的相关面试题，题目来源微信公众号。</p><h1 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h1><h2 id="聊聊spring的IOC和AOP？其底层原理分别是什么？"><a href="#聊聊spring的IOC和AOP？其底层原理分别是什么？" class="headerlink" title="聊聊spring的IOC和AOP？其底层原理分别是什么？"></a>聊聊spring的IOC和AOP？其底层原理分别是什么？</h2><h3 id="IOC"><a href="#IOC" class="headerlink" title="IOC"></a>IOC</h3><p>没有使用spring，所有的对象均需要手动创建，相当于底层类控制了上层类，例如轮子类控制了汽车类，创建汽车对象的时候需要传入轮子的参数。<br>IOC意思就是控制反转，即上层类控制下层类，上层类的对象只需要指定需要什么类型的下层类对象，由外部容器提前创建好并注入，上层类对象本身不负责下层类对象的创建。提高了可维护性，下层类构造函数的变化不会影响上层类的构造函数。<br>spring基于反射原理扫描注解，将相关类生成对象注入到容器中，在需要的地方进行对象注入。</p><h3 id="AOP"><a href="#AOP" class="headerlink" title="AOP"></a>AOP</h3><p>基于动态代理的方式增强原对象的方法。Spring AOP全称为Spring  Aspect-Oriented Programming，即面向切面编程，是运行时织入的，那么运行时织入到底是怎么实现的呢？答案就是代理对象。代理对象又可以分为静态代理和动态代理。</p><p>静态代理：由程序员创建或特定工具自动生成源代码，再对其编译。在程序运行前，代理类的.class文件就已经存在了。<br>动态代理：在程序运行时，运用反射机制动态创建而成。</p><p><strong>Spring两种动态代理方式</strong></p><ul><li>JDK的动态代理</li></ul><p>若目标对象实现了接口，spring默认使用JDK的动态代理。</p><p>优点：因为有接口，所以使系统更加松耦合；</p><p>缺点：为每一个目标类创建接口；</p><ul><li>CGLib</li></ul><p>若目标对象没有实现任何接口，spring使用CGLib进行动态代理</p><p>优点：因为代理类与目标类是继承关系，所以不需要有接口的存在。</p><p>缺点：因为没有使用接口，所以系统的耦合性没有使用JDK的动态代理好。</p><p>若目标对象实现了接口，但是强制cglib代理，则使用cglib代理</p><p>参考：<br><a href="https://www.cnblogs.com/swordfall/p/12880809.html">Spring IoC和AOP的实现原理解析</a></p><h2 id="bean的生命周期，循环引用问题spring如何处理"><a href="#bean的生命周期，循环引用问题spring如何处理" class="headerlink" title="bean的生命周期，循环引用问题spring如何处理"></a>bean的生命周期，循环引用问题spring如何处理</h2><h3 id="bean的生命周期"><a href="#bean的生命周期" class="headerlink" title="bean的生命周期"></a>bean的生命周期</h3><p>Spring 容器只能管理 单例（singleton） 作用域的 Bean 的完整生命周期，对于 原型（prototype） 作用域的 Bean，Spring 容器只创建 bean 的实例后便会返回给用户，剩余的生命周期由用户控制。所以 Bean 的生命周期主要指的是 singleton 作用域 的 Bean。</p><p>具体生命周期参考：<a href="https://juejin.cn/post/7217693476494147641">https://juejin.cn/post/7217693476494147641</a></p><h3 id="循环引用问题spring如何处理"><a href="#循环引用问题spring如何处理" class="headerlink" title="循环引用问题spring如何处理"></a>循环引用问题spring如何处理</h3><p>Spring 并不能解决所有 Bean 的循环依赖问题，Setter方法注入方式 在 Spring 中是不会产生循环依赖问题的，这主要是靠 三级缓存 机制。构造器注入无法解决循环依赖，因为 构造器注入 发生在 实例化阶段，而 Spring 解决循环依赖问题依靠的 三级缓存 在 属性注入阶段，也就是说调用构造函数时还未能放入三级缓存中，所以无法解决 构造器注入 的循环依赖问题。Spring 无法解决 原型作用域 出现的循环依赖问题，因为 Spring 不会缓存 原型 作用域的 Bean，而 Spring 依靠 缓存 来解决循环依赖问题，所以 Spring 无法解决 原型 作用域的 Bean。</p><p>首先会获取 AService 对应的 Bean 对象。<br>先是调用 doGetBean() 中的第一个 getSingleton(beanName) 判断是否有该 Bean 的实例，有就直接返回了。（显然这里没有）<br>然后调用 doGetBean() 中的第二个 getSingleton() 方法来执行 doCreateBean() 方法。<br>先进行实例化操作（也就是利用构造函数实例化），此时实例化后生成的是原始对象。<br>将原始对象通过 lambda表达式 进行封装成 ObjectFactory 对象，通过 addSingletonFactory 加入三级缓存中。<br>然后再进行属性注入，此时发现需要注入 BService 的 Bean，会通过 doGetBean() 去获取 BService 对应的 Bean。<br>同样调用 doGetBean() 中的第一个 getSingleton(beanName) 判断是否有该 Bean 的实例，显然这里也是不会有 BService 的 Bean 的。<br>然后只能调用 doGetBean() 中的第二个 getSingleton() 方法来执行 doCreateBean() 方法来创建一个 BService 的 Bean。<br>同样地先进行实例化操作，生成原始对象后封装成 ObjectFactory 对象放入三级缓存中。<br>然后进行属性注入，此时发现需要注入 AService 的 Bean，此时调用调用 doGetBean() 中的第一个 getSingleton(beanName) 查找是否有 AService 的 Bean。此时会触发三级缓存，也就是调用 singletonFactories.get(beanName)。<br>因为三级缓存中有 AService 的原始对象封装的 ObjectFactory 对象，所以可以获取到的代理对象或原始对象，并且上移到二级缓存中，提前暴露给 BService 调用。<br>所以 BService 可以完成属性注入，然后进行初始化后，将 Bean 放入一级缓存，这样 AService 也可以完成创建。</p><p>参考：<br><a href="https://juejin.cn/post/7217693476494147641">浅谈 Spring Bean 的生命周期</a><br><a href="https://juejin.cn/post/7218080360403615804">浅谈 Spring 如何解决 Bean 的循环依赖问题</a><br><a href="https://www.bilibili.com/video/BV1ET4y1N7Sp/?spm_id_from=333.337.search-card.all.click">第二次讲Spring循环依赖，时长16分钟，我保证每一秒都是精华</a></p><h2 id="Bean的作用域有几种？"><a href="#Bean的作用域有几种？" class="headerlink" title="Bean的作用域有几种？"></a>Bean的作用域有几种？</h2><p>Spring框架支持以下五种bean的作用域：</p><p>1.singleton :bean在每个Spring ioc 容器中只有一个实例。</p><p>2.prototype：一个bean的定义可以有多个实例。</p><p>3.request：每次http请求都会创建一个bean，该作用域仅在基于web的Spring ApplicationContext情形下有效。</p><p>4.session：在一个HTTP Session中，一个bean定义对应一个实例。该作用域仅在基于web的Spring ApplicationContext情形下有效。</p><p>5.global-session：在一个全局的HTTP Session中，一个bean定义对应一个实例。该作用域仅在基于web的Spring ApplicationContext情形下有效。</p><p>参考：<br><a href="https://blog.csdn.net/qq_46138725/article/details/106751203">解释Spring支持的几种bean的作用域？</a></p><h2 id="BeanFactory和ApplicationContext有什么区别？BeanFactory和FactoryBean的区别？"><a href="#BeanFactory和ApplicationContext有什么区别？BeanFactory和FactoryBean的区别？" class="headerlink" title="BeanFactory和ApplicationContext有什么区别？BeanFactory和FactoryBean的区别？"></a>BeanFactory和ApplicationContext有什么区别？BeanFactory和FactoryBean的区别？</h2><h2 id="BeanFactory和ApplicationContext有什么区别"><a href="#BeanFactory和ApplicationContext有什么区别" class="headerlink" title="BeanFactory和ApplicationContext有什么区别"></a>BeanFactory和ApplicationContext有什么区别</h2><p>BeanFactory 接口提供了一种高级配置机制，能够管理任何类型的对象，它是SpringIoC容器标准化超接口！</p><p>ApplicationContext 是 BeanFactory 的子接口。它扩展了以下功能：</p><p>更容易与 Spring 的 AOP 功能集成<br>消息资源处理（用于国际化）<br>特定于应用程序给予此接口实现，例如Web 应用程序的 WebApplicationContext<br>简而言之， BeanFactory 提供了配置框架和基本功能，而 ApplicationContext 添加了更多特定于企业的功能。 ApplicationContext 是 BeanFactory 的完整超集！</p><h2 id="FactoryBean和BeanFactory区别"><a href="#FactoryBean和BeanFactory区别" class="headerlink" title="FactoryBean和BeanFactory区别"></a>FactoryBean和BeanFactory区别</h2><p>**FactoryBean **是 Spring 中一种特殊的 bean，可以在 getObject() 工厂方法自定义的逻辑创建Bean！是一种能够生产其他 Bean 的 Bean。FactoryBean 在容器启动时被创建，而在实际使用时则是通过调用 getObject() 方法来得到其所生产的 Bean。因此，FactoryBean 可以自定义任何所需的初始化逻辑，生产出一些定制化的 bean。</p><p>一般情况下，整合第三方框架，都是通过定义FactoryBean实现！！！</p><p>BeanFactory 是 Spring 框架的基础，其作为一个顶级接口定义了容器的基本行为，例如管理 bean 的生命周期、配置文件的加载和解析、bean 的装配和依赖注入等。BeanFactory 接口提供了访问 bean 的方式，例如 getBean() 方法获取指定的 bean 实例。它可以从不同的来源（例如 Mysql 数据库、XML 文件、Java 配置类等）获取 bean 定义，并将其转换为 bean 实例。同时，BeanFactory 还包含很多子类（例如，ApplicationContext 接口）提供了额外的强大功能。</p><p>总的来说，FactoryBean 和 BeanFactory 的区别主要在于前者是用于创建 bean 的接口，它提供了更加灵活的初始化定制功能，而后者是用于管理 bean 的框架基础接口，提供了基本的容器功能和 bean 生命周期管理。</p><p>参考：<br><a href="https://www.bilibili.com/video/BV1AP411s7D7/?spm_id_from=333.337.search-card.all.click&vd_source=3043528c37081b8aa126b17fd5b4a4c5">赵伟风老师SSM框架实战精讲</a></p><h2 id="Spring-AOP和AspectJ-AOP有什么区别？"><a href="#Spring-AOP和AspectJ-AOP有什么区别？" class="headerlink" title="Spring AOP和AspectJ AOP有什么区别？"></a>Spring AOP和AspectJ AOP有什么区别？</h2><p>Spring AOP是基于Spring IoC实现的，它解决大部分常见的需求，但它并不是一个完整的AOP解决方案。对于非Spring容器管理的对象，它更没有办法了。而AspectJ旨在提供完整的AOP方案，因此也会更复杂。<br>而Spring AOP是运行时织入的，主要使用了两种技术：JDK动态代理和CGLIB代理。对于接口使用JDK Proxy，而继承的使用CGLIB。AspectJ是在运行前织入的，分为三类：编译时织入、编译后织入、加载时织入。<br>Aspectj不受类的特殊限制,不管方法是private、或者static、或者final的,都可以代理，spring AOP只能代理实例方法。<br>AspectJ性能更好，功能更强，使用更复杂。</p><p>参考：<br><a href="https://juejin.cn/post/7197366974371364919">Spring AOP与AspectJ的对比及应用</a><br><a href="https://blog.csdn.net/qq_41664100/article/details/122691886">AspectJ 静态代理实践</a><br><a href="https://zhuanlan.zhihu.com/p/28870960">Java JDK代理、CGLIB、AspectJ代理分析比较</a></p><h2 id="Spring的事务有了解？"><a href="#Spring的事务有了解？" class="headerlink" title="Spring的事务有了解？"></a>Spring的事务有了解？</h2><p>编程式事务是指手动编写程序来管理事务，即通过编写代码的方式直接控制事务的提交和回滚。在 Java 中，通常使用事务管理器(如 Spring 中的 PlatformTransactionManager)来实现编程式事务。</p><p>编程式事务的主要优点是灵活性高，可以按照自己的需求来控制事务的粒度、模式等等。但是，编写大量的事务控制代码容易出现问题，对代码的可读性和可维护性有一定影响。</p><p>声明式事务是指使用注解或 XML 配置的方式来控制事务的提交和回滚。</p><p>开发者只需要添加配置即可， 具体事务的实现由第三方框架实现，避免我们直接进行事务操作！</p><p>使用声明式事务可以将事务的控制和业务逻辑分离开来，提高代码的可读性和可维护性。</p><p>区别：</p><p>编程式事务需要手动编写代码来管理事务<br>而声明式事务可以通过配置文件或注解来控制事务。</p><p>参考：<br><a href="https://www.bilibili.com/video/BV1AP411s7D7/?spm_id_from=333.337.search-card.all.click&vd_source=3043528c37081b8aa126b17fd5b4a4c5">赵伟风老师SSM框架实战精讲</a></p><h2 id="Spring的事件类型有几种？"><a href="#Spring的事件类型有几种？" class="headerlink" title="Spring的事件类型有几种？"></a>Spring的事件类型有几种？</h2><p>Spring 提供了以下5中标准的事件：</p><p>上下文更新事件（ContextRefreshedEvent）：该事件会在ApplicationContext被初始化或者更新时发布。也可以在调用ConfigurableApplicationContext 接口中的refresh()方法时被触发。<br>上下文开始事件（ContextStartedEvent）：当容器调用ConfigurableApplicationContext的Start()方法开始&#x2F;重新开始容器时触发该事件。<br>上下文停止事件（ContextStoppedEvent）：当容器调用ConfigurableApplicationContext的Stop()方法停止容器时触发该事件。<br>上下文关闭事件（ContextClosedEvent）：当ApplicationContext被关闭时触发该事件。容器被关闭时，其管理的所有单例Bean都被销毁。<br>请求处理事件（RequestHandledEvent）：在Web应用中，当一个http请求（request）结束触发该事件。<br>除了上面介绍的事件以外，还可以通过扩展ApplicationEvent 类来开发自定义的事件。</p><p>参考：<br><a href="https://cloud.tencent.com/developer/article/1532994">经典面试题-Spring框架中有哪些不同类型的事件？</a></p><h2 id="Springmvc的流程？"><a href="#Springmvc的流程？" class="headerlink" title="Springmvc的流程？"></a>Springmvc的流程？</h2><p><img src="/2023/10/22/%E5%85%AB%E8%82%A1%E6%96%87-spring/Springmvc%E6%B5%81%E7%A8%8B.png" alt="Springmvc流程"></p><p>参考：<br><a href="https://www.bilibili.com/video/BV1AP411s7D7/?spm_id_from=333.337.search-card.all.click&vd_source=3043528c37081b8aa126b17fd5b4a4c5">赵伟风老师SSM框架实战精讲</a></p><h2 id="SpringMvc的控制器是不是单例模式-如果是-有什么问题-怎么解决？"><a href="#SpringMvc的控制器是不是单例模式-如果是-有什么问题-怎么解决？" class="headerlink" title="SpringMvc的控制器是不是单例模式,如果是,有什么问题,怎么解决？"></a>SpringMvc的控制器是不是单例模式,如果是,有什么问题,怎么解决？</h2><p>单例，实例变量的线程安全问题，可以用@Scope(“prototype”)改为多例的模式，或者实例变量用threadlocal变量。</p><p>参考：<br><a href="https://blog.csdn.net/xcb425/article/details/104423741">SpringMVC控制器是不是单例模式</a></p><h2 id="了解Springboot吗？那讲一下Springboot的启动流程吧"><a href="#了解Springboot吗？那讲一下Springboot的启动流程吧" class="headerlink" title="了解Springboot吗？那讲一下Springboot的启动流程吧"></a>了解Springboot吗？那讲一下Springboot的启动流程吧</h2><h2 id="讲一讲Spring和Springboot的区别"><a href="#讲一讲Spring和Springboot的区别" class="headerlink" title="讲一讲Spring和Springboot的区别"></a>讲一讲Spring和Springboot的区别</h2><h2 id="Springboot的如何去掉不用的配置，springboot不是开箱即用么？怎么把不要的配置去掉呢？"><a href="#Springboot的如何去掉不用的配置，springboot不是开箱即用么？怎么把不要的配置去掉呢？" class="headerlink" title="Springboot的如何去掉不用的配置，springboot不是开箱即用么？怎么把不要的配置去掉呢？"></a>Springboot的如何去掉不用的配置，springboot不是开箱即用么？怎么把不要的配置去掉呢？</h2><h2 id="hystrix的隔离策略和zuul的功能是？"><a href="#hystrix的隔离策略和zuul的功能是？" class="headerlink" title="hystrix的隔离策略和zuul的功能是？"></a>hystrix的隔离策略和zuul的功能是？</h2><h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://mp.weixin.qq.com/s/54_bMeUwjxk-8DHa90heNQ">微信公众号:我的IT技术路</a></p>]]></content>
+    
+    
+    <categories>
+      
+      <category>面试</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>spring</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>论语</title>
     <link href="/2023/10/07/%E8%AE%BA%E8%AF%AD/"/>
     <url>/2023/10/07/%E8%AE%BA%E8%AF%AD/</url>
     
-    <content type="html"><![CDATA[<h1 id="信息"><a href="#信息" class="headerlink" title="信息"></a>信息</h1><p>《论语》 杨逢彬 注译　长江文艺出版社</p><h1 id="摘录"><a href="#摘录" class="headerlink" title="摘录"></a>摘录</h1><ul><li><p>子曰：弟子入则孝，出则悌，谨而信，泛爱众而亲仁，行有余力，则以学文。</p></li><li><p>子曰：君子食无求饱，居无求安，敏于事而慎于言，就有道而正焉，可谓好学也已矣。</p></li><li><p>子曰：学而不思则罔，思而不学则殆。</p></li><li><p>子曰：多闻阙疑，慎言其余，则寡尤。多见阙殆，慎行其余，则寡悔。言寡尤，行寡悔，禄在其中矣。</p></li><li><p>子曰：放于利而行，多怨。</p></li><li><p>子曰：不患无位，患所以立，不患莫己知也，求为可知也。</p></li><li><p>子游曰：事君数，斯辱矣；朋友数，斯疏矣。</p></li><li><p>子曰：质胜文则野，文胜质则史。文质彬彬，然后君子。</p></li><li><p>子曰：暴虎凭河，死而无悔者，吾不与也，必也临事而惧，好谋而成者也。</p></li><li><p>子曰：不在其位，不谋其政。</p></li><li><p>子曰：譬如为山，未成一篑，止，吾止也。譬如平地，虽覆一篑，进，吾往也。</p></li><li><p>子曰：君子不忧不惧。曰：不忧不惧，斯可谓君子已乎？子曰：内省不疚，夫何忧何惧？</p></li><li><p>子曰：忠告而以善导之，否则止，无自辱焉。</p></li><li><p>子曰：毋欲速，毋见小利。欲速则不达，见小利则大事不成。</p></li><li><p>子曰：爱之，能勿劳乎？忠焉，能勿诲乎？</p></li><li><p>子曰：贫而无怨难，富而无骄易。</p></li><li><p>曰：今之成人者何必然？见利思义，见危授命，久要不忘平生之言，亦可以为成人矣。</p></li><li><p>或曰：以德报怨，何如？子曰：何以报德？以直报怨，以德报德。</p></li><li><p>子曰：赐也，汝以予为多学而识之者与？对曰：然。非与？曰：非也，予一以贯之。</p></li><li><p>子曰：人而无远虑，必有近忧。</p></li><li><p>子曰：躬自厚而薄责于人，则远怨矣。</p></li><li><p>子曰：巧言乱德，小不忍乱大谋。</p></li><li><p>子曰：当仁不让于师。</p></li><li><p>孔子曰：侍于君子有三愆：言未及之而言谓之躁，言及之不言谓之隐，未见颜色而言谓之瞽。</p></li><li><p>子曰：道听而涂说，德之弃。</p></li><li><p>子路曰：君子尚勇乎？子曰：君子义以为上。君子有勇而无义为乱，小人有勇而无义为盗。</p></li><li><p>子曰：“君子贞而不谅。”</p></li></ul><h1 id="随想"><a href="#随想" class="headerlink" title="随想"></a>随想</h1><p>以我浅薄的认知，感觉论语即是在说术也是在说道。有些言论看似平淡却富含深意且符合直觉，例如“己所不欲，勿施于人”这句话，可以发现这个观点可以延伸出许多观点，但这个观点本身确实又非常符合直觉，如同数学中的公理一般，这是术。又如“当仁不让于师”，是否有了王阳明致良知的意味，这是道。“生而知之者上也，学而知之者次也；困而学之，又其次也；困而不学，民斯为下矣。”，孔子之所以为圣人，确实有超乎我们常人的认知，论语是值得我们“学而时习之”的。</p>]]></content>
+    <content type="html"><![CDATA[<h1 id="信息"><a href="#信息" class="headerlink" title="信息"></a>信息</h1><p>《论语》 杨逢彬 注译　长江文艺出版社</p><h1 id="摘录"><a href="#摘录" class="headerlink" title="摘录"></a>摘录</h1><ul><li><p>子曰：弟子入则孝，出则悌，谨而信，泛爱众而亲仁，行有余力，则以学文。</p></li><li><p>子曰：君子食无求饱，居无求安，敏于事而慎于言，就有道而正焉，可谓好学也已矣。</p></li><li><p>子曰：学而不思则罔，思而不学则殆。</p></li><li><p>子曰：多闻阙疑，慎言其余，则寡尤。多见阙殆，慎行其余，则寡悔。言寡尤，行寡悔，禄在其中矣。</p></li><li><p>子曰：放于利而行，多怨。</p></li><li><p>子曰：不患无位，患所以立，不患莫己知也，求为可知也。</p></li><li><p>子游曰：事君数，斯辱矣；朋友数，斯疏矣。</p></li><li><p>子曰：质胜文则野，文胜质则史。文质彬彬，然后君子。</p></li><li><p>子曰：暴虎凭河，死而无悔者，吾不与也，必也临事而惧，好谋而成者也。</p></li><li><p>子曰：不在其位，不谋其政。</p></li><li><p>子曰：譬如为山，未成一篑，止，吾止也。譬如平地，虽覆一篑，进，吾往也。</p></li><li><p>子曰：君子不忧不惧。曰：不忧不惧，斯可谓君子已乎？子曰：内省不疚，夫何忧何惧？</p></li><li><p>子曰：忠告而以善导之，否则止，无自辱焉。</p></li><li><p>子曰：毋欲速，毋见小利。欲速则不达，见小利则大事不成。</p></li><li><p>子曰：爱之，能勿劳乎？忠焉，能勿诲乎？</p></li><li><p>子曰：贫而无怨难，富而无骄易。</p></li><li><p>曰：今之成人者何必然？见利思义，见危授命，久要不忘平生之言，亦可以为成人矣。</p></li><li><p>或曰：以德报怨，何如？子曰：何以报德？以直报怨，以德报德。</p></li><li><p>子曰：赐也，汝以予为多学而识之者与？对曰：然。非与？曰：非也，予一以贯之。</p></li><li><p>子曰：人而无远虑，必有近忧。</p></li><li><p>子曰：躬自厚而薄责于人，则远怨矣。</p></li><li><p>子曰：巧言乱德，小不忍乱大谋。</p></li><li><p>子曰：当仁不让于师。</p></li><li><p>孔子曰：侍于君子有三愆：言未及之而言谓之躁，言及之不言谓之隐，未见颜色而言谓之瞽。</p></li><li><p>子曰：道听而涂说，德之弃。</p></li><li><p>子路曰：君子尚勇乎？子曰：君子义以为上。君子有勇而无义为乱，小人有勇而无义为盗。</p></li><li><p>子曰：“君子贞而不谅。”</p></li></ul><h1 id="随想"><a href="#随想" class="headerlink" title="随想"></a>随想</h1><p>以我浅薄的认知，感觉论语即是在说术也是在说道。有些言论看似平淡却富含深意且符合直觉，例如“己所不欲，勿施于人”这句话，可以发现这个观点可以延伸出许多观点，但这个观点本身确实又非常符合直觉，如同数学中的公理一般，这是术。又如“当仁不让于师”，是否有了王阳明致良知的意味，这是道。</p>]]></content>
     
     
     <categories>
@@ -33,19 +58,19 @@
     <link href="/2023/10/02/%E5%85%AB%E8%82%A1%E6%96%87-%E5%88%86%E5%B8%83%E5%BC%8F/"/>
     <url>/2023/10/02/%E5%85%AB%E8%82%A1%E6%96%87-%E5%88%86%E5%B8%83%E5%BC%8F/</url>
     
-    <content type="html"><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>整理分布式的相关面试题，题目来源微信公众号。</p><h1 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h1><h2 id="请简述一下CAP理论，我们常见的中间件分别侧重点是什么？简述一下BASE理论？什么是强一致性，弱一致性，最终一致性"><a href="#请简述一下CAP理论，我们常见的中间件分别侧重点是什么？简述一下BASE理论？什么是强一致性，弱一致性，最终一致性" class="headerlink" title="请简述一下CAP理论，我们常见的中间件分别侧重点是什么？简述一下BASE理论？什么是强一致性，弱一致性，最终一致性"></a>请简述一下CAP理论，我们常见的中间件分别侧重点是什么？简述一下BASE理论？什么是强一致性，弱一致性，最终一致性</h2><h3 id="CAP理论"><a href="#CAP理论" class="headerlink" title="CAP理论"></a>CAP理论</h3><p>CAP原则又称CAP定理，指的是在一个分布式系统中，Consistency（一致性）、 Availability（可用性）、Partition tolerance（分区容错性）这三个基本需求，最多只能同时满足其中的2个。</p><p><img src="/2023/10/02/%E5%85%AB%E8%82%A1%E6%96%87-%E5%88%86%E5%B8%83%E5%BC%8F/cap.png" alt="cap"></p><p>一致性 ：数据在多个副本之间能够保持一致的特性。<br>可用性：系统提供的服务一直处于可用的状态，每次请求都能获得正确的响应。<br>分区容错性：分布式系统在遇到任何网络分区故障的时候，仍然能够对外提供满足一致性和可用性的服务。</p><p>分布式系统是避免不了分区的，分区容错性是一定要满足的。<br>假如现在有两个分区N1和N2，N1和N2分别有不同的分区存储D1和D2，以及不同的服务S1和S2。<br>在满足一致性 的时候，N1和N2的数据要求值一样的，D1&#x3D;D2。<br>在满足可用性的时候，无论访问N1还是N2，都能获取及时的响应。</p><p><img src="/2023/10/02/%E5%85%AB%E8%82%A1%E6%96%87-%E5%88%86%E5%B8%83%E5%BC%8F/cap%E6%A1%88%E4%BE%8B.png" alt="cap案例"></p><p>现在有这样的场景：<br>用户访问了N1，修改了D1的数据。<br>用户再次访问，请求落在了N2。此时D1和D2的数据不一致。</p><p>接下来：<br>保证一致性：此时D1和D2数据不一致，要保证一致性就不能返回不一致的数据，可用性无法保证。<br>保证可用性：立即响应，可用性得到了保证，但是此时响应的数据和D1不一致，一致性无法保证。<br>所以，可以看出，分区容错的前提下，一致性和可用性是矛盾的。</p><p>CAP三者不可同得，那么必须得做一些权衡。</p><p>CA without P❌</p><p>如果不要求P（不允许分区），则C（强一致性）和A（可用性）是可以保证的。但是对于分布式系统，分区是客观存在的，其实分布式系统理论上是不可选CA的。</p><p>CP without A</p><p>如果不要求A（可用），相当于每个请求都需要在Server之间强一致，而P（分区）会导致同步时间无限延长，如此CP也是可以保证的。很多传统的数据库分布式事务都属于这种模式。</p><p>AP wihtout C</p><p>要高可用并允许分区，则需放弃一致性。一旦分区发生，节点之间可能会失去联系，为了高可用，每个节点只能用本地数据提供服务，而这样会导致全局数据的不一致性。现在众多的NoSQL都属于此类。</p><p>redis：单机AC，主从、哨兵、集群AP<br>es:个人认为AP<br>kafka：个人认为AP<br>consul：CP，保证一致性的前提下，尽量保证可用性</p><h3 id="BASE理论"><a href="#BASE理论" class="headerlink" title="BASE理论"></a>BASE理论</h3><p>BASE 是 Basically Available（基本可用） 、Soft-state（软状态） 和 Eventually Consistent（最终一致性） 三个短语的缩写。</p><p>BASE 理论是对 CAP 中一致性 C 和可用性 A 权衡的结果，其来源于对大规模互联网系统分布式实践的总结，是基于 CAP 定理逐步演化而来的，它大大降低了我们对系统的要求。</p><p>BASE理论的核心思想是：</p><p>即使无法做到强一致性（Strong consistency），但每个应用都可以根据自身的业务特点，采用适当的方式来使系统达到最终一致性（Eventual consistency）。</p><ul><li>基本可用</li></ul><p>什么是基本可用呢？</p><p>假如系统出现了不可预知故障，允许损失部分可用性，当然也不能完全不可用。</p><p>损失的这部分可用性指的是什么？</p><p>响应时间上的损失：正常情况下的搜索引擎0.5秒即返回给用户结果，而基本可用的搜索引擎可以在2秒作用返回结果。</p><p>功能上的损失：在一个电商网站上，正常情况下，用户可以顺利完成每一笔订单。但是到了大促期间，为了保护购物系统的稳定性，部分消费者可能会被引导到一个降级页面。</p><ul><li>软状态</li></ul><p>软状态指允许系统中的数据存在中间状态（CAP 理论中的数据不一致），并认为该中间状态的存在不会影响系统的整体可用性，即允许系统在不同节点的数据副本之间进行数据同步的过程存在延时。</p><ul><li>最终一致性</li></ul><p>最终一致性强调的是系统中所有的数据副本，在经过一段时间的同步后，最终能够达到一个一致的状态。因此，最终一致性的本质是需要系统保证最终数据能够达到一致，而不需要实时保证系统数据的强一致性。</p><p>分布式一致性的 3 种级别：</p><p>强一致性 ：系统写入了什么，读出来的就是什么。<br>弱一致性 ：不一定可以读取到最新写入的值，也不保证多少时间之后读取到的数据是最新的，只是会尽量保证某个时刻达到数据一致的状态。<br>最终一致性 ：弱一致性的升级版，系统会保证在一定时间内达到数据一致的状态。<br>业界比较推崇是最终一致性级别，但是某些对数据一致要求十分严格的场景比如银行转账还是要保证强一致性。</p><p>最终一致性怎么保证呢？</p><p>读时修复 : 在读取数据时，检测数据的不一致，进行修复。比如 Cassandra 的 Read Repair 实现，具体来说，在向 Cassandra 系统查询数据的时候，如果检测到不同节点 的副本数据不一致，系统就自动修复数据。<br>写时修复 : 在写入数据，检测数据的不一致时，进行修复。比如 Cassandra 的 Hinted Handoff 实现。具体来说，Cassandra 集群的节点之间远程写数据的时候，如果写失败 就将数据缓存下来，然后定时重传，修复数据的不一致性。<br>异步修复 : 这个是最常用的方式，通过定时对账检测副本数据的一致性，并修复。</p><h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>CAP 是分布式系统设计理论，BASE 是 CAP 理论中 AP 方案的延伸，ACID 是数据库事务完整性的理论。</p><p>CAP理论严格来讲不是三选二，而是CP、AP二选一，因为通常P（分区容错性）是必须得到保证的。</p><p>BASE理论面向的是大型高可用、可扩展的分布式系统。与传统ACID特性相反，不是强一致性模型，BASE提出通过牺牲强一致性来获得可用性，并允许数据一段时间内的不一致，但是最终需要达到一致状态。</p><p>参考：<br><a href="https://www.cnblogs.com/three-fighter/p/15293310.html">分布式必备理论基础：CAP和BASE</a></p><h2 id="有了解过哪些一致性协议？Poxos、ZAB、raft协议有了解？有了解过gossip协议？"><a href="#有了解过哪些一致性协议？Poxos、ZAB、raft协议有了解？有了解过gossip协议？" class="headerlink" title="有了解过哪些一致性协议？Poxos、ZAB、raft协议有了解？有了解过gossip协议？"></a>有了解过哪些一致性协议？Poxos、ZAB、raft协议有了解？有了解过gossip协议？</h2><h3 id="一致性协议"><a href="#一致性协议" class="headerlink" title="一致性协议"></a>一致性协议</h3><p>顾名思义，一致性协议的应用是为了维护各节点数据的一致性，换句话说，就是使集群里的节点存储的数据是一模一样的。那么这样的技术，在现实生活中真的迫切需要嘛？其实这样的需求从古至今一直存在，这里我们举个趣味性的例子，可能很多人知道拜占庭将军问题，古时候东罗马帝国幅员辽阔，各个将军掌管各自的军队分散在帝国各处，他们之间靠信差交流。当东罗马帝国遭遇战争，将军们需要联合起来才能打倒敌方军队。这个时候将军们需要对最基本的进攻还是撤退达成一致。如果一齐进攻，他们能打倒敌人，如果一齐撤退，他们还有机会东山再起。此时将军们派出各自的信差去传达指令。那么帝国里有那么多将军，大家如何达成一致？最简单的，指派一个上将军，大家都听他的命令就好。那么上将军将怎么安排自己的信使？如果信使路上遇到了危险不幸逝去，那么长时间等不来回信的上将军该怎么处理？如果不幸逝世的是上将军怎么办？如果上将军是敌方间谍，专门传递虚假消息怎么办？比如间谍上将军对A将军传达撤退命令，对B将军传达进攻命令，那么最终只有B将军进攻，B就会全军覆没！这些情况其实都真实反映一致性协议需要考虑的种种问题。</p><p>一致性协议可以有多种分类方法，可以从单主和多主的角度对协议进行分类。单主协议，即整个分布式集群中只存在一个主节点，采用这个思想的主要有2PC, Paxos, Raft等. 另一类是多主协议，即整个集群中不只存在一个主节点，Pow协议以及著名的Gossip协议。</p><p>单主协议由一个主节点发出数据，传输给其余从节点，能保证数据传输的有序性。而多主协议则是从多个主节点出发传输数据，传输顺序具有随机性，因而数据的有序性无法得到保证，只保证最终数据的一致性。这是单主协议和多主协议之间最大的区别。单主协议中具有代表性的为Paxos, Raft两大协议，多主协议中具有代表性的为Gossip和Pow协议。</p><h3 id="Gossip协议"><a href="#Gossip协议" class="headerlink" title="Gossip协议"></a>Gossip协议</h3><p>Gossip又被称为流行病算法，它与流行病毒在人群中传播的性质类似，由初始的几个节点向周围互相传播，到后期的大规模互相传播，最终达到一致性。Gossip协议被广泛应用于P2P网络，同时一些分布式的数据库，如Redis集群的消息同步使用的也是Gossip协议，另一个重大应用是被用于比特币的交易信息和区块信息的传播。</p><p>Gossip协议的整体流程非常简单，初始由几个节点发起消息，这几个节点会将消息的更新内容告诉自己周围的节点，收到消息的节点再将这些信息告诉周围的节点。依照这种方式，获得消息的节点会越来越多，总体消息的传输规模会越来越大，消息的传偶速度也越来越快。虽然不是每个节点都能在相同的时间达成一致，但是最终集群中所有节点的信息必然是一致的。Gossip协议确保的是分布式集群的最终一致性。</p><h3 id="Proof-of-work（Pow）算法与比特币"><a href="#Proof-of-work（Pow）算法与比特币" class="headerlink" title="Proof-of-work（Pow）算法与比特币"></a>Proof-of-work（Pow）算法与比特币</h3><p>Proof-of-work算法又被称为Pow算法，其实从这个算法的名称中我们能对它实现的功能窥见一二，工作量证明算法，那是否意味着工作量较大的某一个节点能够获得主动权呢？事实也是类似这个原理，大量的节点参与竞争，通过自身的工作量大小来证明自己的能力，最终能力最大的节点获得优胜，其他节点的信息需要与该节点统一。Pow最为人所熟知的应用是比特币。下面就以比特币为例具体讲解该算法。</p><p>我们知道，比特币塑造的是一个去中心化的交易平台，最重要的一点就是该平台的可信度。要达到高可信度，要求整个系统中没有固定的leader，且为了防止外界篡改，必然要设定一些特殊的机制，比如让图谋不轨的一方无法篡改或者必须付出与收获完全不等称的代价才有修改的可能，以这样的方式打消其修改的念头。这时候比特币引入了Pow算法，在Pow机制下，所有参与者共同求解数学问题，这些数学问题往往需要经过大量枚举才能求解，因此需要参与者消耗大量的硬件算力。成功求解数学问题的参与者将获得记账权，并获得比特币作为奖励。其余所有参与者需要保持和获得记账权节点的区块一致，由此达到最终的一致性。</p><p>依靠Pow算法，比特币很大程度保证了交易平台的安全性。因为如果要对该平台的数据进行篡改或者毁坏，篡改者至少需要获得比特币全网一半以上的算力，这是非常难以达到的。但是同样Pow存在很多缺点，Pow达成一致性的速度很慢，应用在比特币中每秒钟只能做成7笔交易，这在大部分的商业应用中都是达不到要求的。其次Pow造成了很大的资源浪费。所有的竞争者夺取记账权需要付出巨大的硬件算力，这在背后是大量的硬件成本、电力损耗，而一旦记账权确定，其余没有获得记账权的节点的算力等于白白浪费。最后是现在出现了一些大规模的专业矿场，这些矿场的算力非常强大，它们的存在增大了平台被篡改的可能性。</p><p>在比特币的应用中，使用Pow算法确定竞争者的记账权，尽可能地解决”拜占庭将军”问题，再将可信的结果由传播速度极强，节点数目量大的Gossip协议去进行传输，最终达成全网一致，可谓很好地利用这两大算法的特点，将二者优劣互补并巧妙地用于区块链领域。</p><h3 id="Paxos协议"><a href="#Paxos协议" class="headerlink" title="Paxos协议"></a>Paxos协议</h3><p>有点绕，没细看。</p><p>Paxos是非常经典的一致性协议，但是因为过于理论化，难以直接工程化，因此工业界出现了诸多基于Paxos思想出发的变种。虽然这些变种最终很多都和原始的Paxos有比较大的差距，甚至完全演变成了新的协议，但是作为奠基者的Paxos在分布式一致性协议中依然持有不可撼动的地位。</p><h3 id="Raft协议"><a href="#Raft协议" class="headerlink" title="Raft协议"></a>Raft协议</h3><p>Raft的核心思想和Paxos是非常一致的，甚至可以说，Raft是基于Paxos的一种具体化实现和改进，它让一致性算法更容易为人所接受，更容易得到实现。</p><p>多个server进行选举拉票，当且仅当某一个candidate收到超过一半的server的票数时，它就成功当选了leader，并开始向每个server发送心跳信息。那么当选举成功后，整个集群进入log传输的状态。</p><h3 id="Zab"><a href="#Zab" class="headerlink" title="Zab"></a>Zab</h3><p>把节点分两种，Leader（主）和Follower（从）。 有一个主节点，所有写操作全部通过节点进行处理，如果一个从节点收到了一个写操作请求，就会转给主节点处理。 其他节点都是从节点，可以通过从节点进行读操作。 主节点通过选举得出，主节点失踪后，其他从节点自动开始选举新的主节点。应用于Zookeeper。</p><h3 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h3><p>比特币：在比特币的应用中，使用Pow算法确定竞争者的记账权，尽可能地解决”拜占庭将军”问题，再将可信的结果由传播速度极强，节点数目量大的Gossip协议去进行传输，最终达成全网一致，可谓很好地利用这两大算法的特点</p><p>redis：选主，Raft;消息传递，Gossip</p><p>zookeeper：Zab 是特别为 Zookeeper 设计的支持崩溃恢复的原子广播协议，在 Zookeeper 中主要依赖 Zab 协议实现数据一致性，基于该协议，Zookeeper 实现了一种主备模型（Leader 与 Follower）的系统架构保证集群中各个副本之间的数据一致性。</p><p>参考：<br><a href="https://zhuanlan.zhihu.com/p/130974371">分布式一致性协议概述</a><br><a href="https://www.jianshu.com/p/71b2729d3004">几种常见的分布式一致性协议介绍</a><br><a href="https://juejin.cn/post/7001070049200963621">Zookeeper的Zab协议详解</a></p><h2 id="一致性hash算法了解么？"><a href="#一致性hash算法了解么？" class="headerlink" title="一致性hash算法了解么？"></a>一致性hash算法了解么？</h2><p>传统hash算法，在分布式存储环境下，如果增加或者减少节点，大量key需要重新hash，导致大量key需要迁移</p><p>一致性哈希是将整个哈希值空间组织成一个虚拟的圆环，如假设哈希函数H的值空间为0-2^32-1（哈希值是32位无符号整形），将存储节点和key都映射到hash环上的某个位置，一个存储节点只需要管理一个区间的key，如果增加或者减少节点，则只要移动一小部分key，其他的key不用变。</p><p>当存储节点太少的时候，可能出现各节点的存储key不均衡的情况，所以后续出现了虚拟节点方案，在hash环上设置多个虚拟节点，这样可以保证数据在各个虚拟节点上大致分布均匀，然后将虚拟节点均匀的分配给各个实际的存储节点上即可。redis集群即采用了虚拟节点方案进行数据分配。</p><p>参考：<br><a href="https://juejin.cn/post/6844903750860013576">5分钟理解一致性哈希算法</a></p><h2 id="分布式锁的实现方案？"><a href="#分布式锁的实现方案？" class="headerlink" title="分布式锁的实现方案？"></a>分布式锁的实现方案？</h2><h2 id="接口如何实现幂等？"><a href="#接口如何实现幂等？" class="headerlink" title="接口如何实现幂等？"></a>接口如何实现幂等？</h2><h2 id="聊聊微服务治理，分别涉及到哪些方面？你们系统在高可靠上采取了哪些措施？应对高并发有什么方案？系统的监控运维和服务降级、熔断的方案是什么？"><a href="#聊聊微服务治理，分别涉及到哪些方面？你们系统在高可靠上采取了哪些措施？应对高并发有什么方案？系统的监控运维和服务降级、熔断的方案是什么？" class="headerlink" title="聊聊微服务治理，分别涉及到哪些方面？你们系统在高可靠上采取了哪些措施？应对高并发有什么方案？系统的监控运维和服务降级、熔断的方案是什么？"></a>聊聊微服务治理，分别涉及到哪些方面？你们系统在高可靠上采取了哪些措施？应对高并发有什么方案？系统的监控运维和服务降级、熔断的方案是什么？</h2><h2 id="常见的负载均衡算法有哪些？"><a href="#常见的负载均衡算法有哪些？" class="headerlink" title="常见的负载均衡算法有哪些？"></a>常见的负载均衡算法有哪些？</h2><h2 id="聊聊微服务拆分？你们系统是怎么拆分的，这种拆分有什么优缺点？"><a href="#聊聊微服务拆分？你们系统是怎么拆分的，这种拆分有什么优缺点？" class="headerlink" title="聊聊微服务拆分？你们系统是怎么拆分的，这种拆分有什么优缺点？"></a>聊聊微服务拆分？你们系统是怎么拆分的，这种拆分有什么优缺点？</h2><h2 id="如何做微服务的限流？常见的限流算法有哪些？漏桶算法和令牌桶算法的区别是什么？"><a href="#如何做微服务的限流？常见的限流算法有哪些？漏桶算法和令牌桶算法的区别是什么？" class="headerlink" title="如何做微服务的限流？常见的限流算法有哪些？漏桶算法和令牌桶算法的区别是什么？"></a>如何做微服务的限流？常见的限流算法有哪些？漏桶算法和令牌桶算法的区别是什么？</h2><h2 id="聊聊你理解的resful框架，和rpc框架的区别？"><a href="#聊聊你理解的resful框架，和rpc框架的区别？" class="headerlink" title="聊聊你理解的resful框架，和rpc框架的区别？"></a>聊聊你理解的resful框架，和rpc框架的区别？</h2><h2 id="常见的RPC框架有哪些？能否做个对比？"><a href="#常见的RPC框架有哪些？能否做个对比？" class="headerlink" title="常见的RPC框架有哪些？能否做个对比？"></a>常见的RPC框架有哪些？能否做个对比？</h2><h2 id="Grpc框架的原理有了解？"><a href="#Grpc框架的原理有了解？" class="headerlink" title="Grpc框架的原理有了解？"></a>Grpc框架的原理有了解？</h2><h2 id="不同的系统怎么实现单点登入？怎么实现权限校验？"><a href="#不同的系统怎么实现单点登入？怎么实现权限校验？" class="headerlink" title="不同的系统怎么实现单点登入？怎么实现权限校验？"></a>不同的系统怎么实现单点登入？怎么实现权限校验？</h2><p>略</p><h2 id="分布式session的实现方案？"><a href="#分布式session的实现方案？" class="headerlink" title="分布式session的实现方案？"></a>分布式session的实现方案？</h2><p>略</p><h2 id="分布式uuid的实现方案？"><a href="#分布式uuid的实现方案？" class="headerlink" title="分布式uuid的实现方案？"></a>分布式uuid的实现方案？</h2><p>略</p><h2 id="分布式事务的实现方案？"><a href="#分布式事务的实现方案？" class="headerlink" title="分布式事务的实现方案？"></a>分布式事务的实现方案？</h2><p>略</p><h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://mp.weixin.qq.com/s/54_bMeUwjxk-8DHa90heNQ">微信公众号:我的IT技术路</a></p>]]></content>
+    <content type="html"><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>整理分布式的相关面试题，题目来源微信公众号。</p><h1 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h1><h2 id="请简述一下CAP理论，我们常见的中间件分别侧重点是什么？简述一下BASE理论？什么是强一致性，弱一致性，最终一致性"><a href="#请简述一下CAP理论，我们常见的中间件分别侧重点是什么？简述一下BASE理论？什么是强一致性，弱一致性，最终一致性" class="headerlink" title="请简述一下CAP理论，我们常见的中间件分别侧重点是什么？简述一下BASE理论？什么是强一致性，弱一致性，最终一致性"></a>请简述一下CAP理论，我们常见的中间件分别侧重点是什么？简述一下BASE理论？什么是强一致性，弱一致性，最终一致性</h2><h3 id="CAP理论"><a href="#CAP理论" class="headerlink" title="CAP理论"></a>CAP理论</h3><p>CAP原则又称CAP定理，指的是在一个分布式系统中，Consistency（一致性）、 Availability（可用性）、Partition tolerance（分区容错性）这三个基本需求，最多只能同时满足其中的2个。</p><p><img src="/2023/10/02/%E5%85%AB%E8%82%A1%E6%96%87-%E5%88%86%E5%B8%83%E5%BC%8F/cap.png" alt="cap"></p><p>一致性 ：数据在多个副本之间能够保持一致的特性。<br>可用性：系统提供的服务一直处于可用的状态，每次请求都能获得正确的响应。<br>分区容错性：分布式系统在遇到任何网络分区故障的时候，仍然能够对外提供满足一致性和可用性的服务。</p><p>分布式系统是避免不了分区的，分区容错性是一定要满足的。<br>假如现在有两个分区N1和N2，N1和N2分别有不同的分区存储D1和D2，以及不同的服务S1和S2。<br>在满足一致性 的时候，N1和N2的数据要求值一样的，D1&#x3D;D2。<br>在满足可用性的时候，无论访问N1还是N2，都能获取及时的响应。</p><p><img src="/2023/10/02/%E5%85%AB%E8%82%A1%E6%96%87-%E5%88%86%E5%B8%83%E5%BC%8F/cap%E6%A1%88%E4%BE%8B.png" alt="cap案例"></p><p>现在有这样的场景：<br>用户访问了N1，修改了D1的数据。<br>用户再次访问，请求落在了N2。此时D1和D2的数据不一致。</p><p>接下来：<br>保证一致性：此时D1和D2数据不一致，要保证一致性就不能返回不一致的数据，可用性无法保证。<br>保证可用性：立即响应，可用性得到了保证，但是此时响应的数据和D1不一致，一致性无法保证。<br>所以，可以看出，分区容错的前提下，一致性和可用性是矛盾的。</p><p>CAP三者不可同得，那么必须得做一些权衡。</p><p>CA without P❌</p><p>如果不要求P（不允许分区），则C（强一致性）和A（可用性）是可以保证的。但是对于分布式系统，分区是客观存在的，其实分布式系统理论上是不可选CA的。</p><p>CP without A</p><p>如果不要求A（可用），相当于每个请求都需要在Server之间强一致，而P（分区）会导致同步时间无限延长，如此CP也是可以保证的。很多传统的数据库分布式事务都属于这种模式。</p><p>AP wihtout C</p><p>要高可用并允许分区，则需放弃一致性。一旦分区发生，节点之间可能会失去联系，为了高可用，每个节点只能用本地数据提供服务，而这样会导致全局数据的不一致性。现在众多的NoSQL都属于此类。</p><p>redis：单机AC，主从、哨兵、集群AP<br>es:个人认为AP<br>kafka：个人认为AP<br>consul：CP，保证一致性的前提下，尽量保证可用性</p><h3 id="BASE理论"><a href="#BASE理论" class="headerlink" title="BASE理论"></a>BASE理论</h3><p>BASE 是 Basically Available（基本可用） 、Soft-state（软状态） 和 Eventually Consistent（最终一致性） 三个短语的缩写。</p><p>BASE 理论是对 CAP 中一致性 C 和可用性 A 权衡的结果，其来源于对大规模互联网系统分布式实践的总结，是基于 CAP 定理逐步演化而来的，它大大降低了我们对系统的要求。</p><p>BASE理论的核心思想是：</p><p>即使无法做到强一致性（Strong consistency），但每个应用都可以根据自身的业务特点，采用适当的方式来使系统达到最终一致性（Eventual consistency）。</p><ul><li>基本可用</li></ul><p>什么是基本可用呢？</p><p>假如系统出现了不可预知故障，允许损失部分可用性，当然也不能完全不可用。</p><p>损失的这部分可用性指的是什么？</p><p>响应时间上的损失：正常情况下的搜索引擎0.5秒即返回给用户结果，而基本可用的搜索引擎可以在2秒作用返回结果。</p><p>功能上的损失：在一个电商网站上，正常情况下，用户可以顺利完成每一笔订单。但是到了大促期间，为了保护购物系统的稳定性，部分消费者可能会被引导到一个降级页面。</p><ul><li>软状态</li></ul><p>软状态指允许系统中的数据存在中间状态（CAP 理论中的数据不一致），并认为该中间状态的存在不会影响系统的整体可用性，即允许系统在不同节点的数据副本之间进行数据同步的过程存在延时。</p><ul><li>最终一致性</li></ul><p>最终一致性强调的是系统中所有的数据副本，在经过一段时间的同步后，最终能够达到一个一致的状态。因此，最终一致性的本质是需要系统保证最终数据能够达到一致，而不需要实时保证系统数据的强一致性。</p><p>分布式一致性的 3 种级别：</p><p>强一致性 ：系统写入了什么，读出来的就是什么。<br>弱一致性 ：不一定可以读取到最新写入的值，也不保证多少时间之后读取到的数据是最新的，只是会尽量保证某个时刻达到数据一致的状态。<br>最终一致性 ：弱一致性的升级版，系统会保证在一定时间内达到数据一致的状态。<br>业界比较推崇是最终一致性级别，但是某些对数据一致要求十分严格的场景比如银行转账还是要保证强一致性。</p><p>最终一致性怎么保证呢？</p><p>读时修复 : 在读取数据时，检测数据的不一致，进行修复。比如 Cassandra 的 Read Repair 实现，具体来说，在向 Cassandra 系统查询数据的时候，如果检测到不同节点 的副本数据不一致，系统就自动修复数据。<br>写时修复 : 在写入数据，检测数据的不一致时，进行修复。比如 Cassandra 的 Hinted Handoff 实现。具体来说，Cassandra 集群的节点之间远程写数据的时候，如果写失败 就将数据缓存下来，然后定时重传，修复数据的不一致性。<br>异步修复 : 这个是最常用的方式，通过定时对账检测副本数据的一致性，并修复。</p><h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>CAP 是分布式系统设计理论，BASE 是 CAP 理论中 AP 方案的延伸，ACID 是数据库事务完整性的理论。</p><p>CAP理论严格来讲不是三选二，而是CP、AP二选一，因为通常P（分区容错性）是必须得到保证的。</p><p>BASE理论面向的是大型高可用、可扩展的分布式系统。与传统ACID特性相反，不是强一致性模型，BASE提出通过牺牲强一致性来获得可用性，并允许数据一段时间内的不一致，但是最终需要达到一致状态。</p><p>参考：<br><a href="https://www.cnblogs.com/three-fighter/p/15293310.html">分布式必备理论基础：CAP和BASE</a></p><h2 id="有了解过哪些一致性协议？Poxos、ZAB、raft协议有了解？有了解过gossip协议？"><a href="#有了解过哪些一致性协议？Poxos、ZAB、raft协议有了解？有了解过gossip协议？" class="headerlink" title="有了解过哪些一致性协议？Poxos、ZAB、raft协议有了解？有了解过gossip协议？"></a>有了解过哪些一致性协议？Poxos、ZAB、raft协议有了解？有了解过gossip协议？</h2><h3 id="一致性协议"><a href="#一致性协议" class="headerlink" title="一致性协议"></a>一致性协议</h3><p>顾名思义，一致性协议的应用是为了维护各节点数据的一致性，换句话说，就是使集群里的节点存储的数据是一模一样的。那么这样的技术，在现实生活中真的迫切需要嘛？其实这样的需求从古至今一直存在，这里我们举个趣味性的例子，可能很多人知道拜占庭将军问题，古时候东罗马帝国幅员辽阔，各个将军掌管各自的军队分散在帝国各处，他们之间靠信差交流。当东罗马帝国遭遇战争，将军们需要联合起来才能打倒敌方军队。这个时候将军们需要对最基本的进攻还是撤退达成一致。如果一齐进攻，他们能打倒敌人，如果一齐撤退，他们还有机会东山再起。此时将军们派出各自的信差去传达指令。那么帝国里有那么多将军，大家如何达成一致？最简单的，指派一个上将军，大家都听他的命令就好。那么上将军将怎么安排自己的信使？如果信使路上遇到了危险不幸逝去，那么长时间等不来回信的上将军该怎么处理？如果不幸逝世的是上将军怎么办？如果上将军是敌方间谍，专门传递虚假消息怎么办？比如间谍上将军对A将军传达撤退命令，对B将军传达进攻命令，那么最终只有B将军进攻，B就会全军覆没！这些情况其实都真实反映一致性协议需要考虑的种种问题。</p><p>一致性协议可以有多种分类方法，可以从单主和多主的角度对协议进行分类。单主协议，即整个分布式集群中只存在一个主节点，采用这个思想的主要有2PC, Paxos, Raft等. 另一类是多主协议，即整个集群中不只存在一个主节点，Pow协议以及著名的Gossip协议。</p><p>单主协议由一个主节点发出数据，传输给其余从节点，能保证数据传输的有序性。而多主协议则是从多个主节点出发传输数据，传输顺序具有随机性，因而数据的有序性无法得到保证，只保证最终数据的一致性。这是单主协议和多主协议之间最大的区别。单主协议中具有代表性的为Paxos, Raft两大协议，多主协议中具有代表性的为Gossip和Pow协议。</p><h3 id="Gossip协议"><a href="#Gossip协议" class="headerlink" title="Gossip协议"></a>Gossip协议</h3><p>Gossip又被称为流行病算法，它与流行病毒在人群中传播的性质类似，由初始的几个节点向周围互相传播，到后期的大规模互相传播，最终达到一致性。Gossip协议被广泛应用于P2P网络，同时一些分布式的数据库，如Redis集群的消息同步使用的也是Gossip协议，另一个重大应用是被用于比特币的交易信息和区块信息的传播。</p><p>Gossip协议的整体流程非常简单，初始由几个节点发起消息，这几个节点会将消息的更新内容告诉自己周围的节点，收到消息的节点再将这些信息告诉周围的节点。依照这种方式，获得消息的节点会越来越多，总体消息的传输规模会越来越大，消息的传偶速度也越来越快。虽然不是每个节点都能在相同的时间达成一致，但是最终集群中所有节点的信息必然是一致的。Gossip协议确保的是分布式集群的最终一致性。</p><h3 id="Proof-of-work（Pow）算法与比特币"><a href="#Proof-of-work（Pow）算法与比特币" class="headerlink" title="Proof-of-work（Pow）算法与比特币"></a>Proof-of-work（Pow）算法与比特币</h3><p>Proof-of-work算法又被称为Pow算法，其实从这个算法的名称中我们能对它实现的功能窥见一二，工作量证明算法，那是否意味着工作量较大的某一个节点能够获得主动权呢？事实也是类似这个原理，大量的节点参与竞争，通过自身的工作量大小来证明自己的能力，最终能力最大的节点获得优胜，其他节点的信息需要与该节点统一。Pow最为人所熟知的应用是比特币。下面就以比特币为例具体讲解该算法。</p><p>我们知道，比特币塑造的是一个去中心化的交易平台，最重要的一点就是该平台的可信度。要达到高可信度，要求整个系统中没有固定的leader，且为了防止外界篡改，必然要设定一些特殊的机制，比如让图谋不轨的一方无法篡改或者必须付出与收获完全不等称的代价才有修改的可能，以这样的方式打消其修改的念头。这时候比特币引入了Pow算法，在Pow机制下，所有参与者共同求解数学问题，这些数学问题往往需要经过大量枚举才能求解，因此需要参与者消耗大量的硬件算力。成功求解数学问题的参与者将获得记账权，并获得比特币作为奖励。其余所有参与者需要保持和获得记账权节点的区块一致，由此达到最终的一致性。</p><p>依靠Pow算法，比特币很大程度保证了交易平台的安全性。因为如果要对该平台的数据进行篡改或者毁坏，篡改者至少需要获得比特币全网一半以上的算力，这是非常难以达到的。但是同样Pow存在很多缺点，Pow达成一致性的速度很慢，应用在比特币中每秒钟只能做成7笔交易，这在大部分的商业应用中都是达不到要求的。其次Pow造成了很大的资源浪费。所有的竞争者夺取记账权需要付出巨大的硬件算力，这在背后是大量的硬件成本、电力损耗，而一旦记账权确定，其余没有获得记账权的节点的算力等于白白浪费。最后是现在出现了一些大规模的专业矿场，这些矿场的算力非常强大，它们的存在增大了平台被篡改的可能性。</p><p>在比特币的应用中，使用Pow算法确定竞争者的记账权，尽可能地解决”拜占庭将军”问题，再将可信的结果由传播速度极强，节点数目量大的Gossip协议去进行传输，最终达成全网一致，可谓很好地利用这两大算法的特点，将二者优劣互补并巧妙地用于区块链领域。</p><h3 id="Paxos协议"><a href="#Paxos协议" class="headerlink" title="Paxos协议"></a>Paxos协议</h3><p>有点绕，没细看。</p><p>Paxos是非常经典的一致性协议，但是因为过于理论化，难以直接工程化，因此工业界出现了诸多基于Paxos思想出发的变种。虽然这些变种最终很多都和原始的Paxos有比较大的差距，甚至完全演变成了新的协议，但是作为奠基者的Paxos在分布式一致性协议中依然持有不可撼动的地位。</p><h3 id="Raft协议"><a href="#Raft协议" class="headerlink" title="Raft协议"></a>Raft协议</h3><p>Raft的核心思想和Paxos是非常一致的，甚至可以说，Raft是基于Paxos的一种具体化实现和改进，它让一致性算法更容易为人所接受，更容易得到实现。</p><p>多个server进行选举拉票，当且仅当某一个candidate收到超过一半的server的票数时，它就成功当选了leader，并开始向每个server发送心跳信息。那么当选举成功后，整个集群进入log传输的状态。</p><h3 id="Zab"><a href="#Zab" class="headerlink" title="Zab"></a>Zab</h3><p>把节点分两种，Leader（主）和Follower（从）。 有一个主节点，所有写操作全部通过节点进行处理，如果一个从节点收到了一个写操作请求，就会转给主节点处理。 其他节点都是从节点，可以通过从节点进行读操作。 主节点通过选举得出，主节点失踪后，其他从节点自动开始选举新的主节点。应用于Zookeeper。</p><h3 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h3><p>比特币：在比特币的应用中，使用Pow算法确定竞争者的记账权，尽可能地解决”拜占庭将军”问题，再将可信的结果由传播速度极强，节点数目量大的Gossip协议去进行传输，最终达成全网一致，可谓很好地利用这两大算法的特点</p><p>redis：选主，Raft;消息传递，Gossip</p><p>zookeeper：Zab 是特别为 Zookeeper 设计的支持崩溃恢复的原子广播协议，在 Zookeeper 中主要依赖 Zab 协议实现数据一致性，基于该协议，Zookeeper 实现了一种主备模型（Leader 与 Follower）的系统架构保证集群中各个副本之间的数据一致性。</p><p>参考：<br><a href="https://zhuanlan.zhihu.com/p/130974371">分布式一致性协议概述</a><br><a href="https://www.jianshu.com/p/71b2729d3004">几种常见的分布式一致性协议介绍</a><br><a href="https://juejin.cn/post/7001070049200963621">Zookeeper的Zab协议详解</a></p><h2 id="一致性hash算法了解么？"><a href="#一致性hash算法了解么？" class="headerlink" title="一致性hash算法了解么？"></a>一致性hash算法了解么？</h2><p>传统hash算法，在分布式存储环境下，如果增加或者减少节点，大量key需要重新hash，导致大量key需要迁移</p><p>一致性哈希是将整个哈希值空间组织成一个虚拟的圆环，如假设哈希函数H的值空间为0-2^32-1（哈希值是32位无符号整形），将存储节点和key都映射到hash环上的某个位置，一个存储节点只需要管理一个区间的key，如果增加或者减少节点，则只要移动一小部分key，其他的key不用变。</p><p>当存储节点太少的时候，可能出现各节点的存储key不均衡的情况，所以后续出现了虚拟节点方案，在hash环上设置多个虚拟节点，这样可以保证数据在各个虚拟节点上大致分布均匀，然后将虚拟节点均匀的分配给各个实际的存储节点上即可。redis集群即采用了虚拟节点方案进行数据分配。</p><p>参考：<br><a href="https://juejin.cn/post/6844903750860013576">5分钟理解一致性哈希算法</a></p><h2 id="分布式锁的实现方案？"><a href="#分布式锁的实现方案？" class="headerlink" title="分布式锁的实现方案？"></a>分布式锁的实现方案？</h2><p>redis、zookeeper、数据库、consul、etcd都可以。</p><p>常用为redis，redis可以用setnx或者redisson里的锁，redisson里还有redlock，实现分布式锁的高可用</p><p>个人使用经验：<br>加锁：<br>先设定超时时间，循环调用String nx &#x3D; jedisCluster.set(key, “value”, “NX”, “EX”, seconds);直到返回“OK”,或者直到超时，key是锁的标志，value是加锁线程设置的uuid，不可重入<br>解锁：<br>基于lua脚本实现原子性，如果有key，且value是原来设置的uuid，则清理key并返回“OK”，否则返回0</p><p>基于redis的setnx的问题在于follower复制leader可能存在延迟，当leader挂掉，follower顶替时，可能导致锁丢失。替代方案可以考虑redlock或其他高可用方案。</p><p>参考：<br><a href="https://www.cnblogs.com/seesun2012/p/9214653.html">Java分布式锁看这篇就够了</a><br><a href="https://blog.csdn.net/qq_27753441/article/details/120844269">jedis setnx实现锁机制</a></p><h2 id="聊聊微服务治理，分别涉及到哪些方面？你们系统在高可靠上采取了哪些措施？应对高并发有什么方案？系统的监控运维和服务降级、熔断的方案是什么？"><a href="#聊聊微服务治理，分别涉及到哪些方面？你们系统在高可靠上采取了哪些措施？应对高并发有什么方案？系统的监控运维和服务降级、熔断的方案是什么？" class="headerlink" title="聊聊微服务治理，分别涉及到哪些方面？你们系统在高可靠上采取了哪些措施？应对高并发有什么方案？系统的监控运维和服务降级、熔断的方案是什么？"></a>聊聊微服务治理，分别涉及到哪些方面？你们系统在高可靠上采取了哪些措施？应对高并发有什么方案？系统的监控运维和服务降级、熔断的方案是什么？</h2><h3 id="可靠性与可用性"><a href="#可靠性与可用性" class="headerlink" title="可靠性与可用性"></a>可靠性与可用性</h3><p>Reliability和Availability分别对应可靠性和可用性, 这两个概念既有区别也有联系:</p><p>Reliability定义为一个服务连续无故障运行的时间，无故障运行的时间越长，可靠性就越高。<br>Availiability定义为在足够长的时间里，比如一年的时间里，一个服务可用的时间，服务可用时间越长越好。一般用可服务时间除于总时间算出一个百分比，用百分比作为度量。比如一个服务如果有5个9的可用性，指的就是一年里99.999%时间里服务都是可用的。<br>有两个极端的例子可以很好的说明这两个概念的区别:</p><p>假想一个服务，可靠性很高，平均来说可以稳定运行10年，但是一旦服务中断，要用一年的时间来恢复，那么它的可用性只有90%。<br>假想另一个服务，可靠性很差，运行10秒就会宕机，但是恢复服务只需要1ms, 那么它的可用性是99.99%</p><h3 id="微服务治理"><a href="#微服务治理" class="headerlink" title="微服务治理"></a>微服务治理</h3><p>服务注册与发现。<br>可观测性。包括 监控、日志、调用追踪，调用拓扑关系等。<br>安全。不同微服务承载自身独有的业务职责，对于业务敏感的微服务，需要网关对其他服务的访问进行认证与鉴权，也就是安全问题。<br>高可用。使用熔断限流降级等方式，来应对服务不可用带来的各种风险。</p><h3 id="具体方案"><a href="#具体方案" class="headerlink" title="具体方案"></a>具体方案</h3><p>熔断降级，hystrix<br>限流，springcloud gateway 默认令牌桶算法<br>监控，springboot+Prometheus+grafana监控。自研数据链路监控。<br>服务注册，spring cloud consul<br>安全，网关鉴权filter，token认证，接口认证，</p><p>参考：<br><a href="https://zhuanlan.zhihu.com/p/107282067">高可靠和高可用的区别</a><br><a href="https://blog.csdn.net/zhanghe_zht/article/details/108711078">微服务与服务治理</a></p><h2 id="如何做微服务的限流？常见的限流算法有哪些？漏桶算法和令牌桶算法的区别是什么？"><a href="#如何做微服务的限流？常见的限流算法有哪些？漏桶算法和令牌桶算法的区别是什么？" class="headerlink" title="如何做微服务的限流？常见的限流算法有哪些？漏桶算法和令牌桶算法的区别是什么？"></a>如何做微服务的限流？常见的限流算法有哪些？漏桶算法和令牌桶算法的区别是什么？</h2><p>springcloud gateway 默认令牌桶算法</p><p>漏桶可以一次缓存大量请求，但是打给后端的请求时匀速的；令牌桶可以快速把大量请求打给后台，峰值更高，但是不会超过令牌桶的容量，效率高。</p><p>参考：<br><a href="https://www.jianshu.com/p/063219c3c55a">令牌桶和漏桶区别总结</a></p><h2 id="聊聊你理解的resful框架，和rpc框架的区别？"><a href="#聊聊你理解的resful框架，和rpc框架的区别？" class="headerlink" title="聊聊你理解的resful框架，和rpc框架的区别？"></a>聊聊你理解的resful框架，和rpc框架的区别？</h2><p>RPC是以一种调用本地方法的思路来调用远程方法，通过各种RPC框架隐藏调用远程方法的细节，让用户以为调用的就是本地方法。RPC隐藏了底层网络通信的复杂度，让我们更专注于业务逻辑的开发。</p><p>REST通过HTTP实现，把用户的需求抽象成对资源的操作，用户必须通过HTTP协议的GET、HEAD、POST、PUT、DELETE、TRACE、OPTIONS七种基本操作去和服务器交互。</p><p>RPC通常是服务器组件之间的通信，比如和中间件的通信，MQ、分布式缓存、分布式数据库等等。</p><p>而REST通常是面向客户端的（一般是浏览器），他们的使用场景也是不一样的。</p><p>参考：<br><a href="https://www.zhihu.com/tardis/zm/art/426303359?source_id=1005">RPC和RESTful的区别</a></p><h2 id="常见的RPC框架有哪些？能否做个对比？"><a href="#常见的RPC框架有哪些？能否做个对比？" class="headerlink" title="常见的RPC框架有哪些？能否做个对比？"></a>常见的RPC框架有哪些？能否做个对比？</h2><p>多语言一般为gRPC、Thrift；java一般为Dubbo、Spring Cloud</p><p>GRPC主要就是搞了个ProtoBuf，然后采用HTTP协议，所以协议部分没有重复造轮子，重点就在ProtoBuf上。<br>Thrift的数据格式是用的现成的，没有单独搞一套，但是它在传输层和服务端全部是自己造轮子，所以可以对协议层、传输层有多种控制要求。<br>Thrift性能较高，更加灵活，支持语言多，但是文档较少；GRPC文档实例详细，比较节省网络带宽，功能少但是实现较好。</p><p>Dubbo需要基于zk构建远程调用，需要自己进行配置搭建；spring cloud则提供了完整的微服务生态体系，feign远程调用只是其中的一部分，一般更加推荐直接使用springcloud。</p><p>参考：<br><a href="https://zhuanlan.zhihu.com/p/458254270">RPC框架原理到选型：gRPC、Thrift、Dubbo、Spring Cloud</a></p><h2 id="Grpc框架的原理有了解？"><a href="#Grpc框架的原理有了解？" class="headerlink" title="Grpc框架的原理有了解？"></a>Grpc框架的原理有了解？</h2><p>序列化基于protobuffer，网络基于http2协议<br>基于proto协议生成多种语言的代码，然后基于生成代码进行远程调用。</p><p>参考：<br><a href="https://juejin.cn/post/7116490536373993480">玩转gRPC—深入概念与原理</a></p><h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://mp.weixin.qq.com/s/54_bMeUwjxk-8DHa90heNQ">微信公众号:我的IT技术路</a></p>]]></content>
     
     
     <categories>
       
-      <category>分布式</category>
+      <category>面试</category>
       
     </categories>
     
     
     <tags>
       
-      <tag>面试</tag>
+      <tag>分布式</tag>
       
     </tags>
     
@@ -63,14 +88,12 @@
     
     <categories>
       
-      <category>elasticsearch</category>
+      <category>面试</category>
       
     </categories>
     
     
     <tags>
-      
-      <tag>面试</tag>
       
       <tag>elasticsearch</tag>
       
@@ -115,14 +138,12 @@
     
     <categories>
       
-      <category>中间件</category>
+      <category>面试</category>
       
     </categories>
     
     
     <tags>
-      
-      <tag>面试</tag>
       
       <tag>kafka</tag>
       
@@ -142,14 +163,14 @@
     
     <categories>
       
-      <category>数据库</category>
+      <category>面试</category>
       
     </categories>
     
     
     <tags>
       
-      <tag>面试</tag>
+      <tag>mysql</tag>
       
     </tags>
     
@@ -319,14 +340,12 @@
     
     <categories>
       
-      <category>计算机网络</category>
+      <category>面试</category>
       
     </categories>
     
     
     <tags>
-      
-      <tag>面试</tag>
       
       <tag>计算机网络</tag>
       
@@ -346,14 +365,14 @@
     
     <categories>
       
-      <category>java</category>
+      <category>面试</category>
       
     </categories>
     
     
     <tags>
       
-      <tag>面试</tag>
+      <tag>jvm</tag>
       
     </tags>
     
@@ -523,14 +542,12 @@
     
     <categories>
       
-      <category>java</category>
+      <category>面试</category>
       
     </categories>
     
     
     <tags>
-      
-      <tag>面试</tag>
       
       <tag>多线程</tag>
       
@@ -550,14 +567,12 @@
     
     <categories>
       
-      <category>java</category>
+      <category>面试</category>
       
     </categories>
     
     
     <tags>
-      
-      <tag>面试</tag>
       
       <tag>多线程</tag>
       
@@ -602,14 +617,12 @@
     
     <categories>
       
-      <category>java</category>
+      <category>面试</category>
       
     </categories>
     
     
     <tags>
-      
-      <tag>面试</tag>
       
       <tag>多线程</tag>
       
@@ -629,14 +642,14 @@
     
     <categories>
       
-      <category>java</category>
+      <category>面试</category>
       
     </categories>
     
     
     <tags>
       
-      <tag>面试</tag>
+      <tag>java</tag>
       
     </tags>
     
