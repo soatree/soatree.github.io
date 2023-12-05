@@ -25,7 +25,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://soatree.github.io/2023/10/22/%E5%85%AB%E8%82%A1%E6%96%87-spring/Springmvc%E6%B5%81%E7%A8%8B.png">
 <meta property="article:published_time" content="2023-10-22T02:17:52.000Z">
-<meta property="article:modified_time" content="2023-11-06T14:29:38.488Z">
+<meta property="article:modified_time" content="2023-12-05T12:26:37.522Z">
 <meta property="article:author" content="胖树">
 <meta property="article:tag" content="spring">
 <meta name="twitter:card" content="summary_large_image">
@@ -222,7 +222,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          5.1k 字
+          7.5k 字
         
       </span>
     
@@ -233,7 +233,7 @@
         
         
         
-          43 分钟
+          63 分钟
         
       </span>
     
@@ -307,10 +307,10 @@
 <p>4.session：在一个HTTP Session中，一个bean定义对应一个实例。该作用域仅在基于web的Spring ApplicationContext情形下有效。</p>
 <p>5.global-session：在一个全局的HTTP Session中，一个bean定义对应一个实例。该作用域仅在基于web的Spring ApplicationContext情形下有效。</p>
 <p>参考：<br><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_46138725/article/details/106751203">解释Spring支持的几种bean的作用域？</a></p>
-<h2 id="BeanFactory和ApplicationContext有什么区别？BeanFactory和FactoryBean的区别？"><a href="#BeanFactory和ApplicationContext有什么区别？BeanFactory和FactoryBean的区别？" class="headerlink" title="BeanFactory和ApplicationContext有什么区别？BeanFactory和FactoryBean的区别？"></a>BeanFactory和ApplicationContext有什么区别？BeanFactory和FactoryBean的区别？</h2><h2 id="BeanFactory和ApplicationContext有什么区别"><a href="#BeanFactory和ApplicationContext有什么区别" class="headerlink" title="BeanFactory和ApplicationContext有什么区别"></a>BeanFactory和ApplicationContext有什么区别</h2><p>BeanFactory 接口提供了一种高级配置机制，能够管理任何类型的对象，它是SpringIoC容器标准化超接口！</p>
+<h2 id="BeanFactory和ApplicationContext有什么区别？BeanFactory和FactoryBean的区别？"><a href="#BeanFactory和ApplicationContext有什么区别？BeanFactory和FactoryBean的区别？" class="headerlink" title="BeanFactory和ApplicationContext有什么区别？BeanFactory和FactoryBean的区别？"></a>BeanFactory和ApplicationContext有什么区别？BeanFactory和FactoryBean的区别？</h2><h3 id="BeanFactory和ApplicationContext有什么区别"><a href="#BeanFactory和ApplicationContext有什么区别" class="headerlink" title="BeanFactory和ApplicationContext有什么区别"></a>BeanFactory和ApplicationContext有什么区别</h3><p>BeanFactory 接口提供了一种高级配置机制，能够管理任何类型的对象，它是SpringIoC容器标准化超接口！</p>
 <p>ApplicationContext 是 BeanFactory 的子接口。它扩展了以下功能：</p>
 <p>更容易与 Spring 的 AOP 功能集成<br>消息资源处理（用于国际化）<br>特定于应用程序给予此接口实现，例如Web 应用程序的 WebApplicationContext<br>简而言之， BeanFactory 提供了配置框架和基本功能，而 ApplicationContext 添加了更多特定于企业的功能。 ApplicationContext 是 BeanFactory 的完整超集！</p>
-<h2 id="FactoryBean和BeanFactory区别"><a href="#FactoryBean和BeanFactory区别" class="headerlink" title="FactoryBean和BeanFactory区别"></a>FactoryBean和BeanFactory区别</h2><p>**FactoryBean **是 Spring 中一种特殊的 bean，可以在 getObject() 工厂方法自定义的逻辑创建Bean！是一种能够生产其他 Bean 的 Bean。FactoryBean 在容器启动时被创建，而在实际使用时则是通过调用 getObject() 方法来得到其所生产的 Bean。因此，FactoryBean 可以自定义任何所需的初始化逻辑，生产出一些定制化的 bean。</p>
+<h3 id="FactoryBean和BeanFactory区别"><a href="#FactoryBean和BeanFactory区别" class="headerlink" title="FactoryBean和BeanFactory区别"></a>FactoryBean和BeanFactory区别</h3><p>**FactoryBean **是 Spring 中一种特殊的 bean，可以在 getObject() 工厂方法自定义的逻辑创建Bean！是一种能够生产其他 Bean 的 Bean。FactoryBean 在容器启动时被创建，而在实际使用时则是通过调用 getObject() 方法来得到其所生产的 Bean。因此，FactoryBean 可以自定义任何所需的初始化逻辑，生产出一些定制化的 bean。</p>
 <p>一般情况下，整合第三方框架，都是通过定义FactoryBean实现！！！</p>
 <p>BeanFactory 是 Spring 框架的基础，其作为一个顶级接口定义了容器的基本行为，例如管理 bean 的生命周期、配置文件的加载和解析、bean 的装配和依赖注入等。BeanFactory 接口提供了访问 bean 的方式，例如 getBean() 方法获取指定的 bean 实例。它可以从不同的来源（例如 Mysql 数据库、XML 文件、Java 配置类等）获取 bean 定义，并将其转换为 bean 实例。同时，BeanFactory 还包含很多子类（例如，ApplicationContext 接口）提供了额外的强大功能。</p>
 <p>总的来说，FactoryBean 和 BeanFactory 的区别主要在于前者是用于创建 bean 的接口，它提供了更加灵活的初始化定制功能，而后者是用于管理 bean 的框架基础接口，提供了基本的容器功能和 bean 生命周期管理。</p>
@@ -332,7 +332,22 @@
 <p>参考：<br><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1AP411s7D7/?spm_id_from=333.337.search-card.all.click&vd_source=3043528c37081b8aa126b17fd5b4a4c5">赵伟风老师SSM框架实战精讲</a></p>
 <h2 id="SpringMvc的控制器是不是单例模式-如果是-有什么问题-怎么解决？"><a href="#SpringMvc的控制器是不是单例模式-如果是-有什么问题-怎么解决？" class="headerlink" title="SpringMvc的控制器是不是单例模式,如果是,有什么问题,怎么解决？"></a>SpringMvc的控制器是不是单例模式,如果是,有什么问题,怎么解决？</h2><p>单例，实例变量的线程安全问题，可以用@Scope(“prototype”)改为多例的模式，或者实例变量用threadlocal变量。</p>
 <p>参考：<br><a target="_blank" rel="noopener" href="https://blog.csdn.net/xcb425/article/details/104423741">SpringMVC控制器是不是单例模式</a></p>
-<h2 id="了解Springboot吗？那讲一下Springboot的启动流程吧"><a href="#了解Springboot吗？那讲一下Springboot的启动流程吧" class="headerlink" title="了解Springboot吗？那讲一下Springboot的启动流程吧"></a>了解Springboot吗？那讲一下Springboot的启动流程吧</h2><h2 id="讲一讲Spring和Springboot的区别"><a href="#讲一讲Spring和Springboot的区别" class="headerlink" title="讲一讲Spring和Springboot的区别"></a>讲一讲Spring和Springboot的区别</h2><h2 id="Springboot的如何去掉不用的配置，springboot不是开箱即用么？怎么把不要的配置去掉呢？"><a href="#Springboot的如何去掉不用的配置，springboot不是开箱即用么？怎么把不要的配置去掉呢？" class="headerlink" title="Springboot的如何去掉不用的配置，springboot不是开箱即用么？怎么把不要的配置去掉呢？"></a>Springboot的如何去掉不用的配置，springboot不是开箱即用么？怎么把不要的配置去掉呢？</h2><h2 id="hystrix的隔离策略和zuul的功能是？"><a href="#hystrix的隔离策略和zuul的功能是？" class="headerlink" title="hystrix的隔离策略和zuul的功能是？"></a>hystrix的隔离策略和zuul的功能是？</h2><h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/54_bMeUwjxk-8DHa90heNQ">微信公众号:我的IT技术路</a></p>
+<h2 id="了解Springboot吗？那讲一下Springboot的启动流程吧"><a href="#了解Springboot吗？那讲一下Springboot的启动流程吧" class="headerlink" title="了解Springboot吗？那讲一下Springboot的启动流程吧"></a>了解Springboot吗？那讲一下Springboot的启动流程吧</h2><p>初始化信息<br>发布启动等事件，方便外部拓展，读取环境配置信息（把几个配置文件都扫一遍）<br>实例化一个上下文<br>准备上下文<br>ioc容器加载<br>解析启动类，加载自动配置类<br>创建内嵌服务器 </p>
+<p>参考：<br><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1Ya4y1X7f8/?spm_id_from=333.337.search-card.all.click&vd_source=793c112b5e899b88da1862d5817dd942">小米二面：你知道SpringBoot项目是如何启动的吗？</a></p>
+<h2 id="讲一讲Spring和Springboot的区别"><a href="#讲一讲Spring和Springboot的区别" class="headerlink" title="讲一讲Spring和Springboot的区别"></a>讲一讲Spring和Springboot的区别</h2><p>springboot 自动导依赖，自动版本仲裁，自动扫包（主程序所在包及其子包），自动配置，自动导入组件</p>
+<p>自动配置流程细节梳理：<br>1、导入starter-web：导入了web开发场景<br>● 1、场景启动器导入了相关场景的所有依赖：starter-json、starter-tomcat、springmvc<br>● 2、每个场景启动器都引入了一个spring-boot-starter，核心场景启动器。<br>● 3、核心场景启动器引入了spring-boot-autoconfigure包。<br>● 4、spring-boot-autoconfigure里面囊括了所有场景的所有配置。<br>● 5、只要这个包下的所有类都能生效，那么相当于SpringBoot官方写好的整合功能就生效了。<br>● 6、SpringBoot默认却扫描不到 spring-boot-autoconfigure下写好的所有配置类。（这些配置类给我们做了整合操作），默认只扫描主程序所在的包。<br>2、主程序：@SpringBootApplication<br>● 1、@SpringBootApplication由三个注解组成@SpringBootConfiguration、@EnableAutoConfiguratio、@ComponentScan<br>● 2、SpringBoot默认只能扫描自己主程序所在的包及其下面的子包，扫描不到 spring-boot-autoconfigure包中官方写好的配置类<br>● 3、@EnableAutoConfiguration：SpringBoot 开启自动配置的核心。<br>  ○ 1. 是由@Import(AutoConfigurationImportSelector.class)提供功能：批量给容器中导入组件。<br>  ○ 2. SpringBoot启动会默认加载 142个配置类。<br>  ○ 3. 这142个配置类来自于spring-boot-autoconfigure下 META-INF&#x2F;spring&#x2F;org.springframework.boot.autoconfigure.AutoConfiguration.imports文件指定的<br>  ○ 项目启动的时候利用 @Import 批量导入组件机制把 autoconfigure 包下的142 xxxxAutoConfiguration类导入进来（自动配置类）<br>  ○ 虽然导入了142个自动配置类<br>● 4、按需生效：<br>  ○ 并不是这142个自动配置类都能生效<br>  ○ 每一个自动配置类，都有条件注解@ConditionalOnxxx，只有条件成立，才能生效<br>3、xxxxAutoConfiguration自动配置类<br>● 1、给容器中使用@Bean 放一堆组件。<br>● 2、每个自动配置类都可能有这个注解@EnableConfigurationProperties(ServerProperties.class)，用来把配置文件中配的指定前缀的属性值封装到 xxxProperties属性类中<br>● 3、以Tomcat为例：把服务器的所有配置都是以server开头的。配置都封装到了属性类中。<br>● 4、给容器中放的所有组件的一些核心参数，都来自于xxxProperties。xxxProperties都是和配置文件绑定。<br>● 只需要改配置文件的值，核心组件的底层参数都能修改<br>4、写业务，全程无需关心各种整合（底层这些整合写好了，而且也生效了）</p>
+<p>核心流程总结：<br>1、导入starter，就会导入autoconfigure包。<br>2、autoconfigure 包里面 有一个文件 META-INF&#x2F;spring&#x2F;org.springframework.boot.autoconfigure.AutoConfiguration.imports,里面指定的所有启动要加载的自动配置类<br>3、@EnableAutoConfiguration 会自动的把上面文件里面写的所有自动配置类都导入进来。xxxAutoConfiguration 是有条件注解进行按需加载<br>4、xxxAutoConfiguration给容器中导入一堆组件，组件都是从 xxxProperties中提取属性值<br>5、xxxProperties又是和配置文件进行了绑定</p>
+<p>效果：导入starter、修改配置文件，就能修改底层行为。</p>
+<p>参考：<br><a target="_blank" rel="noopener" href="https://www.yuque.com/leifengyang/springboot3/vznmdeb4kgn90vrx#BDh5t">尚硅谷SpringBoot3全栈指南</a></p>
+<h2 id="实现一个springbootstarter"><a href="#实现一个springbootstarter" class="headerlink" title="实现一个springbootstarter"></a>实现一个springbootstarter</h2><p>具体不展开实践了，原理如同上述的自动配置流程，具体案例可以参考：<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/353561846">手把手教你手写一个最简单的 Spring Boot Starter</a></p>
+<p>参考：<br><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/353561846">手把手教你手写一个最简单的 Spring Boot Starter</a></p>
+<h2 id="Springboot的如何去掉不用的配置，springboot不是开箱即用么？怎么把不要的配置去掉呢？"><a href="#Springboot的如何去掉不用的配置，springboot不是开箱即用么？怎么把不要的配置去掉呢？" class="headerlink" title="Springboot的如何去掉不用的配置，springboot不是开箱即用么？怎么把不要的配置去掉呢？"></a>Springboot的如何去掉不用的配置，springboot不是开箱即用么？怎么把不要的配置去掉呢？</h2><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs typescript"><span class="hljs-meta">@SpringBootApplication</span>(excludeName = &#123;<span class="hljs-string">&quot;org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration&quot;</span>&#125;)<br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">DemoApplication</span> &#123;<br> <br>	<span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-built_in">void</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"><span class="hljs-built_in">String</span>[] args</span>) &#123;<br>		<span class="hljs-title class_">SpringApplication</span>.<span class="hljs-title function_">run</span>(<span class="hljs-title class_">DemoApplication</span>.<span class="hljs-property">class</span>, args);<br>	&#125;<br> <br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>在yml配置文件中添加排除配置</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs stylus">spring:<br>  autoconfigure:<br>    exclude: org<span class="hljs-selector-class">.springframework</span><span class="hljs-selector-class">.boot</span><span class="hljs-selector-class">.autoconfigure</span><span class="hljs-selector-class">.jdbc</span>.DataSourceAutoConfiguration<br></code></pre></td></tr></table></figure>
+
+<p>参考：<br><a target="_blank" rel="noopener" href="https://blog.csdn.net/shan_he_jin_xiu/article/details/109609215">排除不需要的自动配置类</a></p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/54_bMeUwjxk-8DHa90heNQ">微信公众号:我的IT技术路</a></p>
 
                 
               </div>
